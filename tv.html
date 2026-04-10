@@ -101,6 +101,28 @@ function reproducirFav(favIdx){
     elVideo.play().catch(function(e){log('Toca para reproducir');});
 }
 
+function playStream(startIdx){
+    var trial=0;
+    var maxTrials=5;
+    function tryNext(){
+        if(trial>=maxTrials){log('Sin stream válido');elVideo.style.display='none';elMenu.style.display='flex';return;}
+        var s=streams[startIdx+trial];
+        if(!s){log('Sin más opciones');elVideo.style.display='none';elMenu.style.display='flex';return;}
+        log('Probando '+(trial+1)+': '+s.title.substring(0,25));
+        elVideo.dataset.idx=startIdx+trial;
+        elVideo.src=s.url;
+        elVideo.play().then(function(){
+            log('✓ '+s.title.substring(0,30));
+        }).catch(function(){
+            trial++;log('Error, tentando...');setTimeout(tryNext,800);
+        });
+    }
+    elVideo.style.display='block';
+    elMenu.style.display='none';
+    elVideo.onerror=function(){trial++;setTimeout(tryNext,500);};
+    tryNext();
+}
+
 function buscar(){
     if(!txt.trim())return;
     log('Buscando...');
@@ -134,8 +156,12 @@ function mostrar(data,more){
     if(!data||data.length===0){log('Sin resultados');return;}
     log(data.length+' streams'+(more?' - MAS':' - FIN'));
     for(var i=0;i<data.length;i++){
+        var t=data[i].title||'';
+        var label='';
+        if(/1080|hd|full/i.test(t)){label=' [HD]';}
+        else if(/720|480|sd/i.test(t)){label=' [SD]';}
         var o=document.createElement('option');
-        o.value=i;o.text=(i+1)+'. '+data[i].title.substring(0,65);
+        o.value=i;o.text=(i+1)+'. '+t.substring(0,60)+label;
         elSel.appendChild(o);
     }
 }
@@ -144,8 +170,12 @@ function appendStreams(data,more){
     hasMore=more;
     if(!data||data.length===0){log('Fin de resultados');return;}
     for(var i=0;i<data.length;i++){
+        var t=data[i].title||'';
+        var label='';
+        if(/1080|hd|full/i.test(t)){label=' [HD]';}
+        else if(/720|480|sd/i.test(t)){label=' [SD]';}
         var o=document.createElement('option');
-        o.value=streams.length;o.text=(streams.length+1)+'. '+data[i].title.substring(0,65);
+        o.value=streams.length;o.text=(streams.length+1)+'. '+t.substring(0,55)+label;
         elSel.appendChild(o);
         streams.push(data[i]);
     }
@@ -158,6 +188,15 @@ document.addEventListener('keydown',function(e){
         if(key==='Escape'){
             elVideo.pause();elVideo.style.display='none';elMenu.style.display='flex';log('Cerrado');
         }else if(key===' '){e.preventDefault();elVideo.paused?elVideo.play():elVideo.pause();}
+        else if(key==='ArrowRight'){
+            e.preventDefault();
+            var next=parseInt(elVideo.dataset.idx)+1;
+            if(next<streams.length){playStream(next);}else{log('Fin lista');}
+        }else if(key==='ArrowLeft'){
+            e.preventDefault();
+            var prev=parseInt(elVideo.dataset.idx)-1;
+            if(prev>=0){playStream(prev);}else{log('Inicio lista');}
+        }
         return;
     }
     if(key==='ArrowDown'){
@@ -179,20 +218,7 @@ document.addEventListener('keydown',function(e){
         if(mode==='favorites'&&favorites[idx]){reproducirFav(idx);}
         else if(mode==='search'&&txt.length>0){
             if(idx>=0&&streams[idx]){
-                log('Reproduciendo: '+streams[idx].title.substring(0,30));
-                elVideo.dataset.idx=idx;
-                elVideo.src=streams[idx].url;
-                elVideo.style.display='block';
-                elMenu.style.display='none';
-                elVideo.onerror=function(){
-                    var nextIdx=parseInt(elVideo.dataset.idx)+1;
-                    if(nextIdx<streams.length){log('Error, siguiente...');setTimeout(function(){
-                        elVideo.dataset.idx=nextIdx;
-                        elVideo.src=streams[nextIdx].url;
-                        elVideo.play();
-                    },1500);}else{log('Sin opciones');}
-                };
-                elVideo.play().catch(function(e){log('Toca para reproducir');});
+                playStream(idx);
             }else{setMode('search');buscar();}
         }
     }else if(key==='Backspace'){
