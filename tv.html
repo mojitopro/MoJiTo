@@ -1,92 +1,220 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Streaming Platform</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: black;
-            color: white;
-        }
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-        }
-        h1 {
-            color: cyan;
-            text-align: center;
-        }
-        .video-player {
-            width: 100%;
-            max-width: 720px;
-            height: auto;
-            background: linear-gradient(135deg, #00ffff, #ff00ff);
-            border: 1px solid white;
-            border-radius: 10px;
-            position: relative;
-        }
-        /* Media Queries for Responsive Design */
-        @media (max-width: 600px) {
-            .container {
-                flex-direction: column;
-                padding: 10px;
-            }
-        }
-        @media (min-width: 601px) and (max-width: 1280px) {
-            .container {
-                flex-direction: row;
-                padding: 20px;
-            }
-        }
-        /* Neon Aesthetic */
-        .neon {
-            text-shadow: 0 0 10px cyan,
-                         0 0 20px cyan,
-                         0 0 30px magenta,
-                         0 0 40px magenta;
-        }
-    </style>
+<meta charset="utf-8">
+<title>SŌF TV</title>
+<style>
+*{margin:0;padding:0}
+html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial}
+#video{width:100%;height:100%;position:fixed;top:0;left:0;display:none;background:#000}
+#menu{padding:30px;height:100%;display:flex;flex-direction:column}
+h1{color:#ff0040;font-size:48px;margin-bottom:30px;text-shadow:0 0 10px rgba(255,0,64,0.5)}
+#in.focused{border-color:#ff0040;box-shadow:0 0 15px rgba(255,0,64,0.3)}
+#msg{font-size:24px;padding:20px;color:#ff0040;min-height:30px}
+.error{color:#ff0040}
+.info{color:#ff0040}
+.hidden{display:none}
+#qm{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:200;flex-direction:column;justify-content:center;align-items:center}
+#qm.show{display:flex}
+#qm h2{color:#ff0040;font-size:40px;margin-bottom:40px;text-shadow:0 0 10px rgba(255,0,64,0.5)}
+#qm p{color:#666;font-size:28px;padding:15px}
+select{font-size:20px;width:100%;padding:15px;background:#0a0a0a;color:#ff0040;border:1px solid #330011;margin-top:20px;height:300px}
+option{background:#0a0a0a;color:#aaa;padding:10px}
+option:checked,option:focus,option:selected{background:#330011;color:#ff0040}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="neon">Welcome to Our Streaming Platform</h1>
-        <div class="video-player">
-            <video id="videoElement" width="720" controls>
-                <source src="movie.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-        <div class="metadata">
-            <p id="streamMetadata">Stream: Example Stream</p>
-            <p id="qualityIndicator">Quality: 1080p</p>
-            <p id="progressTracking">Progress: <span id="progress">0%</span></p>
-        </div>
-        <div class="controls">
-            <button onclick="playVideo()">Play</button>
-            <button onclick="pauseVideo()">Pause</button>
-        </div>
-    </div>
-    <script>
-        // Video Controls
-        const video = document.getElementById('videoElement');
-        function playVideo() {
-            video.play();
+
+<video id="video" controls></video>
+
+<div id="qm">
+<h2>SŌF CONTROL</h2>
+<p>▶ ENTER: siguiente</p>
+<p>◀ FLECHA ARRIBA: anterior</p>
+<p>⏯ ESPACIO: play/pause</p>
+<p>❌ ESC: cerrar</p>
+</div>
+
+<div id="menu">
+<h1>SŌF TV</h1>
+<div id="in">Escribe el canal...</div>
+<button id="more" style="display:none;margin-top:10px;padding:10px 20px;background:#ff0040;border:none;color:#fff;cursor:pointer;">MAS STREAMS (+20)</button>
+<div id="msg" class="info">↑↓ navegar | ENTER reproducir</div>
+<select id="results" size="10" class="hidden"></select>
+</div>
+
+<script>
+var BASE=window.location.protocol+'//'+window.location.host;
+var API=BASE+'/api/search';
+var streams=[];
+var favorites=[];
+var idx=0;
+var txt='';
+var mode='search';
+var currentPage=1;
+var hasMore=false;
+var isLoading=false;
+var elIn=document.getElementById('in');
+var elSel=document.getElementById('results');
+var elMsg=document.getElementById('msg');
+var elMenu=document.getElementById('menu');
+var elVideo=document.getElementById('video');
+
+function log(m,t){elMsg.textContent=m;elMsg.className=t||'info'}
+
+function renderIn(){elIn.textContent=txt||'Escribe el canal...';}
+
+function setMode(m){mode=m;if(m==='search'){elIn.classList.add('focused');elSel.classList.add('hidden');}else{elIn.classList.remove('focused');elSel.classList.remove('hidden');}}
+
+function showFavorites(){
+    mode='favorites';
+    elSel.innerHTML='';elSel.classList.remove('hidden');
+    if(favorites.length===0){log('Sin favoritos');return;}
+    for(var i=0;i<favorites.length;i++){
+        var o=document.createElement('option');
+        o.value=i;o.text='★ '+favorites[i].title.substring(0,60);
+        elSel.appendChild(o);
+    }
+    idx=0;elSel.selectedIndex=0;
+    log(favorites.length+' favoritos');
+}
+
+function addFavorite(){
+    var s=streams[idx];if(!s)return;
+    for(var i=0;i<favorites.length;i++){if(favorites[i].url===s.url)return;}
+    favorites.push({title:s.title,url:s.url});
+    log('★ Guardado: '+s.title.substring(0,20));
+}
+
+function reproducirFav(favIdx){
+    var f=favorites[favIdx];if(!f)return;
+    log('Reproduciendo: '+f.title.substring(0,30));
+    elVideo.dataset.idx=favIdx;
+    elVideo.src=f.url;
+    elVideo.style.display='block';
+    elMenu.style.display='none';
+    elVideo.onerror=function(){
+        var nextIdx=parseInt(elVideo.dataset.idx)+1;
+        if(nextIdx<favorites.length){log('Error, siguiente...');setTimeout(function(){reproducirFav(nextIdx)},1500);}
+        else{log('Sin opciones');}
+    };
+    elVideo.play().catch(function(e){log('Toca para reproducir');});
+}
+
+function buscar(){
+    if(!txt.trim())return;
+    log('Buscando...');
+    elSel.innerHTML='';streams=[];currentPage=1;
+    loadPage(1);
+}
+
+function loadPage(page){
+    if(isLoading)return;
+    isLoading=true;
+    log('Cargando...');
+    var x=new XMLHttpRequest();
+    x.open('GET',API+'?q='+encodeURIComponent(txt)+'&page='+page,true);
+    x.onload=function(){
+        isLoading=false;
+        if(x.status===200){
+            try{
+                var data=JSON.parse(x.responseText);
+                if(page===1){mostrar(data.streams||[], data.hasMore);}
+                else{appendStreams(data.streams||[], data.hasMore);}
+            }catch(e){log('Error');}
         }
-        function pauseVideo() {
-            video.pause();
+    };
+    x.onerror=function(){isLoading=false;log('Sin conexion');};
+    x.send();
+}
+
+function mostrar(data,more){
+    streams=data;idx=-1;hasMore=more;
+    elSel.innerHTML='';elSel.classList.remove('hidden');
+    if(!data||data.length===0){log('Sin resultados');return;}
+    log(data.length+' streams'+(more?' - MAS':' - FIN'));
+    for(var i=0;i<data.length;i++){
+        var o=document.createElement('option');
+        o.value=i;o.text=(i+1)+'. '+data[i].title.substring(0,65);
+        elSel.appendChild(o);
+    }
+}
+
+function appendStreams(data,more){
+    hasMore=more;
+    if(!data||data.length===0){log('Fin de resultados');return;}
+    for(var i=0;i<data.length;i++){
+        var o=document.createElement('option');
+        o.value=streams.length;o.text=(streams.length+1)+'. '+data[i].title.substring(0,65);
+        elSel.appendChild(o);
+        streams.push(data[i]);
+    }
+    log(streams.length+' streams'+(hasMore?' - MAS':' - FIN'));
+}
+
+document.addEventListener('keydown',function(e){
+    var key=e.key;
+    if(elVideo.style.display==='block'){
+        if(key==='Escape'){
+            elVideo.pause();elVideo.style.display='none';elMenu.style.display='flex';log('Cerrado');
+        }else if(key===' '){e.preventDefault();elVideo.paused?elVideo.play():elVideo.pause();}
+        return;
+    }
+    if(key==='ArrowDown'){
+        e.preventDefault();
+        if(mode==='search'&&txt.length>0){
+            if(idx<streams.length-1){idx++;elSel.value=idx;elSel.selectedIndex=idx;log(streams[idx].title.substring(0,40));}
+        }else if(mode==='favorites'){
+            if(idx<favorites.length-1){idx++;elSel.value=idx;elSel.selectedIndex=idx;log(favorites[idx].title.substring(0,40));}
         }
-        // Search Functionality, Favorites Management can be added here
-        // Example:
-        // function searchVideo() {}
-        // function addToFavorites() {}
-        // Keyboard Navigation for TV can be implemented here
-    </script>
+    }else if(key==='ArrowUp'){
+        e.preventDefault();
+        if(mode==='search'&&txt.length>0){
+            if(idx>0){idx--;elSel.value=idx;elSel.selectedIndex=idx;log(streams[idx].title.substring(0,40));}
+        }else if(mode==='favorites'){
+            if(idx>0){idx--;elSel.value=idx;elSel.selectedIndex=idx;log(favorites[idx].title.substring(0,40));}
+        }
+    }else if(key==='Enter'){
+        e.preventDefault();
+        if(mode==='favorites'&&favorites[idx]){reproducirFav(idx);}
+        else if(mode==='search'&&txt.length>0){
+            if(idx>=0&&streams[idx]){
+                log('Reproduciendo: '+streams[idx].title.substring(0,30));
+                elVideo.dataset.idx=idx;
+                elVideo.src=streams[idx].url;
+                elVideo.style.display='block';
+                elMenu.style.display='none';
+                elVideo.onerror=function(){
+                    var nextIdx=parseInt(elVideo.dataset.idx)+1;
+                    if(nextIdx<streams.length){log('Error, siguiente...');setTimeout(function(){
+                        elVideo.dataset.idx=nextIdx;
+                        elVideo.src=streams[nextIdx].url;
+                        elVideo.play();
+                    },1500);}else{log('Sin opciones');}
+                };
+                elVideo.play().catch(function(e){log('Toca para reproducir');});
+            }else{setMode('search');buscar();}
+        }
+    }else if(key==='Backspace'){
+        txt=txt.slice(0,-1);renderIn();idx=-1;elSel.innerHTML='';
+    }else if(key.length===1){
+        txt+=key;renderIn();
+    }else if(key==='F1'){
+        e.preventDefault();document.getElementById('qm').classList.toggle('show');
+    }else if(key==='f'||key==='F'){
+        if(mode==='search'&&streams[idx]){addFavorite();}
+    }else if(key==='s'||key==='S'){
+        showFavorites();
+    }else if(key==='Home'){
+        txt='';renderIn();setMode('search');elSel.innerHTML='';idx=-1;
+    }else if(key==='PageDown'){
+        if(hasMore){currentPage++;loadPage(currentPage);}
+    }else if(key==='PageUp'){
+        if(currentPage>1){currentPage--;loadPage(currentPage);}
+    }
+});
+
+renderIn();
+</script>
 </body>
 </html>
