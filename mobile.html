@@ -6,42 +6,81 @@
 <title>MoJiTo - Móvil</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;background:#0a0a0a;color:#fff;font-family:-apple-system,BlinkMacSystemFont,sans-serif;overflow:hidden}
-#video{width:100%;height:100%;position:fixed;top:0;left:0;background:#000;object-fit:contain}
-#player{width:100%;height:56.25%;position:fixed;top:0;left:0;background:#000}
-#player.show{position:fixed;top:0;left:0;width:100%;height:100%;object-fit:contain;z-index:100}
-#main{width:100%;height:100%;display:flex;flex-direction:column;padding:60px 10px 10px;overflow-y:auto}
-.logo{font-size:24px;font-weight:bold;text-align:center;margin-bottom:15px}
-.logo b{color:#e74c3c}
-.logo span{color:#fff}
-#in{width:100%;padding:15px;font-size:18px;background:#1a1a1a;border:none;border-radius:10px;color:#fff;margin-bottom:10px;outline:none}
-#in::placeholder{color:#666}
-.list{list-style:none}
-.list li{padding:12px 15px;background:#1a1a1a;margin-bottom:8px;border-radius:8px;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow-ellipsis;color:#ccc}
-.list li:active{background:#2a2a2a}
-.list li.playing{background:#c0392b;color:#fff}
-.quality{float:right;color:#f39c12;font-size:12px}
-#msg{text-align:center;padding:10px;color:#666;font-size:14px}
+html,body{
+    width:100%;height:100%;
+    background:#0a0a0a;color:#fff;
+    font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+    overflow:hidden;
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+}
+#loading{
+    position:fixed;
+    top:0;left:0;
+    width:100%;height:100%;
+    background:rgba(0,0,0,0.9);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:999;
+}
+#loading img{width:80px;height:80px}
+#video{width:100%;height:100%;position:fixed;top:0;left:0;background:#000;object-fit:contain;display:none;z-index:100}
 #close{position:fixed;top:10px;right:10px;background:rgba(0,0,0,0.7);color:#fff;border:none;padding:10px 15px;border-radius:5px;font-size:14px;z-index:150;display:none}
 #close.show{display:block}
+#main{width:100%;height:100%;display:flex;flex-direction:column;padding:60px 10px 10px;overflow-y:auto;background:rgba(0,0,0,0.7)}
+.logo{font-size:24px;font-weight:bold;text-align:center;margin-bottom:15px}
+.logo b{color:#ff4757}
+.logo span{color:#fff}
+#in{width:100%;padding:15px;font-size:18px;background:#1a1a1a;border:1px solid #333;border-radius:10px;color:#fff;margin-bottom:10px;outline:none}
+#in:focus{border-color:#ff4757}
+#in::placeholder{color:#666}
+.quick{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px;justify-content:center}
+.quick div{padding:8px 12px;background:#1a1a1a;border:1px solid #333;border-radius:5px;color:#fff;font-size:12px}
+.quick div:active{background:#ff4757}
+.list{list-style:none}
+.list li{padding:12px 15px;background:#1a1a1a;margin-bottom:8px;border-radius:8px;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#ccc}
+.list li:active{background:#2a2a2a}
+.list li.selected{background:#ff4757;color:#fff}
+.quality{float:right;color:#f39c12;font-size:12px}
+#msg{text-align:center;padding:10px;color:#888;font-size:14px}
 </style>
 </head>
 <body>
 
+<div id="loading"><img src="https://media.tenor.com/AbV-jpB0r3gAAAAM/oiia-cat-shmoo.gif"></div>
 <video id="video" controls playsinline webkit-playsinline></video>
-
 <button id="close" onclick="closePlayer()">✕ Cerrar</button>
 
 <div id="main">
-<div class="logo"><b>MoJiTo</b> Móvil</div>
+<div class="logo"><b>MoJiTo</b> <span>Móvil</span></div>
 <input id="in" type="text" placeholder="Buscar canal..." autocomplete="off">
+<div class="quick">
+    <div onclick="quickSearch('adult swim')">adult swim</div>
+    <div onclick="quickSearch('cartoon network')">cartoon</div>
+    <div onclick="quickSearch('espn')">espn</div>
+    <div onclick="quickSearch('fox')">fox</div>
+</div>
 <div id="msg">Escribe y busca</div>
 <ul id="list" class="list"></ul>
 </div>
 
 <script>
-var API=location.protocol+'//'+location.host+'/api/search';
-var streams=[], txt='', loading=false;
+var API='/api/search';
+var streams=[], txt='', selectedIdx=-1;
+
+var fondos=[
+    "https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUydzlra2lxdzRuODd0YWRxOW9tNjI5OTV3a3phMmU0cHhkemwyemN2ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/XvWz0PY5c7PjjbZ1hZ/giphy.gif",
+    "https://media2.giphy.com/media/v1.Y2lkPTZjMDliOTUyOTdub3BieHQwdGF0OXM4YjQybWhoNm5xeTB2M3FlN3N5anUxejd4ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/uRxDeUFDWUx7frR8JB/giphy.gif",
+    "https://media2.giphy.com/media/v1.Y2lkPTZjMDliOTUyYTFhMTFlbGxub2UzZTgzODJkZnpoODd3YXBlc3pkbGxhcmpybWhhdSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/iWU4XWUNbsGZzqSNkP/giphy.gif"
+];
+
+function fondoRandom(){
+    var i=Math.floor(Math.random()*fondos.length);
+    document.body.style.backgroundImage="url('"+fondos[i]+"')";
+}
+fondoRandom();
 
 function q(t){
     if(/1080|4k/i.test(t))return' [HD]';
@@ -56,8 +95,10 @@ function showStreams(data){
     el.innerHTML='';
     if(!data.length){msg('Sin resultados');return;}
     streams=data;
+    selectedIdx=-1;
     data.forEach(function(s,i){
         var li=document.createElement('li');
+        li.id='li-'+i;
         li.innerHTML=s.title.substring(0,40)+'<span class="quality">'+q(s.title)+'</span>';
         li.onclick=function(){play(i);};
         el.appendChild(li);
@@ -68,28 +109,66 @@ function showStreams(data){
 function buscar(){
     if(!txt.trim())return;
     msg('Buscando...');
-    fetch(API+'?q='+encodeURIComponent(txt)).then(function(r){return r.json();}).then(function(d){
-        showStreams(d.streams);
-    }).catch(function(){msg('Error');});
+    
+    var x=new XMLHttpRequest();
+    x.open('GET',API+'?q='+encodeURIComponent(txt),true);
+    x.onreadystatechange=function(){
+        if(x.readyState===4 && x.status===200){
+            try{
+                var d=JSON.parse(x.responseText);
+                showStreams(d.streams||[]);
+            }catch(e){
+                msg('Error');
+            }
+        }
+    };
+    x.onerror=function(){msg('Error de red');};
+    x.send();
+}
+
+function quickSearch(q){
+    document.getElementById('in').value=q;
+    txt=q;
+    buscar();
 }
 
 function play(i){
     var s=streams[i];
     if(!s)return;
+    
+    var elLoad=document.getElementById('loading');
+    elLoad.style.display='flex';
+    msg('Cargando...');
+    
     var v=document.getElementById('video');
+    v.preload='auto';
     v.src=s.url;
-    v.classList.add('show');
-    document.getElementById('close').classList.add('show');
-    v.play().catch(function(){});
-    msg('Reproduciendo: '+s.title.substring(0,20));
+    
+    v.addEventListener('canplay', function onCanPlay(){
+        v.removeEventListener('canplay', onCanPlay);
+        setTimeout(function(){
+            elLoad.style.display='none';
+            v.style.display='block';
+            document.getElementById('close').classList.add('show');
+            v.play();
+            msg(s.title.substring(0,30));
+        }, 3000);
+    });
+    
+    v.addEventListener('error', function onError(){
+        v.removeEventListener('error', onError);
+        elLoad.style.display='none';
+        msg('Error al cargar');
+    });
 }
 
 function closePlayer(){
     var v=document.getElementById('video');
     v.pause();
     v.src='';
-    v.classList.remove('show');
+    v.style.display='none';
     document.getElementById('close').classList.remove('show');
+    msg('Escribe y busca');
 }
 
 document.getElementById('in').addEventListener('input',function(e){
