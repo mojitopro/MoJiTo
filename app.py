@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 from flask import Flask, request, jsonify, send_file
 import os
-import threading
+import time
+import traceback
 
 app = Flask(__name__)
 
@@ -31,12 +32,14 @@ def api_search():
             'Referer': 'https://searchtv.net/'
         })
         
+        time.sleep(1)
         scraper.get('https://searchtv.net/', timeout=15)
+        time.sleep(0.5)
         
         resp = scraper.get(f'https://searchtv.net/search/?query={urllib.parse.quote(q)}', timeout=15)
         
         if resp.status_code != 200:
-            return jsonify({'streams': []})
+            return jsonify({'streams': [], 'status': resp.status_code, 'text': resp.text[:100]})
         
         items = list(resp.json().keys())
         
@@ -74,7 +77,8 @@ def api_search():
         return jsonify({'streams': streams, 'hasMore': has_more})
         
     except Exception as e:
-        return jsonify({'streams': [], 'error': str(e)[:50]})
+        import traceback
+        return jsonify({'streams': [], 'error': str(e)[:50], 'trace': traceback.format_exc()[:100]})
 
 if __name__ == '__main__':
     print('SŌF TV - Fast HD Priority')
