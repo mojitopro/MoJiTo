@@ -5,98 +5,297 @@
 <title>SŌF MOJITO TV</title>
 <style>
 *{margin:0;padding:0}
-html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial}
-#video{width:100%;height:100%;position:fixed;top:0;left:0;display:none;background:#000}
-#menu{padding:50px 10px 0 10px;height:100%;display:flex;flex-direction:column;align-items:center}
-.logo{font-size:72px;font-weight:bold;text-align:center;line-height:1}
-.logo .sof{color:#8b0000;text-shadow:0 0 10px #ff0000,0 0 20px #8b0000}
-.logo .mojito{color:#dc143c;text-shadow:0 0 10px #ff0000,0 0 20px #dc143c}
-.logo .tv{color:#ff0000;font-size:32px;vertical-align:top;margin-left:5px;text-shadow:0 0 10px #ff0000}
-#in{font-size:32px;padding:20px;background:transparent;border:none;color:#666;text-align:center;margin-bottom:20px;outline:none}
-#in.focused{color:#aaa}
-#msg{font-size:20px;padding:15px;color:#8b0000;min-height:30px}
-.info{color:#dc143c}
-.error{color:#ff0000}
-.hidden{display:none}
-select{font-size:20px;width:100%;padding:15px;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;margin-top:20px;height:300px}
-option{background:#1a1a1a;color:#aaa;padding:12px}
+html,body{
+    width:100%;height:100%;
+    background:#000;color:#fff;
+    font-family:Arial;
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+}
+
+#video{
+    width:100%;height:100%;
+    position:fixed;top:0;left:0;
+    display:none;background:#000;
+    z-index:100;
+}
+
+#loading{
+    position:fixed;
+    top:0;left:0;
+    width:100%;height:100%;
+    background:#000;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:999;
+    font-size:18px;
+    color:#aaa;
+}
+
+#menu{
+    padding:50px 10px 0 10px;
+    min-height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    background:rgba(0,0,0,0.7);
+}
+
+.logo{
+    font-size:72px;
+    font-weight:bold;
+    text-align:center;
+    line-height:1
+}
+.logo .sof{color:#ff4757}
+.logo .mojito{color:#ff6b81}
+.logo .tv{
+    color:#fff;
+    font-size:32px;
+    vertical-align:top;
+    margin-left:5px;
+}
+
+#in-box{
+    font-size:32px;
+    padding:20px;
+    background:#111;
+    border:2px solid #333;
+    color:#777;
+    text-align:center;
+    margin-bottom:20px;
+    min-width:400px;
+    min-height:60px;
+}
+
+#in-box.active{
+    border-color:#ff4757;
+    color:#fff;
+    background:#222;
+}
+
+#msg{
+    font-size:20px;
+    padding:15px;
+    color:#ff4757;
+    min-height:30px
+}
+
+#results{
+    width:80%;
+    max-height:300px;
+    overflow-y:auto;
+    background:#111;
+    border:1px solid #333;
+    margin-top:20px;
+    display:none;
+}
+
+.result-item{
+    padding:12px;
+    color:#aaa;
+    border-bottom:1px solid #222;
+}
+
+.result-item.active{
+    background:#ff4757;
+    color:#fff;
+}
+
+.quick{
+    margin-top:15px;
+    text-align:center;
+}
+
+.quick div{
+    display:inline-block;
+    padding:8px 14px;
+    margin:6px;
+    background:#111;
+    border:1px solid #333;
+    color:#fff;
+    font-size:14px;
+}
+
+.quick div.active{
+    border-color:#ff4757;
+    color:#ff4757;
+    background:#222;
+}
 </style>
 </head>
 <body>
 
+<div id="loading"><img src="https://media.tenor.com/AbV-jpB0r3gAAAAM/oiia-cat-shmoo.gif" style="width:100px;height:100px"></div>
 <video id="video" controls></video>
 
 <div id="menu">
-<div class="logo"><span class="sof">SōF</span><span class="mojito"> MoJiTo</span><span class="tv"> TV</span></div>
-<div id="in">Escribe el canal...</div>
-<div id="msg" class="info">Escribe ybusca</div>
-<select id="results" size="10" class="hidden"></select>
+    <div class="logo">
+        <span class="sof">SōF</span>
+        <span class="mojito"> MoJiTo</span>
+        <span class="tv"> TV</span>
+    </div>
+    
+    <div id="in-box">Escribe el canal...</div>
+    
+    <div class="quick">
+        <div id="btn1">[ adult swim ]</div>
+        <div id="btn2">[ cartoon network ]</div>
+        <div id="btn3">[ espn ]</div>
+    </div>
+    
+    <div id="msg">Usa las flechas para navegar</div>
+    <div id="results"></div>
 </div>
 
 <script>
 var API='/api/search';
 var streams=[];
-var idx=0;
 var txt='';
-var elIn=document.getElementById('in');
-var elSel=document.getElementById('results');
-var elMsg=document.getElementById('msg');
-var elMenu=document.getElementById('menu');
-var elVideo=document.getElementById('video');
+var pos=0;
 
-function log(m){
-    elMsg.textContent=m;
+var fondos=[
+    "https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUydzlra2lxdzRuODd0YWRxOW9tNjI5OTV3a3phMmU0cHhkemwyemN2ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/XvWz0PY5c7PjjbZ1hZ/giphy.gif",
+    "https://media2.giphy.com/media/v1.Y2lkPTZjMDliOTUyOTdub3BieHQwdGF0OXM4YjQybWhoNm5xeTB2M3FlN3N5anUxejd4ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/uRxDeUFDWUx7frR8JB/giphy.gif",
+    "https://media2.giphy.com/media/v1.Y2lkPTZjMDliOTUyYTFhMTFlbGxub2UzZTgzODJkZnpoODd3YXBlc3pkbGxhcmpybWhhdSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/iWU4XWUNbsGZzqSNkP/giphy.gif"
+];
+
+function fondoRandom(){
+    var i=Math.floor(Math.random()*fondos.length);
+    document.body.style.backgroundImage="url('"+fondos[i]+"')";
 }
+fondoRandom();
+
+var elIn=document.getElementById('in-box');
+var elRes=document.getElementById('results');
+var elMsg=document.getElementById('msg');
+var elVideo=document.getElementById('video');
+var elLoad=document.getElementById('loading');
+var btns=[document.getElementById('btn1'),document.getElementById('btn2'),document.getElementById('btn3')];
+
+function log(m){elMsg.textContent=m}
 
 function renderIn(){
-    elIn.textContent=txt||'Escribe el canal...';
+    if(txt){
+        elIn.textContent=txt;
+    }else{
+        elIn.textContent='Escribe el canal...';
+    }
+}
+
+function setPos(p){
+    pos=p;
+    updateUI();
+}
+
+function updateUI(){
+    elIn.className='';
+    btns[0].className='';
+    btns[1].className='';
+    btns[2].className='';
+    
+    var items=elRes.getElementsByTagName('div');
+    for(var i=0;i<items.length;i++){
+        items[i].className='result-item';
+    }
+    
+    if(streams.length>0){
+        elRes.style.display='block';
+    }else{
+        elRes.style.display='none';
+    }
+    
+    if(pos===0){
+        elIn.className='active';
+    }else if(pos>=1 && pos<=3){
+        btns[pos-1].className='active';
+    }else if(pos>3 && streams.length>0){
+        var idx=pos-4;
+        var items=elRes.getElementsByTagName('div');
+        if(idx>=0 && idx<items.length){
+            items[idx].className='result-item active';
+            items[idx].scrollIntoView(false);
+        }
+    }
+}
+
+function quickSearch(q){
+    txt=q;
+    renderIn();
+    buscar();
+    setPos(0);
 }
 
 function playStream(i){
     var s=streams[i];
     if(!s)return;
+    
+    elLoad.style.display='flex';
     log('Cargando...');
+    
+    elVideo.preload='auto';
     elVideo.src=s.url;
-    elVideo.style.display='block';
-    elMenu.style.display='none';
-    elVideo.play();
-    log(s.title);
+    
+    elVideo.addEventListener('canplay', function onCanPlay(){
+        elVideo.removeEventListener('canplay', onCanPlay);
+        
+        setTimeout(function(){
+            elLoad.style.display='none';
+            elVideo.style.display='block';
+            document.getElementById('menu').style.display='none';
+            elVideo.play();
+            log(s.title);
+        }, 5000);
+    });
+    
+    elVideo.addEventListener('error', function onError(){
+        elVideo.removeEventListener('error', onError);
+        elLoad.style.display='none';
+        log('Error al cargar');
+    });
 }
 
 function buscar(){
     if(!txt.trim())return;
+    
     log('Buscando...');
-    elSel.innerHTML='';
+    elRes.innerHTML='';
     streams=[];
-    idx=0;
+    pos=0;
     
     var x=new XMLHttpRequest();
     x.open('GET',API+'?q='+encodeURIComponent(txt),true);
+    
     x.onreadystatechange=function(){
         if(x.readyState===4){
             if(x.status===200){
                 try{
                     var d=JSON.parse(x.responseText);
+                    
                     if(d.error){
                         log('Error: '+d.error);
                         return;
                     }
+                    
                     if(!d.streams||!d.streams.length){
                         log('Sin resultados');
-                        if(d.cached){
-                            log('Modo cache');
-                        }
                         return;
                     }
+                    
                     streams=d.streams;
-                    elSel.classList.remove('hidden');
+                    
                     for(var i=0;i<streams.length;i++){
-                        var opt=document.createElement('option');
-                        opt.value=i;
-                        opt.text=(i+1)+'. '+streams[i].title.substring(0,50);
-                        elSel.appendChild(opt);
+                        var div=document.createElement('div');
+                        div.textContent=(i+1)+'. '+streams[i].title.substring(0,50);
+                        elRes.appendChild(div);
                     }
-                    log(streams.length+' streams');
+                    
+                    log(streams.length+' streams - usa flechas');
+                    elIn.className='';
+                    setPos(4);
+                    
                 }catch(e){
                     log('Error parse');
                 }
@@ -105,61 +304,107 @@ function buscar(){
             }
         }
     };
+    
     x.send();
 }
 
 document.onkeydown=function(e){
     var k=e.key;
+    
     if(elVideo.style.display==='block'){
         if(k==='Escape'){
             elVideo.pause();
             elVideo.style.display='none';
-            elMenu.style.display='flex';
+            document.getElementById('menu').style.display='flex';
             log('Cerrado');
-        }else if(k==='ArrowRight'){
-            var n=idx+1;
-            if(n<streams.length)playStream(n);
-        }else if(k==='ArrowLeft'){
-            var p=idx-1;
-            if(p>=0)playStream(p);
         }
         return;
     }
-    if(k==='ArrowDown'){
-        if(idx<streams.length-1){
-            idx++;
-            elSel.value=idx;
-            log(streams[idx].title.substring(0,40));
-        }
-    }else if(k==='ArrowUp'){
-        if(idx>0){
-            idx--;
-            elSel.value=idx;
-            log(streams[idx].title.substring(0,40));
-        }
-    }else if(k==='Enter'){
-        if(idx>=0&&streams[idx]){
-            playStream(idx);
-        }else if(txt){
+    
+    if(k==='Enter'){
+        if(pos===0){
             buscar();
+        }else if(pos===1){
+            quickSearch('adult swim');
+        }else if(pos===2){
+            quickSearch('cartoon network');
+        }else if(pos===3){
+            quickSearch('espn');
+        }else if(pos>3 && streams.length>0){
+            var idx=pos-4;
+            if(idx>=0 && idx<streams.length){
+                playStream(idx);
+            }
         }
-    }else if(k==='Backspace'){
+        return;
+    }
+    
+    if(k==='ArrowRight'){
+        if(pos===0){
+            setPos(1);
+        }else if(pos===1){
+            setPos(2);
+        }else if(pos===2){
+            setPos(3);
+        }else if(pos>3 && pos<3+streams.length){
+            setPos(pos+1);
+        }
+        return;
+    }
+    
+    if(k==='ArrowLeft'){
+        if(pos===1){
+            setPos(0);
+        }else if(pos===2){
+            setPos(1);
+        }else if(pos===3){
+            setPos(2);
+        }else if(pos>4){
+            setPos(pos-1);
+        }
+        return;
+    }
+    
+    if(k==='ArrowDown'){
+        if(pos===0){
+            setPos(1);
+        }else if(pos>=1 && pos<=2){
+            setPos(pos+1);
+        }else if(pos===3){
+            if(streams.length>0){
+                setPos(4);
+            }
+        }else if(pos>=4 && pos<3+streams.length){
+            setPos(pos+1);
+        }
+        return;
+    }
+    
+    if(k==='ArrowUp'){
+        if(pos===1 || pos===2){
+            setPos(pos-1);
+        }else if(pos===3){
+            setPos(2);
+        }else if(pos>3){
+            setPos(pos-1);
+        }
+        return;
+    }
+    
+    if(k==='Backspace'){
         txt=txt.slice(0,-1);
         renderIn();
-        idx=-1;
-        elSel.innerHTML='';
-    }else if(k.length===1){
+        return;
+    }
+    
+    if(k.length===1){
         txt+=k;
         renderIn();
     }
 };
 
-elSel.onchange=function(){
-    idx=parseInt(elSel.value);
-    playStream(idx);
-};
-
 renderIn();
+setPos(0);
 </script>
 </body>
 </html>

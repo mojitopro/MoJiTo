@@ -1,73 +1,51 @@
-import urllib.parse
-import time
-import traceback
+import urllib, time
 
 SEARCHTV = "https://searchtv.net/"
-
 _scraper = None
 _last_error = None
-_last_scrape_time = None
-
-def init_scraper():
-    global _scraper
-    try:
-        import cloudscraper
-        _scraper = cloudscraper.create_scraper()
-        _scraper.get(SEARCHTV, timeout=10)
-    except Exception as e:
-        _scraper = None
-    return _scraper
 
 def get_scraper():
     global _scraper
     if _scraper is None:
-        return init_scraper()
-    return _scraper
+        try:
+            import cloudscraper
+            _scraper = cloudscraper.create_scraper()
+            _scraper.get(SEARCHTV, timeout=10)
+        except:
+            _scraper = False
+    return _scraper if _scraper else None
 
-def search(query, limit=20):
-    global _last_error, _last_scrape_time
-    
+def search(query, limit=20, offset=0):
+    global _last_error
     scraper = get_scraper()
-    result = {
-        'streams': [],
-        'status': 'ok',
-        'source': 'live',
-        'cached': False,
-        'results': 0
-    }
+    result = {'streams': [], 'status': 'ok', 'results': 0, 'total': 0}
     
-    if scraper is None:
-        _last_error = 'scraper not available'
+    if not scraper:
         result['status'] = 'error'
-        result['error'] = _last_error
+        result['error'] = 'scraper unavailable'
         return result
     
-    start_time = time.time()
-    
     try:
-        resp = scraper.get(f"{SEARCHTV}search/?query={urllib.parse.quote(query)}", timeout=10)
-        
+        resp = scraper.get(SEARCHTV + "search/?query=" + urllib.parse.quote(query), timeout=10)
         if resp.status_code != 200:
-            _last_error = f"HTTP {resp.status_code}"
             result['status'] = 'blocked'
-            result['error'] = _last_error
+            result['error'] = 'HTTP ' + str(resp.status_code)
             return result
         
         items = resp.json()
-        result['results'] = len(items)
-        _last_scrape_time = time.time() - start_time
+        result['total'] = len(items)
+        
+        all_items = list(items.items())
+        paginated = all_items[offset:offset+limit]
         
         streams = []
-        for item_id, info in list(items.items())[:limit]:
+        for item_id, info in paginated:
             try:
-                r = scraper.get(f"{SEARCHTV}stream/uuid/{item_id}/", timeout=3)
+                r = scraper.get(SEARCHTV + "stream/uuid/" + item_id + "/", timeout=3)
                 if 'EXTM3U' in r.text:
                     for line in r.text.strip().split('\n'):
                         if line.startswith('http'):
-                            streams.append({
-                                'url': line.strip(),
-                                'title': info.get('title', item_id)
-                            })
+                            streams.append({'url': line.strip(), 'title': info.get('title', item_id)})
                             break
             except:
                 pass
@@ -75,20 +53,15 @@ def search(query, limit=20):
         streams.sort(key=lambda x: 1 if '1080' in x['title'].lower() or 'hd' in x['title'].lower() else 2)
         result['streams'] = streams
         result['results'] = len(streams)
+        result['offset'] = offset
+        result['limit'] = limit
         
     except Exception as e:
         _last_error = str(e)[:50]
-        _last_trace = traceback.format_exc()[:100]
         result['status'] = 'error'
         result['error'] = _last_error
-        result['trace'] = _last_trace
-        result['duration'] = time.time() - start_time
     
     return result
 
 def get_status():
-    return {
-        'scraper_ready': _scraper is not None,
-        'last_error': _last_error,
-        'last_scrape_time': _last_scrape_time
-    }
+    return {'scraper_ready': bool(_scraper), 'last_error': _last_error}

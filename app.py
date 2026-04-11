@@ -1,18 +1,11 @@
 #!/usr/bin/env python3
-import os
 import time
 from flask import Flask, request, jsonify, send_file
 
 app = Flask(__name__)
 
-from scraper.searchtv import search, get_status
+from scraper.searchtv import search
 from core.cache import get_cached, set_cached, get_fallback
-
-LOG_ENABLED = True
-
-def log(msg):
-    if LOG_ENABLED:
-        print(f"[{time.strftime('%H:%M:%S')}] {msg}")
 
 @app.route('/')
 def index():
@@ -21,46 +14,43 @@ def index():
 @app.route('/api/search')
 def api_search():
     q = request.args.get('q', '').strip().lower()
+    offset = int(request.args.get('offset', 0))
+    limit = int(request.args.get('limit', 20))
+    
     if not q:
         return jsonify({'streams': []})
-    
-    cache_key = f"search:{q}"
-    
-    log(f"Search: {q}")
-    
-    cached_data = get_cached(cache_key)
-    if cached_data:
-        log(f"Cache hit: {len(cached_data['streams'])} streams")
-        cached_data['cached'] = True
-        cached_data['status'] = 'cached'
-        return jsonify(cached_data)
-    
-    log("Scraping live...")
-    result = search(q)
-    log(f"Live result: {result.get('results', 0)} streams, status: {result.get('status')}")
-    
+
+    if offset == 0:
+        cache_key = "search:" + q
+        cached = get_cached(cache_key)
+        if cached:
+            cached['cached'] = True
+            cached['status'] = 'cached'
+            return jsonify(cached)
+
+    result = search(q, limit=limit, offset=offset)
+
     if result.get('streams'):
-        set_cached(cache_key, result)
+        if offset == 0:
+            try:
+                set_cached("search:" + q, result)
+            except:
+                pass
         return jsonify(result)
-    
-    log("No streams, trying fallback...")
-    fallback_data = get_fallback(cache_key)
-    if fallback_data:
-        log(f"Fallback: {len(fallback_data.get('streams', []))} streams")
-        fallback_data['status'] = 'degraded'
-        fallback_data['source'] = 'fallback'
-        return jsonify(fallback_data)
-    
-    return jsonify({
-        'streams': [],
-        'status': 'error',
-        'error': result.get('error', 'no data')
-    })
+
+    if offset == 0:
+        fallback = get_fallback("search:" + q)
+        if fallback:
+            fallback['status'] = 'degraded'
+            fallback['source'] = 'fallback'
+            return jsonify(fallback)
+
+    return jsonify({'streams': [], 'status': 'error', 'error': result.get('error', 'no data')})
 
 @app.route('/api/status')
 def api_status():
+    from scraper.searchtv import get_status
     return jsonify(get_status())
 
 if __name__ == '__main__':
-    print('MoJiTo TV - Resilient')
     app.run(host='0.0.0.0', port=8080, threaded=True, debug=False)
