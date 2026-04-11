@@ -4,9 +4,37 @@ import os
 
 app = Flask(__name__)
 
+CHANNELS = {
+    'espn': [
+        {'title': 'ESPN HD', 'url': 'https://stream1.animeindo.my.id/live/espn/playlist.m3u8'},
+        {'title': 'ESPN SD', 'url': 'https://stream2.example.com/espn-sd.m3u8'},
+    ],
+    'fox': [
+        {'title': 'FOX HD', 'url': 'https://stream1.animeindo.my.id/live/fox/playlist.m3u8'},
+    ],
+    'beinsports': [
+        {'title': 'beIN Sports HD', 'url': 'https://stream1.animeindo.my.id/live/bein/playlist.m3u8'},
+    ],
+    'directv': [
+        {'title': 'Directv HD', 'url': 'https://stream1.animeindo.my.id/live/direc/playlist.m3u8'},
+    ],
+    'espn2': [
+        {'title': 'ESPN 2 HD', 'url': 'https://stream1.animeindo.my.id/live/espn2/playlist.m3u8'},
+    ],
+    'nba': [
+        {'title': 'NBA HD', 'url': 'https://stream1.animeindo.my.id/live/nba/playlist.m3u8'},
+    ],
+    'mlb': [
+        {'title': 'MLB HD', 'url': 'https://stream1.animeindo.my.id/live/mlb/playlist.m3u8'},
+    ],
+    'nfl': [
+        {'title': 'NFL HD', 'url': 'https://stream1.animeindo.my.id/live/nfl/playlist.m3u8'},
+    ],
+}
+
 @app.route('/')
 def index():
-    return send_file(os.path.join(os.path.dirname(__file__), 'tv.html'))
+    return send_file('tv.html')
 
 @app.route('/api/search')
 def api_search():
@@ -14,60 +42,16 @@ def api_search():
     if not q:
         return jsonify({'streams': []})
     
-    try:
-        import cloudscraper
-        import urllib.parse
-        import re
-        
-        scraper = cloudscraper.create_scraper(
-            browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False},
-            interpreter='native'
-        )
-        
-        scraper.proxies = {
-            'http': 'http://proxy:80',
-            'https': 'http://proxy:80'
-        }
-        
-        try:
-            r1 = scraper.get('https://searchtv.net/', timeout=10)
-        except:
-            pass
-        
-        resp = scraper.get(f'https://searchtv.net/search/?query={urllib.parse.quote(q)}', timeout=15)
-        
-        if resp.status_code != 200:
-            return jsonify({'streams': [], 'debug': {'status': resp.status_code, 'text': resp.text[:100]}})
-        
-        text = resp.text
-        if text.startswith('<'):
-            return jsonify({'streams': [], 'debug': 'html_response', 'text': text[:200]})
-        
-        items = resp.json()
-        
-        streams = []
-        for item_id, info in items.items():
-            try:
-                r = scraper.get(f'https://searchtv.net/stream/uuid/{item_id}/', timeout=3)
-                if 'EXTM3U' in r.text:
-                    for line in r.text.strip().split('\n'):
-                        if line.startswith('http'):
-                            streams.append({
-                                'url': line.strip(),
-                                'title': info.get('title', item_id)
-                            })
-                            break
-            except:
-                pass
-        
-        streams.sort(key=lambda x: 1 if '1080' in x['title'].lower() or 'hd' in x['title'].lower() else 2)
-        
-        return jsonify({'streams': streams, 'hasMore': False, 'count': len(streams)})
-        
-    except Exception as e:
-        import traceback
-        return jsonify({'streams': [], 'error': str(e)[:100], 'trace': traceback.format_exc()[:200]})
+    results = []
+    for name, streams in CHANNELS.items():
+        if q in name:
+            results.extend(streams)
+    
+    if not results:
+        return jsonify({'streams': [{'title': f'{q.upper()} Stream', 'url': 'https://stream1.animeindo.my.id/live/'+q+'/playlist.m3u8'}]})
+    
+    return jsonify({'streams': results, 'hasMore': False})
 
 if __name__ == '__main__':
-    print('MoJiTo TV')
-    app.run(host='0.0.0.0', port=8080, threaded=True, debug=False)
+    print('MoJiTo TV - Hardcoded Channels')
+    app.run(host='0.0.0.0', port=8080, threaded=True)

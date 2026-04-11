@@ -30,13 +30,13 @@ option:checked,option:focus,option:selected{background:#0066cc;color:#fff}
 <div id="menu">
 <div class="logo"><span class="sof">SōF</span><span class="mojito"> MoJiTo</span><span class="tv"> TV</span></div>
 <div id="in">Escribe el canal...</div>
-<div id="msg" class="info">↑↓ navegar | ENTER reproducir</div>
+<div id="msg" class="info">Escribe un canal y ENTER</div>
 <select id="results" size="10" class="hidden"></select>
 </div>
 
 <script>
-var API='/api/search';
-var streams=[], idx=0, txt='', page=1, hasMore=false, loading=false;
+var API='https://iptv-org.github.io/iptv/streams';
+var streams=[], idx=0, txt='', loading=false;
 var elIn=document.getElementById('in'), elSel=document.getElementById('results'), elMsg=document.getElementById('msg'), elMenu=document.getElementById('menu'), elVideo=document.getElementById('video');
 
 function log(m,t){elMsg.textContent=m;elMsg.className=t||'info'}
@@ -55,32 +55,69 @@ function playStream(i){
     elVideo.src=s.url;
     elVideo.style.display='block';
     elMenu.style.display='none';
-    elVideo.play().then(function(){log('✓ '+s.title.substring(0,30));}).catch(function(){log('Error');});
+    elVideo.play().then(function(){log('✓ '+s.name);}).catch(function(){log('Error');});
 }
 
 function buscar(){
     if(!txt.trim())return;
-    log('Buscando...');
-    elSel.innerHTML='';streams=[];page=1;
-    fetch(API+'?q='+encodeURIComponent(txt)).then(function(r){return r.json()}).then(function(d){
-        if(d.error){log('Error: '+d.error);return;}
-        showStreams(d.streams||[],d.hasMore);
-    }).catch(function(e){log('Error');});
+    log('Buscando: '+txt+'...');
+    elSel.innerHTML='';streams=[];idx=-1;
+    
+    fetch(API+'.m3u').then(function(r){return r.text()}).then(function(m3u){
+        var lines=m3u.split('\n');
+        var found=[];
+        for(var i=0;i<lines.length;i++){
+            if(lines[i].indexOf('#EXTINF')>-1 && lines[i].toLowerCase().indexOf(txt.toLowerCase())>-1){
+                var name=lines[i].split(',')[1]||'Unknown';
+                for(var j=i+1;j<lines.length;j++){
+                    if(lines[j].startsWith('http')){
+                        found.push({name:name.replace(/[\r\n\r]/g,''),url:lines[j].trim()});
+                        break;
+                    }
+                }
+            }
+        }
+        if(found.length){
+            found.sort(function(a,b){return (b.name.indexOf('720')>-1?2:0)-(a.name.indexOf('720')>-1?2:0);});
+            streams=found;
+            elSel.classList.remove('hidden');
+            found.forEach(function(s,i){
+                elSel.add(new Option((i+1)+'. '+s.name.substring(0,50)+ql(s.name),i));
+            });
+            log(found.length+' canales encontrados');
+        }else{
+            loadBackup();
+        }
+    }).catch(function(){loadBackup();});
 }
 
-function showStreams(data,more){
-    if(!data||!data.length){log('Sin resultados');return;}
-    hasMore=more;
-    data.sort(function(a,b){
-        var ga=/1080|4k|uhd/i.test(a.title)?3:(/720|hd/i.test(a.title)?2:1);
-        var gb=/1080|4k|uhd/i.test(b.title)?3:(/720|hd/i.test(b.title)?2:1);
-        return gb-ga;
-    });
-    streams=data;idx=-1;elSel.innerHTML='';elSel.classList.remove('hidden');
-    data.forEach(function(s,i){
-        elSel.add(new Option((i+1)+'. '+s.title.substring(0,50)+ql(s.title),i));
-    });
-    log(streams.length+' streams');
+function loadBackup(){
+    fetch('https://raw.githubusercontent.com/Free-TV/IPTV/master/playlist.m3u').then(function(r){return r.text()}).then(function(m3u){
+        var lines=m3u.split('\n');
+        var found=[];
+        for(var i=0;i<lines.length;i++){
+            if(lines[i].indexOf('#EXTINF')>-1 && lines[i].toLowerCase().indexOf(txt.toLowerCase())>-1){
+                var name=lines[i].split(',')[1]||'Unknown';
+                for(var j=i+1;j<lines.length;j++){
+                    if(lines[j].startsWith('http')){
+                        found.push({name:name.replace(/[\r\n\r]/g,''),url:lines[j].trim()});
+                        break;
+                    }
+                }
+            }
+        }
+        if(found.length){
+            found.sort(function(a,b){return (b.name.indexOf('720')>-1?2:0)-(a.name.indexOf('720')>-1?2:0);});
+            streams=found;
+            elSel.classList.remove('hidden');
+            found.forEach(function(s,i){
+                elSel.add(new Option((i+1)+'. '+s.name.substring(0,50)+ql(s.name),i));
+            });
+            log(found.length+' canales (backup)');
+        }else{
+            log('Sin resultados');
+        }
+    }).catch(function(){log('Sin conexion');});
 }
 
 document.addEventListener('keydown',function(e){
@@ -92,9 +129,9 @@ document.addEventListener('keydown',function(e){
         return;
     }
     if(k==='ArrowDown'){
-        if(idx<streams.length-1){idx++;elSel.value=idx;elSel.selectedIndex=idx;log(streams[idx].title.substring(0,40));}
+        if(idx<streams.length-1){idx++;elSel.value=idx;elSel.selectedIndex=idx;elSel.focus();log(streams[idx].name.substring(0,40));}
     }else if(k==='ArrowUp'){
-        if(idx>0){idx--;elSel.value=idx;elSel.selectedIndex=idx;log(streams[idx].title.substring(0,40));}
+        if(idx>0){idx--;elSel.value=idx;elSel.selectedIndex=idx;elSel.focus();log(streams[idx].name.substring(0,40));}
     }else if(k==='Enter'){
         if(idx>=0&&streams[idx])playStream(idx);
         else if(txt){buscar();}
