@@ -23,7 +23,22 @@ def api_search():
     try:
         import cloudscraper
         import urllib.parse
-        scraper = cloudscraper.create_scraper()
+        import time
+        scraper = cloudscraper.create_scraper(
+            browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False},
+            interpreter='native',
+            delay=10
+        )
+        resp = scraper.get('https://searchtv.net/', timeout=15)
+        
+        time.sleep(1)
+        
+        scraper.headers.update({
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Referer': 'https://searchtv.net/',
+            'Origin': 'https://searchtv.net'
+        })
         
         resp = scraper.get(f'https://searchtv.net/search/?query={urllib.parse.quote(q)}', timeout=10)
         
