@@ -11,29 +11,26 @@ def get_device_type():
     ua = request.headers.get('User-Agent', '').lower()
     accept = request.headers.get('Accept', '').lower()
     
-    # PRIORITY 1: Mobile - keywords más comunes de móviles
-    mobile_keywords = ['android', 'iphone', 'ipad', 'ipod', 'mobile', 'tablet', 'opera mini', 'opera mobi', 'blackberry', 'windows phone', 'safari']
-    if any(keyword in ua for keyword in mobile_keywords):
-        # Si es mobile Y NO es desktop/safari de escritorio
-        if 'windows nt' not in ua and 'mac os x' not in ua:
-            return 'mobile'
-        # iPhone/iPad con Safari
-        if 'iphone' in ua or 'ipad' in ua or 'ipod' in ua:
-            return 'mobile'
+    # PRIORITY 1: Smart TV - dispositivo principal del proyecto
+    # Philco y otras smart TVs conocidas
+    tv_keywords = ['smarttv', 'smart-tv', 'philco', 'googletv', 'appletv', 'roku', 'chromecast', 'tizen', 'webos', 'netcast', 'hbbtv', 'aftb', 'linux', 'arm']
+    if any(keyword in ua for keyword in tv_keywords):
+        # Si no es un teléfono o tablet, es TV
+        if 'android' not in ua and 'iphone' not in ua and 'ipad' not in ua and 'mobile' not in ua:
+            return 'tv'
     
-    # PRIORITY 2: PC - Desktop OS sin móvil
-    pc_keywords = ['windows nt', 'macintosh', 'linux', 'firefox', 'chrome']
-    if any(keyword in ua for keyword in pc_keywords):
+    # PRIORITY 2: PC - Desktop sin móvil
+    if any(x in ua for x in ['windows nt', 'macintosh', 'linux']):
         if 'mobile' not in ua and 'android' not in ua and 'tablet' not in ua:
             return 'pc'
     
-    # PRIORITY 3: Smart TV
-    tv_keywords = ['smarttv', 'smart-tv', 'philco', 'googletv', 'appletv', 'roku', 'chromecast', 'tizen', 'webos', 'netcast', 'hbbtv', 'aftb']
-    if any(keyword in ua for keyword in tv_keywords):
-        return 'tv'
+    # PRIORITY 3: Móvil
+    mobile_keywords = ['android', 'iphone', 'ipad', 'ipod', 'mobile', 'tablet', 'opera mini', 'opera mobi', 'blackberry', 'windows phone']
+    if any(keyword in ua for keyword in mobile_keywords):
+        return 'mobile'
     
-    # Default: mobile (más común)
-    return 'mobile'
+    # Default: TV (proyecto orientado a TV)
+    return 'tv'
 
 @app.route('/')
 def index():
