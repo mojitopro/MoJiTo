@@ -23,9 +23,35 @@ def api_search():
     try:
         import cloudscraper
         import urllib.parse
-        scraper = cloudscraper.create_scraper()
+        scraper = cloudscraper.create_scraper(
+            browser={
+                'browser': 'chrome',
+                'platform': 'windows',
+                'mobile': False,
+                'desktop': True
+            },
+            interpreter='native',
+            delay=10
+        )
         
-        resp = scraper.get(f'https://searchtv.net/search/?query={urllib.parse.quote(q)}', timeout=10)
+        home_resp = scraper.get('https://searchtv.net/', timeout=15)
+        
+        scraper.headers.update({
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Language': 'es-ES,es;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1',
+            'Cache-Control': 'max-age=0',
+            'Origin': 'https://searchtv.net',
+            'Referer': 'https://searchtv.net/'
+        })
+        
+        resp = scraper.get(f'https://searchtv.net/search/?query={urllib.parse.quote(q)}', timeout=15)
         
         if resp.status_code != 200:
             return jsonify({'streams': []})
