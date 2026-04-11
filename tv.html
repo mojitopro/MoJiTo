@@ -48,17 +48,8 @@ option:checked,option:focus,option:selected{background:#0066cc;color:#fff}
 </div>
 
 <script>
-var PROXIES=[
-    'https://api.allorigins.win/raw?url=',
-    'https://corsproxy.io/?',
-    'https://thingproxy.freeboard.io/thing/'
-];
-var PROXY_idx=0;
+var PROXY='https://corsproxy.io/?';
 var API='https://searchtv.net';
-
-function getProxy(url){
-    return PROXIES[PROXY_idx]+encodeURIComponent(url);
-}
 var streams=[], favorites=[], idx=0, txt='', mode='search', page=1, hasMore=false, loading=false;
 var elIn=document.getElementById('in'), elSel=document.getElementById('results'), elMsg=document.getElementById('msg'), elMenu=document.getElementById('menu'), elVideo=document.getElementById('video');
 
@@ -141,17 +132,13 @@ function loadPage(p){
     if(loading)return;
     loading=true;
     log('Cargando...');
-    var url=API+'/search/?q='+encodeURIComponent(txt);
-    fetch(getProxy(url)).then(function(r){return r.json()}).then(function(d){
+    fetch(PROXY+encodeURIComponent(API+'/search/?q='+encodeURIComponent(txt))).then(function(r){return r.json()}).then(function(d){
         loading=false;
         var keys=Object.keys(d);
         processKeys(keys,p);
     }).catch(function(e){
-        PROXY_idx++;
-        if(PROXY_idx>=PROXIES.length){loading=false;log('Sin conexion');return;}
         loading=false;
-        log('Probando otro proxy...');
-        loadPage(p);
+        log('Sin conexion');
     });
 }
 
@@ -163,7 +150,7 @@ function processKeys(keys,p){
             showStreams(streams, hasMore, p===1);
             return;
         }
-        fetch(getProxy(API+'/stream/uuid/'+keys[i]+'/')).then(function(r){return r.text()}).then(function(t){
+        fetch(PROXY+encodeURIComponent(API+'/stream/uuid/'+keys[i]+'/')).then(function(r){return r.text()}).then(function(t){
             i++;
             if('#EXTM3U' in t){
                 var title=keys[i-1], url='';
