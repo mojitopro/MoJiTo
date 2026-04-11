@@ -20,19 +20,40 @@ def api_search():
     start_idx = (page - 1) * limit
     
     try:
-        import curl_cffi
+        import urllib.request
         import urllib.parse
         import json
         import re
         
-        s = curl_cffi.Session(impersonate='chrome110')
+        req = urllib.request.Request(
+            'https://searchtv.net/search/?query=' + urllib.parse.quote(q),
+            headers={
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'application/json, text/html, */*',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Referer': 'https://searchtv.net/',
+                'Origin': 'https://searchtv.net',
+                'Connection': 'keep-alive'
+            }
+        )
         
-        r = s.get('https://searchtv.net/search/?query=' + urllib.parse.quote(q), timeout=15)
-        
-        if r.status_code != 200:
-            return jsonify({'streams': [], 'debug': r.status_code})
-        
-        items = list(r.json().keys())
+        try:
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                data = resp.read().decode()
+                items = list(json.loads(data).keys())
+        except Exception as e1:
+            try:
+                import requests
+                r = requests.get(
+                    'https://searchtv.net/search/?query=' + urllib.parse.quote(q),
+                    headers={
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                    },
+                    timeout=10
+                )
+                items = list(r.json().keys())
+            except Exception as e2:
+                return jsonify({'streams': [], 'error': str(e2)[:100]})
         
         streams = []
         downloaded = 0
@@ -40,22 +61,27 @@ def api_search():
         
         while downloaded < limit and i < len(items):
             try:
-                sr = s.get(f'https://searchtv.net/stream/uuid/{items[i]}/', timeout=3)
-                if '#EXTM3U' in sr.text:
-                    title = str(items[i])
-                    url = ''
-                    for line in sr.text.split('\n'):
-                        if line.startswith('#EXTINF:'):
-                            parts = line.split(',')
-                            if len(parts) > 1:
-                                raw = parts[1].strip().split('==>')[0].strip()
-                                title = re.sub(r'\s*\(\d+\)\s*$', '', raw).strip()
-                        elif line.startswith('http'):
-                            url = line.strip()
-                            break
-                    if url:
-                        streams.append({'title': title, 'url': url})
-                        downloaded += 1
+                sreq = urllib.request.Request(
+                    f'https://searchtv.net/stream/uuid/{items[i]}/',
+                    headers={'User-Agent': 'Mozilla/5.0'}
+                )
+                with urllib.request.urlopen(sreq, timeout=3) as sr:
+                    text = sr.read().decode()
+                    if '#EXTM3U' in text:
+                        title = str(items[i])
+                        url = ''
+                        for line in text.split('\n'):
+                            if line.startswith('#EXTINF:'):
+                                parts = line.split(',')
+                                if len(parts) > 1:
+                                    raw = parts[1].strip().split('==>')[0].strip()
+                                    title = re.sub(r'\s*\(\d+\)\s*$', '', raw).strip()
+                            elif line.startswith('http'):
+                                url = line.strip()
+                                break
+                        if url:
+                            streams.append({'title': title, 'url': url})
+                            downloaded += 1
             except:
                 pass
             i += 1
@@ -67,7 +93,7 @@ def api_search():
         return jsonify({'streams': streams, 'hasMore': has_more})
         
     except Exception as e:
-        return jsonify({'streams': [], 'error': str(e)[:100]})
+        return jsonify({'streams': [], 'error': str(e)[:150]})
 
 if __name__ == '__main__':
     print('MoJiTo TV')
