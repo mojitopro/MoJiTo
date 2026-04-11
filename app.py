@@ -2,7 +2,6 @@
 from flask import Flask, request, jsonify, send_file
 import os
 import threading
-import traceback
 
 app = Flask(__name__)
 
@@ -22,24 +21,36 @@ def api_search():
     start_idx = (page - 1) * limit
     
     try:
-        import requests
+        import cloudscraper
         import urllib.parse
-        s = requests.Session()
-        s.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': '*/*',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Referer': 'https://searchtv.net/',
-            'Origin': 'https://searchtv.net'
+        scraper = cloudscraper.create_scraper(
+            browser={
+                'browser': 'chrome',
+                'platform': 'windows',
+                'mobile': False,
+                'desktop': True
+            }
+        )
+        
+        home_resp = scraper.get('https://searchtv.net/', timeout=15)
+        
+        if home_resp.status_code != 200:
+            import requests
+            scraper = requests.Session()
+            scraper.headers.update({
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            })
+        
+        scraper.headers.update({
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Language': 'es-ES,es;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Referer': 'https://searchtv.net/'
         })
         
-        r1 = s.get('https://searchtv.net/', timeout=15, allow_redirects=True)
-        cookies = s.cookies.get_dict()
-        
-        resp = s.get(f'https://searchtv.net/search/?query={urllib.parse.quote(q)}', timeout=15)
+        resp = scraper.get(f'https://searchtv.net/search/?query={urllib.parse.quote(q)}', timeout=15)
         
         if resp.status_code != 200:
-            return jsonify({'streams': [], 'debug': {'status': resp.status_code, 'text': resp.text[:100]}})
+            return jsonify({'streams': []})
         
         items = list(resp.json().keys())
         
@@ -49,7 +60,7 @@ def api_search():
         
         while downloaded < limit and i < len(items):
             try:
-                stream_resp = s.get(f'https://searchtv.net/stream/uuid/{items[i]}/', timeout=2)
+                stream_resp = scraper.get(f'https://searchtv.net/stream/uuid/{items[i]}/', timeout=2)
                 if 'EXTM3U' in stream_resp.text:
                     title = str(items[i])
                     url = ''
@@ -77,8 +88,7 @@ def api_search():
         return jsonify({'streams': streams, 'hasMore': has_more})
         
     except Exception as e:
-        import traceback
-        return jsonify({'streams': [], 'error': str(e)[:100], 'trace': traceback.format_exc()[:200]})
+        return jsonify({'streams': [], 'error': str(e)[:50]})
 
 if __name__ == '__main__':
     print('SŌF TV - Fast HD Priority')
