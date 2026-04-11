@@ -24,7 +24,15 @@ def api_search():
             interpreter='native'
         )
         
-        r1 = scraper.get('https://searchtv.net/', timeout=15)
+        scraper.proxies = {
+            'http': 'http://proxy:80',
+            'https': 'http://proxy:80'
+        }
+        
+        try:
+            r1 = scraper.get('https://searchtv.net/', timeout=10)
+        except:
+            pass
         
         resp = scraper.get(f'https://searchtv.net/search/?query={urllib.parse.quote(q)}', timeout=15)
         
