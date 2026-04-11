@@ -12,15 +12,14 @@ html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial}
 .logo .sof{color:#8b0000;text-shadow:0 0 10px #ff0000,0 0 20px #8b0000}
 .logo .mojito{color:#dc143c;text-shadow:0 0 10px #ff0000,0 0 20px #dc143c}
 .logo .tv{color:#ff0000;font-size:32px;vertical-align:top;margin-left:5px;text-shadow:0 0 10px #ff0000}
-#in{font-size:32px;padding:20px;background:transparent;border:none;color:#666;text-align:center;margin-bottom:20px;outline:none;text-shadow:0 0 5px rgba(255,0,0,0.3)}
-#in.focused{color:#aaa;text-shadow:0 0 10px rgba(255,0,0,0.5)}
+#in{font-size:32px;padding:20px;background:transparent;border:none;color:#666;text-align:center;margin-bottom:20px;outline:none}
+#in.focused{color:#aaa}
 #msg{font-size:20px;padding:15px;color:#8b0000;min-height:30px}
-.error{color:#ff0000}
 .info{color:#dc143c}
+.error{color:#ff0000}
 .hidden{display:none}
 select{font-size:20px;width:100%;padding:15px;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;margin-top:20px;height:300px}
 option{background:#1a1a1a;color:#aaa;padding:12px}
-option:checked,option:focus,option:selected{background:#0066cc;color:#fff}
 </style>
 </head>
 <body>
@@ -30,70 +29,135 @@ option:checked,option:focus,option:selected{background:#0066cc;color:#fff}
 <div id="menu">
 <div class="logo"><span class="sof">SōF</span><span class="mojito"> MoJiTo</span><span class="tv"> TV</span></div>
 <div id="in">Escribe el canal...</div>
-<div id="msg" class="info">↑↓ navegar | ENTER reproducir</div>
+<div id="msg" class="info">Escribe ybusca</div>
 <select id="results" size="10" class="hidden"></select>
 </div>
 
 <script>
 var API='/api/search';
-var streams=[], idx=0, txt='', loading=false;
-var elIn=document.getElementById('in'), elSel=document.getElementById('results'), elMsg=document.getElementById('msg'), elMenu=document.getElementById('menu'), elVideo=document.getElementById('video');
+var streams=[];
+var idx=0;
+var txt='';
+var elIn=document.getElementById('in');
+var elSel=document.getElementById('results');
+var elMsg=document.getElementById('msg');
+var elMenu=document.getElementById('menu');
+var elVideo=document.getElementById('video');
 
-function log(m,t){elMsg.textContent=m;elMsg.className=t||'info'}
-
-function ql(t){
-    if(/1080|4k|uhd/i.test(t))return' [1080p]';
-    if(/720|hd/i.test(t))return' [HD]';
-    return' [SD]';
+function log(m){
+    elMsg.textContent=m;
 }
 
-function renderIn(){elIn.textContent=txt||'Escribe el canal...';}
+function renderIn(){
+    elIn.textContent=txt||'Escribe el canal...';
+}
 
 function playStream(i){
     var s=streams[i];
     if(!s)return;
+    log('Cargando...');
     elVideo.src=s.url;
     elVideo.style.display='block';
     elMenu.style.display='none';
-    elVideo.play().then(function(){log('✓ '+s.title);}).catch(function(){log('Error');});
+    elVideo.play();
+    log(s.title);
 }
 
 function buscar(){
     if(!txt.trim())return;
-    log('Buscando: '+txt+'...');
-    elSel.innerHTML='';streams=[];idx=-1;
-    fetch(API+'?q='+encodeURIComponent(txt)).then(function(r){return r.json()}).then(function(d){
-        if(d.error){log('Error: '+d.error);return;}
-        if(!d.streams||!d.streams.length){log('Sin resultados');return;}
-        streams=d.streams;
-        elSel.classList.remove('hidden');
-        streams.forEach(function(s,i){
-            elSel.add(new Option((i+1)+'. '+s.title.substring(0,50)+ql(s.title),i));
-        });
-        log(streams.length+' streams');
-    }).catch(function(e){log('Error');});
+    log('Buscando...');
+    elSel.innerHTML='';
+    streams=[];
+    idx=0;
+    
+    var x=new XMLHttpRequest();
+    x.open('GET',API+'?q='+encodeURIComponent(txt),true);
+    x.onreadystatechange=function(){
+        if(x.readyState===4){
+            if(x.status===200){
+                try{
+                    var d=JSON.parse(x.responseText);
+                    if(d.error){
+                        log('Error: '+d.error);
+                        return;
+                    }
+                    if(!d.streams||!d.streams.length){
+                        log('Sin resultados');
+                        if(d.cached){
+                            log('Modo cache');
+                        }
+                        return;
+                    }
+                    streams=d.streams;
+                    elSel.classList.remove('hidden');
+                    for(var i=0;i<streams.length;i++){
+                        var opt=document.createElement('option');
+                        opt.value=i;
+                        opt.text=(i+1)+'. '+streams[i].title.substring(0,50);
+                        elSel.appendChild(opt);
+                    }
+                    log(streams.length+' streams');
+                }catch(e){
+                    log('Error parse');
+                }
+            }else{
+                log('Error: '+x.status);
+            }
+        }
+    };
+    x.send();
 }
 
-document.addEventListener('keydown',function(e){
+document.onkeydown=function(e){
     var k=e.key;
     if(elVideo.style.display==='block'){
-        if(k==='Escape'){elVideo.pause();elVideo.style.display='none';elMenu.style.display='flex';log('Cerrado');}
-        else if(k==='ArrowRight'){var n=idx+1;n<streams.length?playStream(n):log('Fin');}
-        else if(k==='ArrowLeft'){var p=idx-1;p>=0?playStream(p):log('Inicio');}
+        if(k==='Escape'){
+            elVideo.pause();
+            elVideo.style.display='none';
+            elMenu.style.display='flex';
+            log('Cerrado');
+        }else if(k==='ArrowRight'){
+            var n=idx+1;
+            if(n<streams.length)playStream(n);
+        }else if(k==='ArrowLeft'){
+            var p=idx-1;
+            if(p>=0)playStream(p);
+        }
         return;
     }
     if(k==='ArrowDown'){
-        if(idx<streams.length-1){idx++;elSel.value=idx;elSel.selectedIndex=idx;log(streams[idx].title.substring(0,40));}
+        if(idx<streams.length-1){
+            idx++;
+            elSel.value=idx;
+            log(streams[idx].title.substring(0,40));
+        }
     }else if(k==='ArrowUp'){
-        if(idx>0){idx--;elSel.value=idx;elSel.selectedIndex=idx;log(streams[idx].title.substring(0,40));}
+        if(idx>0){
+            idx--;
+            elSel.value=idx;
+            log(streams[idx].title.substring(0,40));
+        }
     }else if(k==='Enter'){
-        if(idx>=0&&streams[idx])playStream(idx);
-        else if(txt){buscar();}
-    }else if(k==='Backspace'){txt=txt.slice(0,-1);renderIn();idx=-1;elSel.innerHTML='';}
-    else if(k.length===1){txt+=k;renderIn();}
-});
+        if(idx>=0&&streams[idx]){
+            playStream(idx);
+        }else if(txt){
+            buscar();
+        }
+    }else if(k==='Backspace'){
+        txt=txt.slice(0,-1);
+        renderIn();
+        idx=-1;
+        elSel.innerHTML='';
+    }else if(k.length===1){
+        txt+=k;
+        renderIn();
+    }
+};
 
-elSel.addEventListener('change',function(){idx=parseInt(elSel.value);playStream(idx);});
+elSel.onchange=function(){
+    idx=parseInt(elSel.value);
+    playStream(idx);
+};
 
 renderIn();
 </script>

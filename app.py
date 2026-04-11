@@ -1,32 +1,22 @@
 #!/usr/bin/env python3
-import os, json, subprocess, urllib.request, urllib.parse
-from datetime import datetime
-from pathlib import Path
-from typing import List, Dict
-
 import os
+import time
 from flask import Flask, request, jsonify, send_file
 
 app = Flask(__name__)
 
-CFG = {"name":"SōF — Shadow of Fire","group":"SōF — Shadow of Fire",
-       "test":8,"file":"sof-playlist.json"}
+from scraper.searchtv import search, get_status
+from core.cache import get_cached, set_cached, get_fallback
 
-ST = "https://searchtv.net/"
-scraper = None
+LOG_ENABLED = True
 
-try:
-    import cloudscraper
-    scraper = cloudscraper.create_scraper()
-    scraper.get(ST)
-except: pass
-
-def log(m, l="INFO"):
-    print(f"{l}: {m}")
+def log(msg):
+    if LOG_ENABLED:
+        print(f"[{time.strftime('%H:%M:%S')}] {msg}")
 
 @app.route('/')
 def index():
-    return send_file(os.path.join(os.path.dirname(__file__), 'tv.html'))
+    return send_file('tv.html')
 
 @app.route('/api/search')
 def api_search():
@@ -34,38 +24,43 @@ def api_search():
     if not q:
         return jsonify({'streams': []})
     
-    if not scraper:
-        return jsonify({'streams': [], 'error': 'cloudscraper no disponible'})
+    cache_key = f"search:{q}"
     
-    try:
-        resp = scraper.get(f"{ST}search/?query={urllib.parse.quote(q)}", timeout=10)
-        if resp.status_code != 200:
-            return jsonify({'streams': [], 'error': f'HTTP {resp.status_code}'})
-        
-        items = resp.json()
-        streams = []
-        
-        for item_id, info in items.items():
-            try:
-                r = scraper.get(f"{ST}stream/uuid/{item_id}/", timeout=3)
-                if 'EXTM3U' in r.text:
-                    for line in r.text.strip().split('\n'):
-                        if line.startswith('http'):
-                            streams.append({
-                                'url': line.strip(),
-                                'title': info.get('title', item_id)
-                            })
-                            break
-            except:
-                pass
-        
-        streams.sort(key=lambda x: 1 if '1080' in x['title'].lower() or 'hd' in x['title'].lower() else 2)
-        
-        return jsonify({'streams': streams, 'hasMore': False})
-        
-    except Exception as e:
-        return jsonify({'streams': [], 'error': str(e)[:100]})
+    log(f"Search: {q}")
+    
+    cached_data = get_cached(cache_key)
+    if cached_data:
+        log(f"Cache hit: {len(cached_data['streams'])} streams")
+        cached_data['cached'] = True
+        cached_data['status'] = 'cached'
+        return jsonify(cached_data)
+    
+    log("Scraping live...")
+    result = search(q)
+    log(f"Live result: {result.get('results', 0)} streams, status: {result.get('status')}")
+    
+    if result.get('streams'):
+        set_cached(cache_key, result)
+        return jsonify(result)
+    
+    log("No streams, trying fallback...")
+    fallback_data = get_fallback(cache_key)
+    if fallback_data:
+        log(f"Fallback: {len(fallback_data.get('streams', []))} streams")
+        fallback_data['status'] = 'degraded'
+        fallback_data['source'] = 'fallback'
+        return jsonify(fallback_data)
+    
+    return jsonify({
+        'streams': [],
+        'status': 'error',
+        'error': result.get('error', 'no data')
+    })
+
+@app.route('/api/status')
+def api_status():
+    return jsonify(get_status())
 
 if __name__ == '__main__':
-    print('MoJiTo TV')
+    print('MoJiTo TV - Resilient')
     app.run(host='0.0.0.0', port=8080, threaded=True, debug=False)
