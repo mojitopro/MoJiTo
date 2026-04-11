@@ -21,26 +21,21 @@ def api_search():
     start_idx = (page - 1) * limit
     
     try:
-        import cloudscraper
+        import requests
         import urllib.parse
-        import time
-        scraper = cloudscraper.create_scraper(
-            browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False},
-            interpreter='native',
-            delay=10
-        )
-        resp = scraper.get('https://searchtv.net/', timeout=15)
-        
-        time.sleep(1)
-        
-        scraper.headers.update({
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.5',
+        s = requests.Session()
+        s.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': '*/*',
+            'Accept-Language': 'en-US,en;q=0.9',
             'Referer': 'https://searchtv.net/',
             'Origin': 'https://searchtv.net'
         })
         
-        resp = scraper.get(f'https://searchtv.net/search/?query={urllib.parse.quote(q)}', timeout=10)
+        r1 = s.get('https://searchtv.net/', timeout=15, allow_redirects=True)
+        cookies = s.cookies.get_dict()
+        
+        resp = s.get(f'https://searchtv.net/search/?query={urllib.parse.quote(q)}', timeout=15)
         
         if resp.status_code != 200:
             return jsonify({'streams': []})
