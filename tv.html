@@ -131,36 +131,38 @@ function buscar(){
 function loadPage(p){
     if(loading)return;
     loading=true;
-    log('Cargando...');
-    var url=PROXY+encodeURIComponent(API+'/search/?q='+encodeURIComponent(txt));
+    log('Buscando: '+txt);
+    var url='https://searchtv.net/search/?q='+encodeURIComponent(txt);
     fetch(url).then(function(r){
+        log('Response: '+r.status);
         if(!r.ok)throw new Error('HTTP '+r.status);
         return r.text();
     }).then(function(txt){
-        loading=false;
+        log('Text len: '+txt.length);
         try{
             var d=JSON.parse(txt);
             var keys=Object.keys(d);
             processKeys(keys,p);
         }catch(e){
-            log('Error: parse');
+            console.log('Raw:', txt.substring(0,200));
+            log('Error parse');
         }
     }).catch(function(e){
         loading=false;
-        log('Sin conexion: '+e.message);
+        log('Error: '+e.message);
     });
 }
 
 function processKeys(keys,p){
     log('Keys: '+keys.length);
     var limit=20, startIdx=(p-1)*limit, downloaded=0, i=startIdx;
-    if(!keys||!keys.length){loading=false;log('Sin resultados ('+keys.length+')');return;}
+    if(!keys||!keys.length){loading=false;log('Sin resultados');return;}
     function checkNext(){
         if(downloaded>=limit||i>=keys.length){
             showStreams(streams, hasMore, p===1);
             return;
         }
-        var streamUrl=PROXY+encodeURIComponent(API+'/stream/uuid/'+keys[i]+'/');
+        var streamUrl=API+'/stream/uuid/'+keys[i]+'/';
         fetch(streamUrl).then(function(r){return r.text()}).then(function(t){
             i++;
             if('#EXTM3U' in t){
