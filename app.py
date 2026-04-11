@@ -1,13 +1,31 @@
 #!/usr/bin/env python3
 from flask import Flask, request, jsonify, send_file
 import os
-import threading
+import re
 
 app = Flask(__name__)
 
+def detect_device():
+    ua = request.headers.get('User-Agent', '').lower()
+    
+    if any(d in ua for d in ['crkey', 'appletv', 'roku', 'firetv', 'fire tv', 'chromecast', 'tcl', 'lgwebtv', 'vizio', 'samsung', 'panasonic', 'sharp', 'sony', 'hisense', 'telefunken', 'grundig', 'loewe', 'metz', 'philips']):
+        return 'tv'
+    
+    if any(m in ua for m in ['iphone', 'ipad', 'ipod', 'android', 'mobile', 'tablet']):
+        return 'mobile'
+    
+    return 'pc'
+
 @app.route('/')
 def index():
-    return send_file(os.path.join(os.path.dirname(__file__), 'tv.html'))
+    device = detect_device()
+    
+    if device == 'tv':
+        return send_file('tv.html')
+    elif device == 'mobile':
+        return send_file('mobile.html')
+    else:
+        return send_file('pc.html')
 
 @app.route('/api/search')
 def api_search():
@@ -31,8 +49,7 @@ def api_search():
             'Referer': 'https://searchtv.net/'
         })
         
-        home_resp = scraper.get('https://searchtv.net/', timeout=15)
-        
+        scraper.get('https://searchtv.net/', timeout=15)
         resp = scraper.get(f'https://searchtv.net/search/?query={urllib.parse.quote(q)}', timeout=15)
         
         if resp.status_code != 200:
@@ -55,7 +72,6 @@ def api_search():
                             parts = line.split(',')
                             if len(parts) > 1:
                                 raw = parts[1].strip().split('==>')[0].strip()
-                                import re
                                 title = re.sub(r'\s*\(\d+\)\s*$', '', raw).strip()
                         elif line.startswith('http'):
                             url = line.strip()
@@ -77,5 +93,5 @@ def api_search():
         return jsonify({'streams': [], 'error': str(e)[:50]})
 
 if __name__ == '__main__':
-    print('SŌF TV - Fast HD Priority')
+    print('MoJiTo Multi-Device Server')
     app.run(host='0.0.0.0', port=8080, threaded=True, debug=False)

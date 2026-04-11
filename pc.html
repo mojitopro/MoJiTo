@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>MoJiTo - PC</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:#0d0d0d;color:#e0e0e0;font-family:'Segoe UI',sans-serif;overflow:hidden}
+#video{width:100%;height:calc(100%-60px);position:absolute;top:0;left:0;background:#000}
+#player{width:100%;height:100%;position:fixed;top:0;left:0;z-index:200;display:none;background:#000}
+#player.show{display:block}
+#bar{position:fixed;bottom:0;left:0;width:100%;height:60px;background:#1a1a1a;display:flex;align-items:center;padding:0 20px;gap:15px;z-index:100}
+#bar.hidden{display:none}
+.logo{font-size:20px;font-weight:bold}
+.logo b{color:#e74c3c}
+#in{flex:1;padding:10px 15px;font-size:16px;background:#2a2a2a;border:none;border-radius:5px;color:#fff;outline:none}
+#btn{background:#e74c3c;border:none;padding:10px 20px;border-radius:5px;color:#fff;cursor:pointer;font-weight:bold}
+#btn:active{background:#c0392b}
+#results{width:100%;height:calc(100%-60px);overflow-y:auto;padding:20px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px;text-align:left;border-bottom:1px solid #2a2a2a}
+th{background:#1a1a1a;color:#888;font-size:12px;text-transform:uppercase}
+td{font-size:14px;cursor:pointer}
+td:hover{background:#1a1a1a}
+td.playing{background:#3d2018;color:#fff}
+.quality{color:#f39c12;font-size:11px;margin-left:10px}
+.fav{color:#e74c3c;font-size:16px;margin-left:10px;cursor:pointer}
+#msg{text-align:center;padding:20px;color:#666}
+</style>
+</head>
+<body>
+
+<video id="video" controls></video>
+<video id="player" controls></video>
+
+<div id="bar">
+<div class="logo"><b>MoJiTo</b> PC</div>
+<input id="in" type="text" placeholder="Buscar canal...">
+<button id="btn">Buscar</button>
+</div>
+
+<div id="results">
+<div id="msg">Escribe un canal para buscar</div>
+</div>
+
+<script>
+var API=location.protocol+'//'+location.host+'/api/search';
+var streams=[], favorites=[], playingIdx=-1;
+
+function quality(t){
+    if(/1080|4k/i.test(t))return' [1080p]';
+    if(/720/i.test(t))return' [720p]';
+    return' [480p]';
+}
+
+function msg(m){document.getElementById('msg').textContent=m;}
+
+function render(){
+    var html='<table><thead><tr><th>#</th><th>Canal</th><th>Calidad</th><th>Fav</th></tr></thead><tbody>';
+    streams.forEach(function(s,i){
+        var playing=i===playingIdx?' class="playing"':'';
+        var favorited=favorites.some(function(f){return f.url===s.url})?'★':'☆';
+        html+='<tr'+playing+' onclick="play('+i+')"><td>'+(i+1)+'</td><td>'+s.title.substring(0,50)+'<span class="quality">'+quality(s.title)+'</span></td><td>'+quality(s.title)+'</td><td><span class="fav" onclick="toggleFav(event,'+i+')">'+favorited+'</span></td></tr>';
+    });
+    html+='</tbody></table>';
+    document.getElementById('results').innerHTML=html;
+    if(!streams.length)msg('Sin resultados');
+}
+
+function play(i){
+    var s=streams[i];
+    if(!s)return;
+    var v=document.getElementById('player');
+    v.src=s.url;
+    v.classList.add('show');
+    document.getElementById('bar').classList.add('hidden');
+    document.getElementById('video').classList.add('hidden');
+    playingIdx=i;
+    render();
+    v.play().catch(function(){msg('Error al reproducir');});
+    msg('Reproduciendo: '+s.title);
+}
+
+function toggleFav(e,i){
+    e.stopPropagation();
+    var s=streams[i];
+    var idx=favorites.findIndex(function(f){return f.url===s.url});
+    if(idx>=0){
+        favorites.splice(idx,1);
+    }else{
+        favorites.push({title:s.title,url:s.url});
+    }
+    render();
+}
+
+function buscar(){
+    var txt=document.getElementById('in').value.trim();
+    if(!txt)return;
+    msg('Buscando...');
+    fetch(API+'?q='+encodeURIComponent(txt)).then(function(r){return r.json();}).then(function(d){
+        streams=d.streams||[];
+        playingIdx=-1;
+        render();
+        msg(streams.length+' streams encontrados');
+    }).catch(function(){msg('Error');});
+}
+
+function close(){
+    var v=document.getElementById('player');
+    v.pause();
+    v.src='';
+    v.classList.remove('show');
+    document.getElementById('bar').classList.remove('hidden');
+    document.getElementById('video').classList.remove('hidden');
+    playingIdx=-1;
+}
+
+document.getElementById('btn').onclick=buscar;
+document.getElementById('in').addEventListener('keydown',function(e){
+    if(e.key==='Enter')buscar();
+    if(e.key==='Escape')close();
+});
+</script>
+</body>
+</html>
