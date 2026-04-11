@@ -25,37 +25,32 @@ def api_search():
         import json
         import re
         
+        proxies = {
+            'http': 'http://104.244.76.13:45842',
+            'https': 'http://104.244.76.13:45842'
+        }
+        
         s = requests.Session()
         s.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'es-ES,es;q=0.9,en-US;q=0.8,en;q=0.7',
-            'Accept-Encoding': 'gzip, deflate',
-            'Connection': 'keep-alive',
-            'Cache-Control': 'max-age=0'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
         })
         
-        r1 = s.get('https://searchtv.net/', timeout=15, allow_redirects=True)
-        
-        r = s.get(
-            'https://searchtv.net/search/?query=' + urllib.parse.quote(q),
-            headers={
-                'Referer': 'https://searchtv.net/',
-                'Origin': 'https://searchtv.net'
-            },
-            timeout=15
-        )
+        try:
+            r = s.get(
+                'https://searchtv.net/search/?query=' + urllib.parse.quote(q),
+                proxies=proxies,
+                timeout=15
+            )
+        except:
+            r = s.get(
+                'https://searchtv.net/search/?query=' + urllib.parse.quote(q),
+                timeout=15
+            )
         
         if r.status_code != 200:
-            return jsonify({'streams': [], 'debug': {'status': r.status_code, 'len': len(r.text), 'text': r.text[:80]}})
+            return jsonify({'streams': [], 'status': r.status_code})
         
-        if '<' in r.text[:10]:
-            return jsonify({'streams': [], 'debug': 'html_response', 'text': r.text[:100]})
-        
-        try:
-            items = list(r.json().keys())
-        except:
-            return jsonify({'streams': [], 'debug': 'json_error', 'text': r.text[:100]})
+        items = list(r.json().keys())
         
         streams = []
         downloaded = 0
