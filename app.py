@@ -20,24 +20,19 @@ def api_search():
     start_idx = (page - 1) * limit
     
     try:
-        import urllib.request
+        import curl_cffi
         import urllib.parse
         import json
         import re
         
-        req = urllib.request.Request(
-            f'https://searchtv.net/search/?query={urllib.parse.quote(q)}',
-            headers={
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Accept': 'application/json',
-                'Accept-Language': 'en-US,en;q=0.9',
-                'Referer': 'https://searchtv.net/'
-            }
-        )
+        s = curl_cffi.Session(impersonate='chrome110')
         
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = resp.read().decode()
-            items = list(json.loads(data).keys())
+        r = s.get('https://searchtv.net/search/?query=' + urllib.parse.quote(q), timeout=15)
+        
+        if r.status_code != 200:
+            return jsonify({'streams': [], 'debug': r.status_code})
+        
+        items = list(r.json().keys())
         
         streams = []
         downloaded = 0
@@ -45,27 +40,22 @@ def api_search():
         
         while downloaded < limit and i < len(items):
             try:
-                stream_req = urllib.request.Request(
-                    f'https://searchtv.net/stream/uuid/{items[i]}/',
-                    headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-                )
-                with urllib.request.urlopen(stream_req, timeout=3) as sr:
-                    text = sr.read().decode()
-                    if '#EXTM3U' in text:
-                        title = str(items[i])
-                        url = ''
-                        for line in text.split('\n'):
-                            if line.startswith('#EXTINF:'):
-                                parts = line.split(',')
-                                if len(parts) > 1:
-                                    raw = parts[1].strip().split('==>')[0].strip()
-                                    title = re.sub(r'\s*\(\d+\)\s*$', '', raw).strip()
-                            elif line.startswith('http'):
-                                url = line.strip()
-                                break
-                        if url:
-                            streams.append({'title': title, 'url': url})
-                            downloaded += 1
+                sr = s.get(f'https://searchtv.net/stream/uuid/{items[i]}/', timeout=3)
+                if '#EXTM3U' in sr.text:
+                    title = str(items[i])
+                    url = ''
+                    for line in sr.text.split('\n'):
+                        if line.startswith('#EXTINF:'):
+                            parts = line.split(',')
+                            if len(parts) > 1:
+                                raw = parts[1].strip().split('==>')[0].strip()
+                                title = re.sub(r'\s*\(\d+\)\s*$', '', raw).strip()
+                        elif line.startswith('http'):
+                            url = line.strip()
+                            break
+                    if url:
+                        streams.append({'title': title, 'url': url})
+                        downloaded += 1
             except:
                 pass
             i += 1
