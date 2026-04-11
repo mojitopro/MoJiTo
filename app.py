@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 from flask import Flask, request, jsonify, send_file
 import os
-import time
-import traceback
+import threading
 
 app = Flask(__name__)
 
@@ -22,24 +21,14 @@ def api_search():
     start_idx = (page - 1) * limit
     
     try:
-        import requests
+        import cloudscraper
         import urllib.parse
-        scraper = requests.Session()
-        scraper.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'es-ES,es;q=0.9,en-US;q=0.8,en;q=0.7',
-            'Referer': 'https://searchtv.net/'
-        })
+        scraper = cloudscraper.create_scraper()
         
-        time.sleep(1)
-        scraper.get('https://searchtv.net/', timeout=15)
-        time.sleep(0.5)
-        
-        resp = scraper.get(f'https://searchtv.net/search/?query={urllib.parse.quote(q)}', timeout=15)
+        resp = scraper.get(f'https://searchtv.net/search/?query={urllib.parse.quote(q)}', timeout=10)
         
         if resp.status_code != 200:
-            return jsonify({'streams': [], 'status': resp.status_code, 'text': resp.text[:100]})
+            return jsonify({'streams': []})
         
         items = list(resp.json().keys())
         
@@ -77,8 +66,7 @@ def api_search():
         return jsonify({'streams': streams, 'hasMore': has_more})
         
     except Exception as e:
-        import traceback
-        return jsonify({'streams': [], 'error': str(e)[:50], 'trace': traceback.format_exc()[:100]})
+        return jsonify({'streams': [], 'error': str(e)[:50]})
 
 if __name__ == '__main__':
     print('SŌF TV - Fast HD Priority')
