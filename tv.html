@@ -135,19 +135,22 @@ function loadPage(p){
     var url=PROXY+encodeURIComponent(API+'/search/?q='+encodeURIComponent(txt));
     fetch(url).then(function(r){return r.text()}).then(function(t){
         loading=false;
-        var first50=t.substring(0,50);
-        log('Got: '+first50+'...');
+        if(t.startsWith('<')){log('HTML:'+t.substring(0,30));return;}
+        log('Len:'+t.length);
+        if(t.length<10){log('Muy corto');return;}
         try{
             var d=JSON.parse(t);
             var keys=Object.keys(d);
-            log('Keys: '+keys.length);
-            processKeys(keys,p);
+            if(keys.length){
+                log('Keys: '+keys.length);
+                processKeys(keys,p);
+            }else{log('Sin keys');}
         }catch(e){
-            log('Not JSON: '+first50);
+            log('Err: '+t.substring(0,40));
         }
     }).catch(function(e){
         loading=false;
-        log('Sin conexion');
+        log('Fail: '+e.message);
     });
 }
 
