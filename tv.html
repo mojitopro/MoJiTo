@@ -48,8 +48,7 @@ option:checked,option:focus,option:selected{background:#0066cc;color:#fff}
 </div>
 
 <script>
-var BASE=window.location.protocol+'//'+window.location.host;
-var API=BASE+'/api/search';
+var API='https://searchtv.net';
 var streams=[], favorites=[], idx=0, txt='', mode='search', page=1, hasMore=false, loading=false;
 var elIn=document.getElementById('in'), elSel=document.getElementById('results'), elMsg=document.getElementById('msg'), elMenu=document.getElementById('menu'), elVideo=document.getElementById('video');
 
@@ -58,8 +57,7 @@ function log(m,t){elMsg.textContent=m;elMsg.className=t||'info'}
 function ql(t){
     if(/1080|4k|uhd/i.test(t))return' [1080p]';
     if(/720|hd/i.test(t))return' [HD]';
-    if(/480|sd/i.test(t))return' [SD]';
-    return'';
+    return' [SD]';
 }
 
 function renderIn(){elIn.textContent=txt||'Escribe el canal...';}
@@ -133,20 +131,47 @@ function loadPage(p){
     if(loading)return;
     loading=true;
     log('Cargando...');
-    var x=new XMLHttpRequest();
-    x.open('GET',API+'?q='+encodeURIComponent(txt)+'&page='+p,true);
-    x.onload=function(){
+    fetch(API+'/search/?q='+encodeURIComponent(txt)).then(function(r){return r.json()}).then(function(d){
         loading=false;
-        if(x.status===200){
-            try{
-                var d=JSON.parse(x.responseText);
-                showStreams(d.streams||[],d.hasMore,p===1);
-                if(p>1){idx=streams.length-d.streams.length;elSel.selectedIndex=idx;elSel.focus();}
-            }catch(e){log('Error');}
+        var keys=Object.keys(d);
+        processKeys(keys,p);
+    }).catch(function(e){
+        loading=false;
+        log('Error: '+e.message);
+    });
+}
+
+function processKeys(keys,p){
+    var limit=20, startIdx=(p-1)*limit, downloaded=0, i=startIdx;
+    function checkNext(){
+        if(downloaded>=limit||i>=keys.length){
+            showStreams(streams, hasMore, p===1);
+            return;
         }
-    };
-    x.onerror=function(){loading=false;log('Sin conexion');};
-    x.send();
+        fetch(API+'/stream/uuid/'+keys[i]+'/').then(function(r){return r.text()}).then(function(t){
+            i++;
+            if('#EXTM3U' in t){
+                var title=keys[i-1], url='';
+                t.split('\n').forEach(function(line){
+                    if(line.startsWith('#EXTINF:')){
+                        var parts=line.split(',');
+                        if(parts.length>1){
+                            var raw=parts[1].split('==>')[0].trim();
+                            title=raw.replace(/\s*\(\d+\)\s*$/,'').trim();
+                        }
+                    }else if(line.startsWith('http')){
+                        url=line.trim();
+                    }
+                });
+                if(url){
+                    streams.push({title:title,url:url});
+                    downloaded++;
+                }
+            }
+            checkNext();
+        }).catch(function(){i++;checkNext();});
+    }
+    checkNext();
 }
 
 function showStreams(data,more,isFirst){
