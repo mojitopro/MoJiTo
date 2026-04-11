@@ -131,24 +131,25 @@ function loadPage(p){
     if(loading)return;
     loading=true;
     log('Cargando...');
-    fetch(API+'/search/?q='+encodeURIComponent(txt)).then(function(r){return r.json()}).then(function(d){
+    fetch(API+'/search/?q='+encodeURIComponent(txt), {mode: 'cors'}).then(function(r){return r.json()}).then(function(d){
         loading=false;
         var keys=Object.keys(d);
         processKeys(keys,p);
     }).catch(function(e){
         loading=false;
-        log('Error: '+e.message);
+        log('Sin conexion');
     });
 }
 
 function processKeys(keys,p){
     var limit=20, startIdx=(p-1)*limit, downloaded=0, i=startIdx;
+    if(!keys||!keys.length){loading=false;log('Sin resultados');return;}
     function checkNext(){
         if(downloaded>=limit||i>=keys.length){
             showStreams(streams, hasMore, p===1);
             return;
         }
-        fetch(API+'/stream/uuid/'+keys[i]+'/').then(function(r){return r.text()}).then(function(t){
+        fetch(API+'/stream/uuid/'+keys[i]+'/', {mode: 'cors'}).then(function(r){return r.text()}).then(function(t){
             i++;
             if('#EXTM3U' in t){
                 var title=keys[i-1], url='';
