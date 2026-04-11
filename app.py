@@ -11,33 +11,29 @@ def get_device_type():
     ua = request.headers.get('User-Agent', '').lower()
     accept = request.headers.get('Accept', '').lower()
     
-    # Check for Smart TV indicators in User-Agent
-    tv_indicators = ['smarttv', 'smart-tv', 'philco', 'googletv', 'appletv', 'roku', 'chromecast', 'tizen', 'webos', 'netcast', 'linux', 'arm']
-    is_tv_ua = any(indicator in ua for indicator in tv_indicators)
+    # PRIORITY 1: Mobile - keywords más comunes de móviles
+    mobile_keywords = ['android', 'iphone', 'ipad', 'ipod', 'mobile', 'tablet', 'opera mini', 'opera mobi', 'blackberry', 'windows phone', 'safari']
+    if any(keyword in ua for keyword in mobile_keywords):
+        # Si es mobile Y NO es desktop/safari de escritorio
+        if 'windows nt' not in ua and 'mac os x' not in ua:
+            return 'mobile'
+        # iPhone/iPad con Safari
+        if 'iphone' in ua or 'ipad' in ua or 'ipod' in ua:
+            return 'mobile'
     
-    # PC: typical desktop OS without mobile indicators
-    is_pc = any(x in ua for x in ['windows', 'macintosh']) and 'mobile' not in ua
+    # PRIORITY 2: PC - Desktop OS sin móvil
+    pc_keywords = ['windows nt', 'macintosh', 'linux', 'firefox', 'chrome']
+    if any(keyword in ua for keyword in pc_keywords):
+        if 'mobile' not in ua and 'android' not in ua and 'tablet' not in ua:
+            return 'pc'
     
-    # Mobile: typical mobile indicators
-    is_mobile = any(x in ua for x in ['android', 'iphone', 'mobile', 'tablet'])
-    
-    # Additional check: if no user-agent but accepts HTML, default to TV
-    if not ua or ua == '*':
+    # PRIORITY 3: Smart TV
+    tv_keywords = ['smarttv', 'smart-tv', 'philco', 'googletv', 'appletv', 'roku', 'chromecast', 'tizen', 'webos', 'netcast', 'hbbtv', 'aftb']
+    if any(keyword in ua for keyword in tv_keywords):
         return 'tv'
     
-    # If appears to be mobile device
-    if is_mobile:
-        return 'mobile'
-    
-    # If has PC indicators and no mobile
-    if is_pc:
-        return 'pc'
-    
-    # Default to TV for smart TV browsers / WebViews
-    if is_tv_ua or 'linux' in ua or 'arm' in ua:
-        return 'tv'
-    
-    return 'tv'
+    # Default: mobile (más común)
+    return 'mobile'
 
 @app.route('/')
 def index():
@@ -102,6 +98,15 @@ def api_search():
 def api_status():
     from scraper.searchtv import get_status
     return jsonify(get_status())
+
+@app.route('/api/debug')
+def api_debug():
+    ua = request.headers.get('User-Agent', '')
+    device = get_device_type()
+    return jsonify({
+        'user_agent': ua,
+        'detected_device': device
+    })
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, threaded=True, debug=False)
