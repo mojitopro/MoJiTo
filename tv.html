@@ -135,13 +135,15 @@ function loadPage(p){
     var url=PROXY+encodeURIComponent(API+'/search/?q='+encodeURIComponent(txt));
     fetch(url).then(function(r){return r.text()}).then(function(t){
         loading=false;
+        var first50=t.substring(0,50);
+        log('Got: '+first50+'...');
         try{
             var d=JSON.parse(t);
             var keys=Object.keys(d);
             log('Keys: '+keys.length);
             processKeys(keys,p);
         }catch(e){
-            log('Error JSON');
+            log('Not JSON: '+first50);
         }
     }).catch(function(e){
         loading=false;
