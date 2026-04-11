@@ -25,32 +25,40 @@ def api_search():
         import json
         import re
         
-        proxies = {
-            'http': 'http://104.244.76.13:45842',
-            'https': 'http://104.244.76.13:45842'
-        }
-        
         s = requests.Session()
         s.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Referer': 'https://searchtv.net/'
         })
         
-        try:
-            r = s.get(
-                'https://searchtv.net/search/?query=' + urllib.parse.quote(q),
-                proxies=proxies,
-                timeout=15
-            )
-        except:
-            r = s.get(
-                'https://searchtv.net/search/?query=' + urllib.parse.quote(q),
-                timeout=15
-            )
+        proxies_list = [
+            {'http': 'http://167.71.192.89:1080', 'https': 'http://167.71.192.89:1080'},
+            {'http': 'http://207.180.243.216:5690', 'https': 'http://207.180.243.216:5690'},
+            {'http': 'http://195.201.92.52:3128', 'https': 'http://195.201.92.52:3128'},
+            {'http': 'http://89.187.175.101:3128', 'https': 'http://89.187.175.101:3128'},
+            {'http': 'http://154.38.163.109:3128', 'https': 'http://154.38.163.109:3128'},
+            {'http': 'http://167.71.75.51:3128', 'https': 'http://167.71.75.51:3128'},
+            None
+        ]
         
-        if r.status_code != 200:
-            return jsonify({'streams': [], 'status': r.status_code})
+        items = None
+        for proxy in proxies_list:
+            try:
+                r = s.get(
+                    'https://searchtv.net/search/?query=' + urllib.parse.quote(q),
+                    proxies=proxy,
+                    timeout=8
+                )
+                if r.status_code == 200 and '<' not in r.text[:10]:
+                    items = list(r.json().keys())
+                    break
+            except:
+                continue
         
-        items = list(r.json().keys())
+        if not items:
+            return jsonify({'streams': [], 'error': 'all_proxies_failed'})
         
         streams = []
         downloaded = 0
