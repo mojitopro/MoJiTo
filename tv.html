@@ -49,7 +49,12 @@ option:checked,option:focus,option:selected{background:#0066cc;color:#fff}
 
 <script>
 var API='https://searchtv.net';
-var PROXY='https://corsproxy.io/?';
+var PROXIES=[
+    'https://corsproxy.io/?url=',
+    'https://thingproxy.freeboard.io/thing/',
+    'https://api.allorigins.win/raw?url='
+];
+var PROXY_IDX=0;
 var streams=[], favorites=[], idx=0, txt='', mode='search', page=1, hasMore=false, loading=false;
 var elIn=document.getElementById('in'), elSel=document.getElementById('results'), elMsg=document.getElementById('msg'), elMenu=document.getElementById('menu'), elVideo=document.getElementById('video');
 
@@ -128,25 +133,30 @@ function buscar(){
     loadPage(1);
 }
 
-function loadPage(p){
-    if(loading)return;
+function tryProxy(p, idx){
+    if(idx>=PROXIES.length){loading=false;log('Sin proxys');return;}
     loading=true;
-    log('Buscando: '+txt);
-    var url=PROXY+encodeURIComponent(API+'/search/?q='+encodeURIComponent(txt));
-    fetch(url).then(function(r){return r.text()}).then(function(t){
+    log('Try proxy '+(idx+1)+'...');
+    var url=PROXIES[idx]+encodeURIComponent(API+'/search/?q='+encodeURIComponent(txt));
+    fetch(url, {cache: 'no-store'}).then(function(r){return r.text()}).then(function(t){
         loading=false;
-        if(t.startsWith('<')){log('HTML:'+t.substring(0,30));return;}
-        log('Len:'+t.length);
-        if(t.length<10){log('Muy corto');return;}
+        if(t.startsWith('<')){tryProxy(p, idx+1);return;}
+        if(t.length<10){tryProxy(p, idx+1);return;}
         try{
             var d=JSON.parse(t);
             var keys=Object.keys(d);
             if(keys.length){
                 log('Keys: '+keys.length);
                 processKeys(keys,p);
-            }else{log('Sin keys');}
-        }catch(e){
-            log('Err: '+t.substring(0,40));
+            }else{log('Sin keys');tryProxy(p, idx+1);}
+        }catch(e){tryProxy(p, idx+1);}
+    }).catch(function(){tryProxy(p, idx+1);});
+}
+
+function loadPage(p){
+    if(loading)return;
+    tryProxy(p, 0);
+}
         }
     }).catch(function(e){
         loading=false;
