@@ -48,8 +48,8 @@ option:checked,option:focus,option:selected{background:#0066cc;color:#fff}
 </div>
 
 <script>
-var PROXY='https://corsproxy.io/?';
 var API='https://searchtv.net';
+var PROXY='https://corsproxy.io/?';
 var streams=[], favorites=[], idx=0, txt='', mode='search', page=1, hasMore=false, loading=false;
 var elIn=document.getElementById('in'), elSel=document.getElementById('results'), elMsg=document.getElementById('msg'), elMenu=document.getElementById('menu'), elVideo=document.getElementById('video');
 
@@ -132,30 +132,20 @@ function loadPage(p){
     if(loading)return;
     loading=true;
     log('Buscando: '+txt);
-    var url='https://searchtv.net/search/?q='+encodeURIComponent(txt);
-    fetch(url, {
-        headers: {
-            'Referer': 'https://searchtv.net/',
-            'Origin': 'https://searchtv.net',
-            'Accept': 'application/json'
-        }
-    }).then(function(r){
-        log('Response: '+r.status);
-        if(!r.ok)throw new Error('HTTP '+r.status);
-        return r.text();
-    }).then(function(txt){
-        log('Text len: '+txt.length);
+    var url=PROXY+encodeURIComponent(API+'/search/?q='+encodeURIComponent(txt));
+    fetch(url).then(function(r){return r.text()}).then(function(t){
+        loading=false;
         try{
-            var d=JSON.parse(txt);
+            var d=JSON.parse(t);
             var keys=Object.keys(d);
+            log('Keys: '+keys.length);
             processKeys(keys,p);
         }catch(e){
-            console.log('Raw:', txt.substring(0,200));
-            log('Error parse');
+            log('Error JSON');
         }
     }).catch(function(e){
         loading=false;
-        log('Error: '+e.message);
+        log('Sin conexion');
     });
 }
 
@@ -168,7 +158,7 @@ function processKeys(keys,p){
             showStreams(streams, hasMore, p===1);
             return;
         }
-        var streamUrl=API+'/stream/uuid/'+keys[i]+'/';
+        var streamUrl=PROXY+encodeURIComponent(API+'/stream/uuid/'+keys[i]+'/');
         fetch(streamUrl).then(function(r){return r.text()}).then(function(t){
             i++;
             if('#EXTM3U' in t){
