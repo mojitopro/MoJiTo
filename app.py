@@ -1,31 +1,13 @@
 #!/usr/bin/env python3
 from flask import Flask, request, jsonify, send_file
 import os
-import re
+import threading
 
 app = Flask(__name__)
 
-def detect_device():
-    ua = request.headers.get('User-Agent', '').lower()
-    
-    if any(d in ua for d in ['crkey', 'appletv', 'roku', 'firetv', 'fire tv', 'chromecast', 'tcl', 'lgwebtv', 'vizio', 'samsung', 'panasonic', 'sharp', 'sony', 'hisense', 'telefunken', 'grundig', 'loewe', 'metz', 'philips']):
-        return 'tv'
-    
-    if any(m in ua for m in ['iphone', 'ipad', 'ipod', 'android', 'mobile', 'tablet']):
-        return 'mobile'
-    
-    return 'pc'
-
 @app.route('/')
 def index():
-    device = detect_device()
-    
-    if device == 'tv':
-        return send_file('tv.html')
-    elif device == 'mobile':
-        return send_file('mobile.html')
-    else:
-        return send_file('pc.html')
+    return send_file(os.path.join(os.path.dirname(__file__), 'tv.html'))
 
 @app.route('/api/search')
 def api_search():
@@ -39,17 +21,32 @@ def api_search():
     start_idx = (page - 1) * limit
     
     try:
-        import requests
+        import cloudscraper
         import urllib.parse
-        scraper = requests.Session()
+        scraper = cloudscraper.create_scraper(
+            browser={
+                'browser': 'chrome',
+                'platform': 'windows',
+                'mobile': False,
+                'desktop': True
+            }
+        )
+        
+        home_resp = scraper.get('https://searchtv.net/', timeout=15)
+        
+        if home_resp.status_code != 200:
+            import requests
+            scraper = requests.Session()
+            scraper.headers.update({
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            })
+        
         scraper.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
             'Accept-Language': 'es-ES,es;q=0.9,en-US;q=0.8,en;q=0.7',
             'Referer': 'https://searchtv.net/'
         })
         
-        scraper.get('https://searchtv.net/', timeout=15)
         resp = scraper.get(f'https://searchtv.net/search/?query={urllib.parse.quote(q)}', timeout=15)
         
         if resp.status_code != 200:
@@ -72,6 +69,7 @@ def api_search():
                             parts = line.split(',')
                             if len(parts) > 1:
                                 raw = parts[1].strip().split('==>')[0].strip()
+                                import re
                                 title = re.sub(r'\s*\(\d+\)\s*$', '', raw).strip()
                         elif line.startswith('http'):
                             url = line.strip()
@@ -93,5 +91,5 @@ def api_search():
         return jsonify({'streams': [], 'error': str(e)[:50]})
 
 if __name__ == '__main__':
-    print('MoJiTo Multi-Device Server')
+    print('SŌF TV - Fast HD Priority')
     app.run(host='0.0.0.0', port=8080, threaded=True, debug=False)
