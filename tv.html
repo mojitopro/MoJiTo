@@ -133,7 +133,13 @@ function loadPage(p){
     loading=true;
     log('Buscando: '+txt);
     var url='https://searchtv.net/search/?q='+encodeURIComponent(txt);
-    fetch(url).then(function(r){
+    fetch(url, {
+        headers: {
+            'Referer': 'https://searchtv.net/',
+            'Origin': 'https://searchtv.net',
+            'Accept': 'application/json'
+        }
+    }).then(function(r){
         log('Response: '+r.status);
         if(!r.ok)throw new Error('HTTP '+r.status);
         return r.text();
