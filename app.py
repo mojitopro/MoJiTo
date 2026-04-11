@@ -19,15 +19,25 @@ def api_search():
         import urllib.parse
         import re
         
-        scraper = cloudscraper.create_scraper()
+        scraper = cloudscraper.create_scraper(
+            browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False},
+            interpreter='native'
+        )
         
-        resp = scraper.get(f'https://searchtv.net/search/?query={urllib.parse.quote(q)}', timeout=10)
+        r1 = scraper.get('https://searchtv.net/', timeout=15)
+        
+        resp = scraper.get(f'https://searchtv.net/search/?query={urllib.parse.quote(q)}', timeout=15)
+        
         if resp.status_code != 200:
-            return jsonify({'streams': []})
+            return jsonify({'streams': [], 'debug': {'status': resp.status_code, 'text': resp.text[:100]}})
+        
+        text = resp.text
+        if text.startswith('<'):
+            return jsonify({'streams': [], 'debug': 'html_response', 'text': text[:200]})
         
         items = resp.json()
-        streams = []
         
+        streams = []
         for item_id, info in items.items():
             try:
                 r = scraper.get(f'https://searchtv.net/stream/uuid/{item_id}/', timeout=3)
@@ -44,10 +54,11 @@ def api_search():
         
         streams.sort(key=lambda x: 1 if '1080' in x['title'].lower() or 'hd' in x['title'].lower() else 2)
         
-        return jsonify({'streams': streams, 'hasMore': False})
+        return jsonify({'streams': streams, 'hasMore': False, 'count': len(streams)})
         
     except Exception as e:
-        return jsonify({'streams': [], 'error': str(e)[:100]})
+        import traceback
+        return jsonify({'streams': [], 'error': str(e)[:100], 'trace': traceback.format_exc()[:200]})
 
 if __name__ == '__main__':
     print('MoJiTo TV')
