@@ -132,25 +132,36 @@ function loadPage(p){
     if(loading)return;
     loading=true;
     log('Cargando...');
-    fetch(PROXY+encodeURIComponent(API+'/search/?q='+encodeURIComponent(txt))).then(function(r){return r.json()}).then(function(d){
+    var url=PROXY+encodeURIComponent(API+'/search/?q='+encodeURIComponent(txt));
+    fetch(url).then(function(r){
+        if(!r.ok)throw new Error('HTTP '+r.status);
+        return r.text();
+    }).then(function(txt){
         loading=false;
-        var keys=Object.keys(d);
-        processKeys(keys,p);
+        try{
+            var d=JSON.parse(txt);
+            var keys=Object.keys(d);
+            processKeys(keys,p);
+        }catch(e){
+            log('Error: parse');
+        }
     }).catch(function(e){
         loading=false;
-        log('Sin conexion');
+        log('Sin conexion: '+e.message);
     });
 }
 
 function processKeys(keys,p){
+    log('Keys: '+keys.length);
     var limit=20, startIdx=(p-1)*limit, downloaded=0, i=startIdx;
-    if(!keys||!keys.length){loading=false;log('Sin resultados');return;}
+    if(!keys||!keys.length){loading=false;log('Sin resultados ('+keys.length+')');return;}
     function checkNext(){
         if(downloaded>=limit||i>=keys.length){
             showStreams(streams, hasMore, p===1);
             return;
         }
-        fetch(PROXY+encodeURIComponent(API+'/stream/uuid/'+keys[i]+'/')).then(function(r){return r.text()}).then(function(t){
+        var streamUrl=PROXY+encodeURIComponent(API+'/stream/uuid/'+keys[i]+'/');
+        fetch(streamUrl).then(function(r){return r.text()}).then(function(t){
             i++;
             if('#EXTM3U' in t){
                 var title=keys[i-1], url='';
