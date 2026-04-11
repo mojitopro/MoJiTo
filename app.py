@@ -7,9 +7,60 @@ app = Flask(__name__)
 from scraper.searchtv import search
 from core.cache import get_cached, set_cached, get_fallback
 
+def get_device_type():
+    ua = request.headers.get('User-Agent', '').lower()
+    accept = request.headers.get('Accept', '').lower()
+    
+    # Check for Smart TV indicators in User-Agent
+    tv_indicators = ['smarttv', 'smart-tv', 'philco', 'googletv', 'appletv', 'roku', 'chromecast', 'tizen', 'webos', 'netcast', 'linux', 'arm']
+    is_tv_ua = any(indicator in ua for indicator in tv_indicators)
+    
+    # PC: typical desktop OS without mobile indicators
+    is_pc = any(x in ua for x in ['windows', 'macintosh']) and 'mobile' not in ua
+    
+    # Mobile: typical mobile indicators
+    is_mobile = any(x in ua for x in ['android', 'iphone', 'mobile', 'tablet'])
+    
+    # Additional check: if no user-agent but accepts HTML, default to TV
+    if not ua or ua == '*':
+        return 'tv'
+    
+    # If appears to be mobile device
+    if is_mobile:
+        return 'mobile'
+    
+    # If has PC indicators and no mobile
+    if is_pc:
+        return 'pc'
+    
+    # Default to TV for smart TV browsers / WebViews
+    if is_tv_ua or 'linux' in ua or 'arm' in ua:
+        return 'tv'
+    
+    return 'tv'
+
 @app.route('/')
 def index():
+    device = get_device_type()
+    
+    if device == 'tv':
+        return send_file('tv.html')
+    elif device == 'mobile':
+        return send_file('mobile.html')
+    else:
+        return send_file('pc.html')
+
+@app.route('/tv')
+def tv():
     return send_file('tv.html')
+
+@app.route('/mobile')
+def mobile():
+    return send_file('mobile.html')
+
+@app.route('/pc')
+def pc():
+    return send_file('pc.html')
 
 @app.route('/api/search')
 def api_search():
