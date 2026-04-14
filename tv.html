@@ -9,58 +9,63 @@
 :root{--primary:#ff4757;--secondary:#ff6b81;--bg:#0a0a0a;--bg2:#111;--text:#fff;--text2:#888}
 html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:Arial,sans-serif;overflow:hidden}
 
-#app{display:flex;height:100%;transition:all 0.3s}
+#app{display:flex;height:100%}
 #app.fullscreen{flex-direction:column}
 #app.fullscreen #sidebar{display:none}
-#app.fullscreen #player-area{forder:none}
 
-#sidebar{width:280px;background:var(--bg2);display:flex;flex-direction:column;border-right:1px solid #222;transition:all 0.3s}
-#sidebar-header{padding:20px;border-bottom:1px solid #222}
-.logo{font-size:28px;font-weight:bold}
+#sidebar{width:300px;background:var(--bg2);display:flex;flex-direction:column;border-right:1px solid #222}
+#sidebar-header{padding:15px;border-bottom:1px solid #222}
+.logo{font-size:24px;font-weight:bold}
 .logo .sof{color:var(--primary)}
 .logo .mojito{color:var(--secondary)}
-.logo .tv{color:var(--text);font-size:14px;margin-left:5px}
+.logo .tv{color:var(--text);font-size:12px;margin-left:3px}
 
-#search-box{width:100%;padding:12px;background:#000;border:1px solid #333;color:#fff;font-size:16px;margin-top:15px;border-radius:4px}
+#search-box{width:100%;padding:10px;background:#000;border:1px solid #333;color:#fff;font-size:14px;border-radius:4px;ime-mode:disabled}
 #search-box:focus{outline:none;border-color:var(--primary)}
+#search-box::placeholder{color:#555}
 
-#channel-list{flex:1;overflow-y:auto;padding:10px}
-.channel-item{padding:12px 15px;margin:2px 0;border-radius:4px;cursor:pointer;transition:background 0.2s}
+#channel-list{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:2px}
+.channel-item{padding:8px 12px;border-radius:4px;cursor:pointer;transition:all 0.15s;display:flex;justify-content:space-between;align-items:center}
 .channel-item:hover{background:#222}
 .channel-item.active{background:var(--primary);color:#fff}
-.channel-item .name{font-size:15px;font-weight:bold}
-.channel-item .status{font-size:12px;color:var(--text2);margin-top:4px}
-.channel-item.active .status{color:rgba(255,255,255,0.7)}
+.channel-item .name{font-size:13px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
+.channel-item .count{font-size:11px;opacity:0.7;background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:3px}
 
 #main{flex:1;display:flex;flex-direction:column;position:relative}
-#player-area{flex:1;background:#000;display:flex;align-items:center;justify-content:relative;position:relative}
+#player-area{flex:1;background:#000;display:flex;align-items:center;justify-content:center;position:relative}
 #video{width:100%;height:100%;background:#000;object-fit:contain}
 #video:focus{outline:none}
 
-#no-signal{position:absolute;text-align:center;color:var(--text2);z-index:10}
-#no-signal .icon{font-size:60px;margin-bottom:20px}
+#no-signal{position:absolute;text-align:center;color:var(--text2);z-index:10;padding:20px}
+#no-signal .icon{font-size:50px;margin-bottom:15px}
+#no-signal .msg{font-size:16px}
 
-#info-bar{height:60px;background:var(--bg2);display:flex;align-items:center;padding:0 20px;border-top:1px solid #222}
-#now-playing{flex:1}
-#now-playing .title{font-size:18px;font-weight:bold}
-#now-playing .channel{font-size:14px;color:var(--text2)}
-#controls{display:flex;gap:10px}
-#controls button{background:#222;border:none;color:#fff;padding:8px 14px;border-radius:4px;cursor:pointer;font-size:13px}
+#info-bar{height:50px;background:var(--bg2);display:flex;align-items:center;padding:0 15px;border-top:1px solid #222;gap:10px}
+#now-playing{flex:1;min-width:0}
+#now-playing .title{font-size:16px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#now-playing .channel{font-size:12px;color:var(--text2)}
+#controls{display:flex;gap:8px}
+#controls button{background:#222;border:none;color:#fff;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px}
 #controls button:hover{background:var(--primary)}
 
 #loading{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;z-index:999}
-#loading .spinner{width:50px;height:50px;border:3px solid #333;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite}
+#loading .spinner{width:40px;height:40px;border:3px solid #333;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-#msg-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 20px;border-radius:4px;display:none;z-index:100;font-size:16px}
+#msg-toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 20px;border-radius:4px;display:none;z-index:100;font-size:14px}
 
-#overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;z-index:200}
-#overlay .panel{background:var(--bg2);padding:30px;border-radius:10px;text-align:center;min-width:300px}
-#overlay .panel h3{color:var(--primary);margin-bottom:20px}
-#overlay .panel button{display:block;width:100%;padding:15px;margin:10px 0;background:#222;border:none;color:#fff;border-radius:4px;cursor:pointer;font-size:16px}
+#overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:200}
+#overlay .panel{background:var(--bg2);padding:25px;border-radius:10px;text-align:center;min-width:250px}
+#overlay .panel h3{color:var(--primary);margin-bottom:15px;font-size:22px}
+#overlay .panel button{display:block;width:100%;padding:12px;margin:8px 0;background:#222;border:none;color:#fff;border-radius:4px;cursor:pointer;font-size:15px}
 #overlay .panel button:hover{background:var(--primary)}
 
-.fondo-gif{position:fixed;top:0;left:0;width:100%;height:100%;opacity:0.25;pointer-events:none;z-index:0}
+.fondo-gif{position:fixed;top:0;left:0;width:100%;height:100%;opacity:0.2;pointer-events:none;z-index:0}
+
+@media (max-width: 700px){
+    #sidebar{width:200px}
+    .channel-item .name{max-width:120px}
+}
 </style>
 </head>
 <body>
@@ -71,17 +76,17 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-fam
     <div id="sidebar">
         <div id="sidebar-header">
             <div class="logo"><span class="sof">SōF</span><span class="mojito">MoJiTo</span><span class="tv">TV</span></div>
-            <input type="text" id="search-box" placeholder="Buscar canal...">
+            <input type="text" id="search-box" placeholder="Buscar..." autocomplete="off" spellcheck="false">
         </div>
         <div id="channel-list"></div>
     </div>
     
     <div id="main">
         <div id="player-area">
-            <video id="video" controls></video>
+            <video id="video" controls playsinline></video>
             <div id="no-signal">
                 <div class="icon">📺</div>
-                <div>Selecciona un canal</div>
+                <div class="msg">Selecciona un canal</div>
             </div>
         </div>
         <div id="info-bar">
@@ -90,7 +95,7 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-fam
                 <div class="channel" id="np-channel">--</div>
             </div>
             <div id="controls">
-                <button id="btn-fullscreen">⛶ Full</button>
+                <button id="btn-fullscreen">⛶</button>
                 <button id="btn-retry">↻</button>
                 <button id="btn-prev">◀</button>
                 <button id="btn-next">▶</button>
@@ -116,10 +121,10 @@ var API_BASE = '/api';
 var channels = [];
 var filteredChannels = [];
 var currentChannel = null;
-var currentIndex = 0;
 var currentStreamIndex = 0;
 var streams = [];
 var lastChannel = localStorage.getItem('mojitolast') || null;
+var selectedIndex = -1;
 
 var video = document.getElementById('video');
 var channelList = document.getElementById('channel-list');
@@ -161,13 +166,18 @@ async function loadChannels(){
         channels = data.channels || [];
         filteredChannels = [...channels];
         renderChannels();
+        
+        // Select last channel if exists
         if(lastChannel && channels.includes(lastChannel)){
-            setTimeout(() => playChannel(lastChannel), 500);
+            setTimeout(() => {
+                selectChannel(channels.indexOf(lastChannel));
+                playChannel(lastChannel);
+            }, 500);
         }else{
             overlay.style.display = 'flex';
         }
     } catch(e){
-        showToast('Error cargando canales');
+        showToast('Error: ' + e.message);
     }
 }
 
@@ -175,24 +185,39 @@ function renderChannels(){
     channelList.innerHTML = '';
     filteredChannels.forEach(function(ch, i){
         var div = document.createElement('div');
-        div.className = 'channel-item' + (ch === lastChannel ? ' active' : '');
-        div.innerHTML = '<div class="name">' + ch + '</div><div class="status">⏎ Enter para ver</div>';
-        div.onclick = function(){ playChannel(ch); };
+        div.className = 'channel-item' + (i === selectedIndex ? ' active' : '');
+        div.innerHTML = '<div class="name">' + ch + '</div>';
+        div.onclick = function(){
+            selectedIndex = i;
+            renderChannels();
+            playChannel(ch);
+        };
         channelList.appendChild(div);
     });
 }
 
+function selectChannel(idx){
+    if(idx >= 0 && idx < filteredChannels.length){
+        selectedIndex = idx;
+        renderChannels();
+        var el = channelList.children[idx];
+        if(el) el.scrollIntoView({block:'nearest', behavior:'smooth'});
+    }
+}
+
 function filterChannels(){
-    var q = searchBox.value.toLowerCase();
-    filteredChannels = q ? channels.filter(c => c.toLowerCase().includes(q)) : [...channels];
+    var q = searchBox.value.toLowerCase().trim();
+    if(!q){
+        filteredChannels = [...channels];
+        selectedIndex = 0;
+    }else{
+        filteredChannels = channels.filter(c => c.toLowerCase().includes(q));
+        selectedIndex = filteredChannels.length > 0 ? 0 : -1;
+    }
     renderChannels();
 }
 
 async function playChannel(name){
-    if(app.classList.contains('fullscreen')){
-        await zapTo(name);
-        return;
-    }
     showLoading();
     currentChannel = name;
     currentStreamIndex = 0;
@@ -205,17 +230,17 @@ async function playChannel(name){
         
         if(data.stream && data.stream.url){
             streams = [data.stream];
+            if(data.stream.fallbacks && data.stream.fallbacks.length > 0){
+                streams = streams.concat(data.stream.fallbacks.map(function(u){return {url:u};}));
+            }
             playStream(data.stream.url);
             npTitle.textContent = name;
-            showToast('▶ ' + name);
         }else{
             var searchData = await fetchJSON(API_BASE + '/search?q=' + encodeURIComponent(name));
             if(searchData.streams && searchData.streams.length > 0){
                 streams = searchData.streams;
-                currentStreamIndex = 0;
                 playStream(streams[0].url);
                 npTitle.textContent = streams[0].title || name;
-                showToast('▶ ' + (streams[0].title || name));
             }else{
                 showToast('Sin señal');
                 npTitle.textContent = 'Sin señal';
@@ -229,86 +254,33 @@ async function playChannel(name){
     }
     
     hideLoading();
-    highlightChannel(name);
 }
 
 function playStream(url){
     noSignal.style.display = 'none';
     video.style.display = 'block';
     video.src = url;
-    video.play().catch(e => {
+    video.play().catch(function(e){
         if(currentStreamIndex < streams.length - 1){
             currentStreamIndex++;
-            showToast('Cambiando stream...');
+            showToast('Fallback...');
             playStream(streams[currentStreamIndex].url);
         }else{
-            showToast('Sin streams');
+            showToast('Sin streams disponibles');
         }
     });
 }
 
-function highlightChannel(name){
-    var items = channelList.getElementsByClassName('channel-item');
-    for(var i = 0; i < items.length; i++){
-        items[i].classList.toggle('active', items[i].querySelector('.name').textContent === name);
-    }
-}
-
-function getCurrentChannelIndex(){
-    var active = document.querySelector('.channel-item.active');
-    if(active){
-        var name = active.querySelector('.name').textContent;
-        return filteredChannels.indexOf(name);
-    }
-    return -1;
-}
-
-async function zapTo(name){
-    showLoading();
-    currentChannel = name;
-    currentStreamIndex = 0;
-    npTitle.textContent = 'Cambiando...';
-    npChannel.textContent = name;
-    localStorage.setItem('mojitolast', name);
-    
-    try {
-        var data = await fetchJSON(API_BASE + '/channel/' + encodeURIComponent(name));
-        
-        if(data.stream && data.stream.url){
-            streams = [data.stream];
-            playStream(data.stream.url);
-            npTitle.textContent = name;
-        }else{
-            var searchData = await fetchJSON(API_BASE + '/search?q=' + encodeURIComponent(name));
-            if(searchData.streams && searchData.streams.length > 0){
-                streams = searchData.streams;
-                playStream(streams[0].url);
-                npTitle.textContent = streams[0].title || name;
-            }else{
-                npTitle.textContent = 'Sin señal';
-                showToast('Sin señal: ' + name);
-            }
-        }
-    } catch(e){
-        showToast('Error zapping');
-    }
-    hideLoading();
-}
-
 function nextChannel(){
-    var idx = getCurrentChannelIndex();
-    if(idx === -1) idx = 0;
-    var nextIdx = (idx + 1) % filteredChannels.length;
-    var name = filteredChannels[nextIdx];
-    zapTo(name);
+    var nextIdx = (selectedIndex + 1) % filteredChannels.length;
+    selectChannel(nextIdx);
+    playChannel(filteredChannels[nextIdx]);
 }
 
 function prevChannel(){
-    var idx = getCurrentChannelIndex();
-    if(idx === -1) idx = 0;
-    var prevIdx = (idx - 1 + filteredChannels.length) % filteredChannels.length;
-    var name = filteredChannels[prevIdx];
-    zapTo(name);
+    var prevIdx = (selectedIndex - 1 + filteredChannels.length) % filteredChannels.length;
+    selectChannel(prevIdx);
+    playChannel(filteredChannels[prevIdx]);
 }
 
 function toggleFullscreen(){
@@ -329,6 +301,7 @@ function retry(){
 function randomChannel(){
     if(channels.length > 0){
         var rand = channels[Math.floor(Math.random() * channels.length)];
+        selectChannel(channels.indexOf(rand));
         playChannel(rand);
     }
 }
@@ -341,9 +314,8 @@ document.getElementById('btn-random').onclick = randomChannel;
 
 document.getElementById('btn-play').onclick = function(){
     overlay.style.display = 'none';
-    if(lastChannel && channels.includes(lastChannel)){
-        playChannel(lastChannel);
-    }else if(channels.length > 0){
+    if(channels.length > 0){
+        selectChannel(0);
         playChannel(channels[0]);
     }
 };
@@ -353,16 +325,32 @@ document.getElementById('btn-random-play').onclick = function(){
     randomChannel();
 };
 
-searchBox.oninput = filterChannels;
+searchBox.addEventListener('input', filterChannels);
+searchBox.addEventListener('keydown', function(e){
+    e.stopPropagation();
+});
 
 document.onkeydown = function(e){
     var k = e.key;
     
-    if(k === 'f' || k === 'F'){
+    // Handle Enter - select current highlighted channel and play
+    if(k === 'Enter'){
+        e.preventDefault();
+        if(overlay.style.display === 'flex'){
+            document.getElementById('btn-play').click();
+        }else if(selectedIndex >= 0 && selectedIndex < filteredChannels.length){
+            playChannel(filteredChannels[selectedIndex]);
+        }
+        return;
+    }
+    
+    // Fullscreen
+    if((k === 'f' || k === 'F') && searchBox !== document.activeElement){
         toggleFullscreen();
         return;
     }
     
+    // Escape
     if(k === 'Escape'){
         if(app.classList.contains('fullscreen')){
             app.classList.remove('fullscreen');
@@ -374,79 +362,53 @@ document.onkeydown = function(e){
         return;
     }
     
-    if(k === 'Enter'){
-        if(overlay.style.display === 'flex'){
-            document.getElementById('btn-play').click();
+    // Only handle navigation keys when not typing in search
+    if(searchBox !== document.activeElement){
+        if(k === 'ArrowRight' || k === 'ArrowDown'){
+            if(app.classList.contains('fullscreen')){
+                nextChannel();
+            }else{
+                var next = (selectedIndex + 1) % filteredChannels.length;
+                selectChannel(next);
+            }
+            e.preventDefault();
             return;
         }
-        var active = document.querySelector('.channel-item.active');
-        if(active){
-            playChannel(active.querySelector('.name').textContent);
-        }else if(searchBox.value && filteredChannels.length > 0){
-            playChannel(filteredChannels[0]);
+        
+        if(k === 'ArrowLeft' || k === 'ArrowUp'){
+            if(app.classList.contains('fullscreen')){
+                prevChannel();
+            }else{
+                var prev = (selectedIndex - 1 + filteredChannels.length) % filteredChannels.length;
+                selectChannel(prev);
+            }
+            e.preventDefault();
+            return;
         }
-        return;
+        
+        if(k === 'ChannelUp'){ nextChannel(); e.preventDefault(); return; }
+        if(k === 'ChannelDown'){ prevChannel(); e.preventDefault(); return; }
+        
+        // Space to pause/play
+        if(k === ' '){
+            if(video.style.display === 'block'){
+                video.paused ? video.play() : video.pause();
+                e.preventDefault();
+            }
+            return;
+        }
     }
     
-    if(k === 'ArrowRight' && !searchBox.matches(':focus')){
-        if(app.classList.contains('fullscreen')){
-            nextChannel();
-        }else{
-            var active = document.querySelector('.channel-item.active');
-            if(active) active.nextElementSibling?.click();
-        }
-        e.preventDefault();
-        return;
-    }
-    
-    if(k === 'ArrowLeft' && !searchBox.matches(':focus')){
-        if(app.classList.contains('fullscreen')){
-            prevChannel();
-        }else{
-            var active = document.querySelector('.channel-item.active');
-            if(active) active.previousElementSibling?.click();
-        }
-        e.preventDefault();
-        return;
-    }
-    
-    if(k === 'ArrowUp'){
-        var active = document.querySelector('.channel-item.active');
-        if(active && active.previousElementSibling){
-            active.classList.remove('active');
-            active.previousElementSibling.classList.add('active');
-            active.previousElementSibling.scrollIntoView({block:'nearest'});
-        }
-        e.preventDefault();
-        return;
-    }
-    
-    if(k === 'ArrowDown'){
-        var active = document.querySelector('.channel-item.active');
-        if(active && active.nextElementSibling){
-            active.classList.remove('active');
-            active.nextElementSibling.classList.add('active');
-            active.nextElementSibling.scrollIntoView({block:'nearest'});
-        }
-        e.preventDefault();
-        return;
-    }
-    
-    if(k === 'ChannelUp'){ nextChannel(); e.preventDefault(); return; }
-    if(k === 'ChannelDown'){ prevChannel(); e.preventDefault(); return; }
-    
+    // Typing in search box
     if(k === 'Backspace'){
         searchBox.value = searchBox.value.slice(0,-1);
         filterChannels();
-        e.preventDefault();
         return;
     }
     
     if(k.length === 1 && !e.ctrlKey && !e.metaKey){
         searchBox.value += k;
         filterChannels();
-        searchBox.focus();
-        e.preventDefault();
         return;
     }
 };
@@ -455,6 +417,12 @@ document.addEventListener('fullscreenchange', function(){
     if(!document.fullscreenElement && app.classList.contains('fullscreen')){
         app.classList.remove('fullscreen');
     }
+});
+
+// Prevent virtual keyboard on search box
+searchBox.addEventListener('focus', function(){
+    this.blur();
+    this.focus();
 });
 
 loadChannels();
