@@ -9,9 +9,12 @@
 :root{--primary:#ff4757;--secondary:#ff6b81;--bg:#0a0a0a;--bg2:#111;--text:#fff;--text2:#888}
 html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:Arial,sans-serif;overflow:hidden}
 
-#app{display:flex;height:100%}
+#app{display:flex;height:100%;transition:all 0.3s}
+#app.fullscreen{flex-direction:column}
+#app.fullscreen #sidebar{display:none}
+#app.fullscreen #player-area{forder:none}
 
-#sidebar{width:280px;background:var(--bg2);display:flex;flex-direction:column;border-right:1px solid #222}
+#sidebar{width:280px;background:var(--bg2);display:flex;flex-direction:column;border-right:1px solid #222;transition:all 0.3s}
 #sidebar-header{padding:20px;border-bottom:1px solid #222}
 .logo{font-size:28px;font-weight:bold}
 .logo .sof{color:var(--primary)}
@@ -30,28 +33,34 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-fam
 .channel-item.active .status{color:rgba(255,255,255,0.7)}
 
 #main{flex:1;display:flex;flex-direction:column;position:relative}
-#player-area{flex:1;background:#000;display:flex;align-items:center;justify-content:center;position:relative}
-#video{width:100%;height:100%;background:#000}
+#player-area{flex:1;background:#000;display:flex;align-items:center;justify-content:relative;position:relative}
+#video{width:100%;height:100%;background:#000;object-fit:contain}
 #video:focus{outline:none}
 
-#no-signal{position:absolute;text-align:center;color:var(--text2)}
+#no-signal{position:absolute;text-align:center;color:var(--text2);z-index:10}
 #no-signal .icon{font-size:60px;margin-bottom:20px}
 
 #info-bar{height:60px;background:var(--bg2);display:flex;align-items:center;padding:0 20px;border-top:1px solid #222}
 #now-playing{flex:1}
 #now-playing .title{font-size:18px;font-weight:bold}
 #now-playing .channel{font-size:14px;color:var(--text2)}
-#controls{display:flex;gap:15px}
-#controls button{background:#222;border:none;color:#fff;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:14px}
+#controls{display:flex;gap:10px}
+#controls button{background:#222;border:none;color:#fff;padding:8px 14px;border-radius:4px;cursor:pointer;font-size:13px}
 #controls button:hover{background:var(--primary)}
 
 #loading{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;z-index:999}
 #loading .spinner{width:50px;height:50px;border:3px solid #333;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-#msg-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 20px;border-radius:4px;display:none;z-index:100}
+#msg-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 20px;border-radius:4px;display:none;z-index:100;font-size:16px}
 
-.fondo-gif{position:fixed;top:0;left:0;width:100%;height:100%;opacity:0.3;pointer-events:none;z-index:0}
+#overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;z-index:200}
+#overlay .panel{background:var(--bg2);padding:30px;border-radius:10px;text-align:center;min-width:300px}
+#overlay .panel h3{color:var(--primary);margin-bottom:20px}
+#overlay .panel button{display:block;width:100%;padding:15px;margin:10px 0;background:#222;border:none;color:#fff;border-radius:4px;cursor:pointer;font-size:16px}
+#overlay .panel button:hover{background:var(--primary)}
+
+.fondo-gif{position:fixed;top:0;left:0;width:100%;height:100%;opacity:0.25;pointer-events:none;z-index:0}
 </style>
 </head>
 <body>
@@ -81,9 +90,11 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-fam
                 <div class="channel" id="np-channel">--</div>
             </div>
             <div id="controls">
-                <button id="btn-retry">↻ Retry</button>
-                <button id="btn-next">Sig →</button>
-                <button id="btn-random">🎲 Random</button>
+                <button id="btn-fullscreen">⛶ Full</button>
+                <button id="btn-retry">↻</button>
+                <button id="btn-prev">◀</button>
+                <button id="btn-next">▶</button>
+                <button id="btn-random">🎲</button>
             </div>
         </div>
     </div>
@@ -92,14 +103,23 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-fam
 <div id="loading"><div class="spinner"></div></div>
 <div id="msg-toast"></div>
 
+<div id="overlay">
+    <div class="panel">
+        <h3>MoJiTo TV</h3>
+        <button id="btn-play">▶ Reproducir</button>
+        <button id="btn-random-play">🎲 Aleatorio</button>
+    </div>
+</div>
+
 <script>
 var API_BASE = '/api';
 var channels = [];
 var filteredChannels = [];
 var currentChannel = null;
+var currentIndex = 0;
 var currentStreamIndex = 0;
 var streams = [];
-var searchQuery = '';
+var lastChannel = localStorage.getItem('mojitolast') || null;
 
 var video = document.getElementById('video');
 var channelList = document.getElementById('channel-list');
@@ -109,6 +129,8 @@ var loading = document.getElementById('loading');
 var msgToast = document.getElementById('msg-toast');
 var npTitle = document.getElementById('np-title');
 var npChannel = document.getElementById('np-channel');
+var app = document.getElementById('app');
+var overlay = document.getElementById('overlay');
 
 var fondos = [
     "https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUydzlra2lxdzRuODd0YWRxOW9tNjI5OTV3a3phMmU0cHhkemwyemN2ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/XvWz0PY5c7PjjbZ1hZ/giphy.gif",
@@ -121,12 +143,12 @@ function fondoRandom(){
 }
 fondoRandom();
 
-function showLoading(){loading.style.display = 'flex'}
-function hideLoading(){loading.style.display = 'none'}
+function showLoading(){loading.style.display='flex'}
+function hideLoading(){loading.style.display='none'}
 function showToast(msg){
     msgToast.textContent = msg;
     msgToast.style.display = 'block';
-    setTimeout(() => msgToast.style.display = 'none', 3000);
+    setTimeout(() => msgToast.style.display = 'none', 2500);
 }
 
 function fetchJSON(url){
@@ -139,6 +161,11 @@ async function loadChannels(){
         channels = data.channels || [];
         filteredChannels = [...channels];
         renderChannels();
+        if(lastChannel && channels.includes(lastChannel)){
+            setTimeout(() => playChannel(lastChannel), 500);
+        }else{
+            overlay.style.display = 'flex';
+        }
     } catch(e){
         showToast('Error cargando canales');
     }
@@ -148,8 +175,8 @@ function renderChannels(){
     channelList.innerHTML = '';
     filteredChannels.forEach(function(ch, i){
         var div = document.createElement('div');
-        div.className = 'channel-item';
-        div.innerHTML = '<div class="name">' + ch + '</div><div class="status"> Presiona Enter para ver</div>';
+        div.className = 'channel-item' + (ch === lastChannel ? ' active' : '');
+        div.innerHTML = '<div class="name">' + ch + '</div><div class="status">⏎ Enter para ver</div>';
         div.onclick = function(){ playChannel(ch); };
         channelList.appendChild(div);
     });
@@ -157,20 +184,21 @@ function renderChannels(){
 
 function filterChannels(){
     var q = searchBox.value.toLowerCase();
-    if(!q){
-        filteredChannels = [...channels];
-    }else{
-        filteredChannels = channels.filter(c => c.toLowerCase().includes(q));
-    }
+    filteredChannels = q ? channels.filter(c => c.toLowerCase().includes(q)) : [...channels];
     renderChannels();
 }
 
 async function playChannel(name){
+    if(app.classList.contains('fullscreen')){
+        await zapTo(name);
+        return;
+    }
     showLoading();
     currentChannel = name;
     currentStreamIndex = 0;
     npTitle.textContent = 'Cargando...';
     npChannel.textContent = name;
+    localStorage.setItem('mojitolast', name);
     
     try {
         var data = await fetchJSON(API_BASE + '/channel/' + encodeURIComponent(name));
@@ -179,18 +207,17 @@ async function playChannel(name){
             streams = [data.stream];
             playStream(data.stream.url);
             npTitle.textContent = name;
-            showToast('Reproduciendo: ' + name);
+            showToast('▶ ' + name);
         }else{
-            // Try alternative - search directly
             var searchData = await fetchJSON(API_BASE + '/search?q=' + encodeURIComponent(name));
             if(searchData.streams && searchData.streams.length > 0){
                 streams = searchData.streams;
                 currentStreamIndex = 0;
                 playStream(streams[0].url);
                 npTitle.textContent = streams[0].title || name;
-                showToast('Reproduciendo: ' + (streams[0].title || name));
+                showToast('▶ ' + (streams[0].title || name));
             }else{
-                showToast('Sin streams disponibles');
+                showToast('Sin señal');
                 npTitle.textContent = 'Sin señal';
                 noSignal.style.display = 'flex';
                 video.style.display = 'none';
@@ -212,10 +239,10 @@ function playStream(url){
     video.play().catch(e => {
         if(currentStreamIndex < streams.length - 1){
             currentStreamIndex++;
-            showToast('Fallback al siguiente stream...');
+            showToast('Cambiando stream...');
             playStream(streams[currentStreamIndex].url);
         }else{
-            showToast('No hay streams disponibles');
+            showToast('Sin streams');
         }
     });
 }
@@ -223,27 +250,79 @@ function playStream(url){
 function highlightChannel(name){
     var items = channelList.getElementsByClassName('channel-item');
     for(var i = 0; i < items.length; i++){
-        if(items[i].querySelector('.name').textContent === name){
-            items[i].classList.add('active');
-            items[i].scrollIntoView({block: 'nearest'});
-        }else{
-            items[i].classList.remove('active');
-        }
+        items[i].classList.toggle('active', items[i].querySelector('.name').textContent === name);
     }
+}
+
+function getCurrentChannelIndex(){
+    var active = document.querySelector('.channel-item.active');
+    if(active){
+        var name = active.querySelector('.name').textContent;
+        return filteredChannels.indexOf(name);
+    }
+    return -1;
+}
+
+async function zapTo(name){
+    showLoading();
+    currentChannel = name;
+    currentStreamIndex = 0;
+    npTitle.textContent = 'Cambiando...';
+    npChannel.textContent = name;
+    localStorage.setItem('mojitolast', name);
+    
+    try {
+        var data = await fetchJSON(API_BASE + '/channel/' + encodeURIComponent(name));
+        
+        if(data.stream && data.stream.url){
+            streams = [data.stream];
+            playStream(data.stream.url);
+            npTitle.textContent = name;
+        }else{
+            var searchData = await fetchJSON(API_BASE + '/search?q=' + encodeURIComponent(name));
+            if(searchData.streams && searchData.streams.length > 0){
+                streams = searchData.streams;
+                playStream(streams[0].url);
+                npTitle.textContent = streams[0].title || name;
+            }else{
+                npTitle.textContent = 'Sin señal';
+                showToast('Sin señal: ' + name);
+            }
+        }
+    } catch(e){
+        showToast('Error zapping');
+    }
+    hideLoading();
+}
+
+function nextChannel(){
+    var idx = getCurrentChannelIndex();
+    if(idx === -1) idx = 0;
+    var nextIdx = (idx + 1) % filteredChannels.length;
+    var name = filteredChannels[nextIdx];
+    zapTo(name);
+}
+
+function prevChannel(){
+    var idx = getCurrentChannelIndex();
+    if(idx === -1) idx = 0;
+    var prevIdx = (idx - 1 + filteredChannels.length) % filteredChannels.length;
+    var name = filteredChannels[prevIdx];
+    zapTo(name);
+}
+
+function toggleFullscreen(){
+    app.classList.toggle('fullscreen');
+    if(app.classList.contains('fullscreen')){
+        video.requestFullscreen ? video.requestFullscreen() : video.webkitRequestFullscreen();
+    }
+    showToast(app.classList.contains('fullscreen') ? 'Fullscreen' : 'Normal');
 }
 
 function retry(){
-    if(currentChannel && streams.length > 0){
+    if(streams.length > 0){
         currentStreamIndex = 0;
         playStream(streams[0].url);
-    }
-}
-
-function nextStream(){
-    if(streams.length > 1){
-        currentStreamIndex = (currentStreamIndex + 1) % streams.length;
-        playStream(streams[currentStreamIndex].url);
-        showToast('Stream ' + (currentStreamIndex + 1) + '/' + streams.length);
     }
 }
 
@@ -254,46 +333,89 @@ function randomChannel(){
     }
 }
 
+document.getElementById('btn-fullscreen').onclick = toggleFullscreen;
 document.getElementById('btn-retry').onclick = retry;
-document.getElementById('btn-next').onclick = nextStream;
+document.getElementById('btn-next').onclick = nextChannel;
+document.getElementById('btn-prev').onclick = prevChannel;
 document.getElementById('btn-random').onclick = randomChannel;
+
+document.getElementById('btn-play').onclick = function(){
+    overlay.style.display = 'none';
+    if(lastChannel && channels.includes(lastChannel)){
+        playChannel(lastChannel);
+    }else if(channels.length > 0){
+        playChannel(channels[0]);
+    }
+};
+
+document.getElementById('btn-random-play').onclick = function(){
+    overlay.style.display = 'none';
+    randomChannel();
+};
+
 searchBox.oninput = filterChannels;
 
 document.onkeydown = function(e){
     var k = e.key;
     
-    if(video.style.display === 'block'){
-        if(k === 'Escape'){
+    if(k === 'f' || k === 'F'){
+        toggleFullscreen();
+        return;
+    }
+    
+    if(k === 'Escape'){
+        if(app.classList.contains('fullscreen')){
+            app.classList.remove('fullscreen');
+            if(document.fullscreenElement) document.exitFullscreen();
+        }else if(video.style.display === 'block'){
             video.pause();
-            video.style.display = 'none';
-            noSignal.style.display = 'flex';
             showToast('Pausado');
         }
         return;
     }
     
     if(k === 'Enter'){
+        if(overlay.style.display === 'flex'){
+            document.getElementById('btn-play').click();
+            return;
+        }
         var active = document.querySelector('.channel-item.active');
         if(active){
-            var name = active.querySelector('.name').textContent;
-            playChannel(name);
+            playChannel(active.querySelector('.name').textContent);
         }else if(searchBox.value && filteredChannels.length > 0){
             playChannel(filteredChannels[0]);
         }
         return;
     }
     
+    if(k === 'ArrowRight' && !searchBox.matches(':focus')){
+        if(app.classList.contains('fullscreen')){
+            nextChannel();
+        }else{
+            var active = document.querySelector('.channel-item.active');
+            if(active) active.nextElementSibling?.click();
+        }
+        e.preventDefault();
+        return;
+    }
+    
+    if(k === 'ArrowLeft' && !searchBox.matches(':focus')){
+        if(app.classList.contains('fullscreen')){
+            prevChannel();
+        }else{
+            var active = document.querySelector('.channel-item.active');
+            if(active) active.previousElementSibling?.click();
+        }
+        e.preventDefault();
+        return;
+    }
+    
     if(k === 'ArrowUp'){
         var active = document.querySelector('.channel-item.active');
-        if(active){
-            var prev = active.previousElementSibling;
-            if(prev){
-                active.classList.remove('active');
-                prev.classList.add('active');
-                prev.scrollIntoView({block: 'nearest'});
-            }
-        }else if(filteredChannels.length > 0){
-            channelList.children[0].classList.add('active');
+        if(active && active.previousElementSibling){
+            active.classList.remove('active');
+            active.previousElementSibling.classList.add('active');
+            active.previousElementSibling.scrollIntoView({block:'nearest'});
         }
         e.preventDefault();
         return;
@@ -301,28 +423,26 @@ document.onkeydown = function(e){
     
     if(k === 'ArrowDown'){
         var active = document.querySelector('.channel-item.active');
-        if(active){
-            var next = active.nextElementSibling;
-            if(next){
-                active.classList.remove('active');
-                next.classList.add('active');
-                next.scrollIntoView({block: 'nearest'});
-            }
-        }else if(filteredChannels.length > 0){
-            channelList.children[0].classList.add('active');
+        if(active && active.nextElementSibling){
+            active.classList.remove('active');
+            active.nextElementSibling.classList.add('active');
+            active.nextElementSibling.scrollIntoView({block:'nearest'});
         }
         e.preventDefault();
         return;
     }
     
+    if(k === 'ChannelUp'){ nextChannel(); e.preventDefault(); return; }
+    if(k === 'ChannelDown'){ prevChannel(); e.preventDefault(); return; }
+    
     if(k === 'Backspace'){
-        searchBox.value = searchBox.value.slice(0, -1);
+        searchBox.value = searchBox.value.slice(0,-1);
         filterChannels();
         e.preventDefault();
         return;
     }
     
-    if(k.length === 1){
+    if(k.length === 1 && !e.ctrlKey && !e.metaKey){
         searchBox.value += k;
         filterChannels();
         searchBox.focus();
@@ -330,6 +450,12 @@ document.onkeydown = function(e){
         return;
     }
 };
+
+document.addEventListener('fullscreenchange', function(){
+    if(!document.fullscreenElement && app.classList.contains('fullscreen')){
+        app.classList.remove('fullscreen');
+    }
+});
 
 loadChannels();
 </script>
