@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 import time
+import os
 from flask import Flask, request, jsonify, send_file
 
 app = Flask(__name__)
 
 from scraper.searchtv import search
 from core.cache import get_cached, set_cached, get_fallback
+from selector import get_best_stream, get_all_channels
+from db import get_connection
 
 def get_device_type():
     ua = request.headers.get('User-Agent', '').lower()
@@ -104,6 +107,37 @@ def api_debug():
         'user_agent': ua,
         'detected_device': device
     })
+
+@app.route('/api/channel/<channel>')
+def api_channel(channel):
+    result = get_best_stream(channel)
+    if result:
+        return jsonify({'status': 'ok', 'stream': result})
+    return jsonify({'status': 'error', 'error': 'channel not found'})
+
+@app.route('/api/channels')
+def api_channels():
+    channels = get_all_channels()
+    return jsonify({'channels': channels, 'total': len(channels)})
+
+@app.route('/api/stats')
+def api_stats():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT status, COUNT(*) as count FROM streams GROUP BY status")
+    stats = {row['status']: row['count'] for row in cursor.fetchall()}
+    cursor.execute("SELECT COUNT(*) as total FROM streams")
+    stats['total'] = cursor.fetchone()['total']
+    return jsonify(stats)
+
+@app.route('/api/ingest')
+def api_ingest():
+    from ingest import ingest_playlist
+    try:
+        ingest_playlist()
+        return jsonify({'status': 'ok', 'message': 'data ingested'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, threaded=True, debug=False)
