@@ -29,7 +29,6 @@ html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-fam
 .channel-item:hover{background:#222}
 .channel-item.active{background:var(--primary);color:#fff}
 .channel-item .name{font-size:13px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
-.channel-item .count{font-size:11px;opacity:0.7;background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:3px}
 
 #main{flex:1;display:flex;flex-direction:column;position:relative}
 #player-area{flex:1;background:#000;display:flex;align-items:center;justify-content:center;position:relative}
@@ -125,6 +124,7 @@ var currentStreamIndex = 0;
 var streams = [];
 var lastChannel = localStorage.getItem('mojitolast') || null;
 var selectedIndex = -1;
+var mode = 'list'; // 'list' or 'video'
 
 var video = document.getElementById('video');
 var channelList = document.getElementById('channel-list');
@@ -143,8 +143,7 @@ var fondos = [
 ];
 
 function fondoRandom(){
-    var i = Math.floor(Math.random() * fondos.length);
-    document.querySelector('.fondo-gif').style.backgroundImage = "url('" + fondos[i] + "')";
+    document.querySelector('.fondo-gif').style.backgroundImage = "url('" + fondos[Math.floor(Math.random()*fondos.length)] + "')";
 }
 fondoRandom();
 
@@ -167,7 +166,6 @@ async function loadChannels(){
         filteredChannels = [...channels];
         renderChannels();
         
-        // Select last channel if exists
         if(lastChannel && channels.includes(lastChannel)){
             setTimeout(() => {
                 selectChannel(channels.indexOf(lastChannel));
@@ -230,17 +228,23 @@ async function playChannel(name){
         
         if(data.stream && data.stream.url){
             streams = [data.stream];
-            if(data.stream.fallbacks && data.stream.fallbacks.length > 0){
+            if(data.stream.fallbacks){
                 streams = streams.concat(data.stream.fallbacks.map(function(u){return {url:u};}));
             }
             playStream(data.stream.url);
             npTitle.textContent = name;
+            mode = 'video';
+            // Enter fullscreen when playing
+            if(!app.classList.contains('fullscreen')){
+                app.classList.add('fullscreen');
+            }
         }else{
             var searchData = await fetchJSON(API_BASE + '/search?q=' + encodeURIComponent(name));
             if(searchData.streams && searchData.streams.length > 0){
                 streams = searchData.streams;
                 playStream(streams[0].url);
                 npTitle.textContent = streams[0].title || name;
+                mode = 'video';
             }else{
                 showToast('Sin señal');
                 npTitle.textContent = 'Sin señal';
@@ -252,7 +256,6 @@ async function playChannel(name){
         showToast('Error: ' + e.message);
         npTitle.textContent = 'Error';
     }
-    
     hideLoading();
 }
 
@@ -266,7 +269,7 @@ function playStream(url){
             showToast('Fallback...');
             playStream(streams[currentStreamIndex].url);
         }else{
-            showToast('Sin streams disponibles');
+            showToast('Sin streams');
         }
     });
 }
@@ -287,6 +290,8 @@ function toggleFullscreen(){
     app.classList.toggle('fullscreen');
     if(app.classList.contains('fullscreen')){
         video.requestFullscreen ? video.requestFullscreen() : video.webkitRequestFullscreen();
+    }else{
+        if(document.fullscreenElement) document.exitFullscreen();
     }
     showToast(app.classList.contains('fullscreen') ? 'Fullscreen' : 'Normal');
 }
@@ -304,6 +309,18 @@ function randomChannel(){
         selectChannel(channels.indexOf(rand));
         playChannel(rand);
     }
+}
+
+function exitVideo(){
+    mode = 'list';
+    video.pause();
+    video.src = '';
+    video.style.display = 'none';
+    noSignal.style.display = 'flex';
+    app.classList.remove('fullscreen');
+    if(document.fullscreenElement) document.exitFullscreen();
+    npTitle.textContent = 'Sin selección';
+    npChannel.textContent = '--';
 }
 
 document.getElementById('btn-fullscreen').onclick = toggleFullscreen;
@@ -332,94 +349,209 @@ searchBox.addEventListener('keydown', function(e){
 
 document.onkeydown = function(e){
     var k = e.key;
+    var code = e.code || '';
     
-    // Handle Enter - select current highlighted channel and play
-    if(k === 'Enter'){
-        e.preventDefault();
-        if(overlay.style.display === 'flex'){
-            document.getElementById('btn-play').click();
-        }else if(selectedIndex >= 0 && selectedIndex < filteredChannels.length){
-            playChannel(filteredChannels[selectedIndex]);
-        }
-        return;
-    }
+    // List of common remote control keys
+    // These work with most smart TV remotes including Philco
     
-    // Fullscreen
-    if((k === 'f' || k === 'F') && searchBox !== document.activeElement){
-        toggleFullscreen();
-        return;
-    }
-    
-    // Escape
-    if(k === 'Escape'){
-        if(app.classList.contains('fullscreen')){
+    // === MODE SWITCHING ===
+    // Go back / Return key - exit video to list
+    if(k === 'Backspace' || k === 'Escape' || code === 'Back' || code === 'GoBack' || code === 'BrowserBack' || k === '↩'){
+        if(mode === 'video'){
+            exitVideo();
+        }else if(app.classList.contains('fullscreen')){
             app.classList.remove('fullscreen');
             if(document.fullscreenElement) document.exitFullscreen();
-        }else if(video.style.display === 'block'){
-            video.pause();
-            showToast('Pausado');
         }
+        e.preventDefault();
         return;
     }
     
-    // Only handle navigation keys when not typing in search
-    if(searchBox !== document.activeElement){
-        if(k === 'ArrowRight' || k === 'ArrowDown'){
-            if(app.classList.contains('fullscreen')){
-                nextChannel();
+    // Home key - go to list
+    if(code === 'Home' || code === 'GoHome' || k === '🏠'){
+        exitVideo();
+        overlay.style.display = 'flex';
+        e.preventDefault();
+        return;
+    }
+    
+    // === VIDEO MODE CONTROLS ===
+    if(mode === 'video'){
+        // Play/Pause - also Enter key
+        if(k === 'Enter' || k === ' ' || code === 'Play' || code === 'Pause' || code === 'MediaPlayPause'){
+            if(video.paused){
+                video.play();
+                showToast('▶ Reproduciendo');
             }else{
-                var next = (selectedIndex + 1) % filteredChannels.length;
-                selectChannel(next);
+                video.pause();
+                showToast('⏸ Pausado');
             }
             e.preventDefault();
             return;
         }
         
-        if(k === 'ArrowLeft' || k === 'ArrowUp'){
-            if(app.classList.contains('fullscreen')){
-                prevChannel();
-            }else{
-                var prev = (selectedIndex - 1 + filteredChannels.length) % filteredChannels.length;
-                selectChannel(prev);
+        // Stop
+        if(k === 's' || k === 'S' || code === 'Stop' || code === 'MediaStop'){
+            exitVideo();
+            e.preventDefault();
+            return;
+        }
+        
+        // Volume Up/Down - not implemented but prevent default
+        if(code === 'VolumeUp' || code === 'VolumeDown' || code === 'AudioVolumeUp' || code === 'AudioVolumeDown'){
+            // Let browser handle volume
+            return;
+        }
+        
+        // Channel Up/Down - change channel
+        if(code === 'ChannelUp' || code === 'ChannelDown' || code === 'ArrowUp' || code === 'ArrowDown'){
+            nextChannel();
+            e.preventDefault();
+            return;
+        }
+        
+        // Info / EPG key - toggle info
+        if(code === 'Info' || code === 'EPG' || k === 'i' || k === 'I'){
+            if(npTitle.textContent !== 'Sin selección'){
+                showToast(npTitle.textContent);
             }
             e.preventDefault();
             return;
         }
         
-        if(k === 'ChannelUp'){ nextChannel(); e.preventDefault(); return; }
-        if(k === 'ChannelDown'){ prevChannel(); e.preventDefault(); return; }
+        // Exit/Back key - return to list
+        if(code === 'Exit' || code === 'Last' || code === 'Back' || k === '0'){
+            exitVideo();
+            e.preventDefault();
+            return;
+        }
         
-        // Space to pause/play
-        if(k === ' '){
-            if(video.style.display === 'block'){
-                video.paused ? video.play() : video.pause();
-                e.preventDefault();
-            }
+        // Fast forward/rewind
+        if(code === 'FastForward' || k === 'ArrowRight'){
+            video.currentTime += 10;
+            showToast('+10s');
+            e.preventDefault();
+            return;
+        }
+        if(code === 'Rewind' || k === 'ArrowLeft'){
+            video.currentTime -= 10;
+            showToast('-10s');
+            e.preventDefault();
             return;
         }
     }
     
-    // Typing in search box
-    if(k === 'Backspace'){
-        searchBox.value = searchBox.value.slice(0,-1);
-        filterChannels();
+    // === LIST MODE CONTROLS ===
+    if(mode === 'list'){
+        // Enter - play selected channel
+        if(k === 'Enter'){
+            e.preventDefault();
+            if(overlay.style.display === 'flex'){
+                document.getElementById('btn-play').click();
+            }else if(selectedIndex >= 0 && selectedIndex < filteredChannels.length){
+                playChannel(filteredChannels[selectedIndex]);
+            }
+            return;
+        }
+        
+        // Navigation - arrows
+        if(code === 'ArrowUp' || code === 'ChannelUp' || k === 'ArrowUp'){
+            var prev = (selectedIndex - 1 + filteredChannels.length) % filteredChannels.length;
+            selectChannel(prev);
+            e.preventDefault();
+            return;
+        }
+        if(code === 'ArrowDown' || code === 'ChannelDown' || k === 'ArrowDown'){
+            var next = (selectedIndex + 1) % filteredChannels.length;
+            selectChannel(next);
+            e.preventDefault();
+            return;
+        }
+        if(code === 'ArrowLeft'){
+            selectChannel(0);
+            e.preventDefault();
+            return;
+        }
+        if(code === 'ArrowRight'){
+            if(channels.length > 0){
+                selectChannel(channels.length - 1);
+            }
+            e.preventDefault();
+            return;
+        }
+        
+        // Page Up/Down
+        if(code === 'PageUp'){
+            var newIdx = Math.max(0, selectedIndex - 10);
+            selectChannel(newIdx);
+            e.preventDefault();
+            return;
+        }
+        if(code === 'PageDown'){
+            var newIdx = Math.min(filteredChannels.length - 1, selectedIndex + 10);
+            selectChannel(newIdx);
+            e.preventDefault();
+            return;
+        }
+        
+        // Number keys for quick access
+        if(k >= '0' && k <= '9'){
+            var idx = parseInt(k);
+            if(idx < filteredChannels.length){
+                selectChannel(idx);
+                playChannel(filteredChannels[idx]);
+            }
+            e.preventDefault();
+            return;
+        }
+    }
+    
+    // Global keys
+    // Fullscreen toggle
+    if((k === 'f' || k === 'F') && searchBox !== document.activeElement){
+        toggleFullscreen();
+        e.preventDefault();
         return;
     }
     
-    if(k.length === 1 && !e.ctrlKey && !e.metaKey){
-        searchBox.value += k;
-        filterChannels();
+    // Random channel
+    if(k === 'r' || k === 'R'){
+        randomChannel();
+        e.preventDefault();
         return;
+    }
+    
+    // Escape from search - close keyboard if open
+    if(k === 'Escape' && searchBox === document.activeElement){
+        searchBox.blur();
+        e.preventDefault();
+        return;
+    }
+    
+    // Typing in search (only when not in video mode)
+    if(mode === 'list' && searchBox !== document.activeElement && !e.ctrlKey && !e.metaKey){
+        if(k === 'Backspace'){
+            searchBox.value = searchBox.value.slice(0,-1);
+            filterChannels();
+            return;
+        }
+        if(k.length === 1){
+            searchBox.value += k;
+            filterChannels();
+            searchBox.focus();
+            return;
+        }
     }
 };
 
 document.addEventListener('fullscreenchange', function(){
     if(!document.fullscreenElement && app.classList.contains('fullscreen')){
-        app.classList.remove('fullscreen');
+        if(mode === 'list'){
+            app.classList.remove('fullscreen');
+        }
     }
 });
 
-// Prevent virtual keyboard on search box
 searchBox.addEventListener('focus', function(){
     this.blur();
     this.focus();
