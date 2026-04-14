@@ -139,5 +139,23 @@ def api_ingest():
     except Exception as e:
         return jsonify({'status': 'error', 'error': str(e)})
 
+@app.route('/api/ingest/nodes')
+def api_ingest_nodes():
+    from ingest_nodes import ingest_nodes
+    try:
+        ingest_nodes()
+        return jsonify({'status': 'ok', 'message': 'nodes ingested'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)})
+
+@app.route('/api/discover')
+def api_discover():
+    from discover import discover
+    try:
+        discover()
+        return jsonify({'status': 'ok', 'message': 'discovery complete'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)})
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, threaded=True, debug=False)
