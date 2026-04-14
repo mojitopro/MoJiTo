@@ -2,409 +2,336 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>SŌF MOJITO TV</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MoJiTo TV</title>
 <style>
-*{margin:0;padding:0}
-html,body{
-    width:100%;height:100%;
-    background:#000;color:#fff;
-    font-family:Arial;
-    background-size:cover;
-    background-position:center;
-    background-repeat:no-repeat;
-}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--primary:#ff4757;--secondary:#ff6b81;--bg:#0a0a0a;--bg2:#111;--text:#fff;--text2:#888}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:Arial,sans-serif;overflow:hidden}
 
-#video{
-    width:100%;height:100%;
-    position:fixed;top:0;left:0;
-    display:none;background:#000;
-    z-index:100;
-}
+#app{display:flex;height:100%}
 
-#loading{
-    position:fixed;
-    top:0;left:0;
-    width:100%;height:100%;
-    background:#000;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:999;
-    font-size:18px;
-    color:#aaa;
-}
+#sidebar{width:280px;background:var(--bg2);display:flex;flex-direction:column;border-right:1px solid #222}
+#sidebar-header{padding:20px;border-bottom:1px solid #222}
+.logo{font-size:28px;font-weight:bold}
+.logo .sof{color:var(--primary)}
+.logo .mojito{color:var(--secondary)}
+.logo .tv{color:var(--text);font-size:14px;margin-left:5px}
 
-#menu{
-    padding:50px 10px 0 10px;
-    min-height:100%;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    background:rgba(0,0,0,0.7);
-}
+#search-box{width:100%;padding:12px;background:#000;border:1px solid #333;color:#fff;font-size:16px;margin-top:15px;border-radius:4px}
+#search-box:focus{outline:none;border-color:var(--primary)}
 
-.logo{
-    font-size:72px;
-    font-weight:bold;
-    text-align:center;
-    line-height:1
-}
-.logo .sof{color:#ff4757}
-.logo .mojito{color:#ff6b81}
-.logo .tv{
-    color:#fff;
-    font-size:32px;
-    vertical-align:top;
-    margin-left:5px;
-}
+#channel-list{flex:1;overflow-y:auto;padding:10px}
+.channel-item{padding:12px 15px;margin:2px 0;border-radius:4px;cursor:pointer;transition:background 0.2s}
+.channel-item:hover{background:#222}
+.channel-item.active{background:var(--primary);color:#fff}
+.channel-item .name{font-size:15px;font-weight:bold}
+.channel-item .status{font-size:12px;color:var(--text2);margin-top:4px}
+.channel-item.active .status{color:rgba(255,255,255,0.7)}
 
-#in-box{
-    font-size:32px;
-    padding:20px;
-    background:#111;
-    border:2px solid #333;
-    color:#777;
-    text-align:center;
-    margin-bottom:20px;
-    min-width:400px;
-    min-height:60px;
-}
+#main{flex:1;display:flex;flex-direction:column;position:relative}
+#player-area{flex:1;background:#000;display:flex;align-items:center;justify-content:center;position:relative}
+#video{width:100%;height:100%;background:#000}
+#video:focus{outline:none}
 
-#in-box.active{
-    border-color:#ff4757;
-    color:#fff;
-    background:#222;
-}
+#no-signal{position:absolute;text-align:center;color:var(--text2)}
+#no-signal .icon{font-size:60px;margin-bottom:20px}
 
-#msg{
-    font-size:20px;
-    padding:15px;
-    color:#ff4757;
-    min-height:30px
-}
+#info-bar{height:60px;background:var(--bg2);display:flex;align-items:center;padding:0 20px;border-top:1px solid #222}
+#now-playing{flex:1}
+#now-playing .title{font-size:18px;font-weight:bold}
+#now-playing .channel{font-size:14px;color:var(--text2)}
+#controls{display:flex;gap:15px}
+#controls button{background:#222;border:none;color:#fff;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:14px}
+#controls button:hover{background:var(--primary)}
 
-#results{
-    width:80%;
-    max-height:300px;
-    overflow-y:auto;
-    background:#111;
-    border:1px solid #333;
-    margin-top:20px;
-    display:none;
-}
+#loading{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;z-index:999}
+#loading .spinner{width:50px;height:50px;border:3px solid #333;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-.result-item{
-    padding:12px;
-    color:#aaa;
-    border-bottom:1px solid #222;
-}
+#msg-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 20px;border-radius:4px;display:none;z-index:100}
 
-.result-item.active{
-    background:#ff4757;
-    color:#fff;
-}
-
-.quick{
-    margin-top:15px;
-    text-align:center;
-}
-
-.quick div{
-    display:inline-block;
-    padding:8px 14px;
-    margin:6px;
-    background:#111;
-    border:1px solid #333;
-    color:#fff;
-    font-size:14px;
-}
-
-.quick div.active{
-    border-color:#ff4757;
-    color:#ff4757;
-    background:#222;
-}
+.fondo-gif{position:fixed;top:0;left:0;width:100%;height:100%;opacity:0.3;pointer-events:none;z-index:0}
 </style>
 </head>
 <body>
 
-<div id="loading"><img src="https://media.tenor.com/AbV-jpB0r3gAAAAM/oiia-cat-shmoo.gif" style="width:100px;height:100px"></div>
-<video id="video" controls></video>
+<div class="fondo-gif"></div>
 
-<div id="menu">
-    <div class="logo">
-        <span class="sof">SōF</span>
-        <span class="mojito"> MoJiTo</span>
-        <span class="tv"> TV</span>
+<div id="app">
+    <div id="sidebar">
+        <div id="sidebar-header">
+            <div class="logo"><span class="sof">SōF</span><span class="mojito">MoJiTo</span><span class="tv">TV</span></div>
+            <input type="text" id="search-box" placeholder="Buscar canal...">
+        </div>
+        <div id="channel-list"></div>
     </div>
     
-    <div id="in-box">Escribe el canal...</div>
-    
-    <div class="quick">
-        <div id="btn1">[ adult swim ]</div>
-        <div id="btn2">[ cartoon network ]</div>
-        <div id="btn3">[ espn ]</div>
+    <div id="main">
+        <div id="player-area">
+            <video id="video" controls></video>
+            <div id="no-signal">
+                <div class="icon">📺</div>
+                <div>Selecciona un canal</div>
+            </div>
+        </div>
+        <div id="info-bar">
+            <div id="now-playing">
+                <div class="title" id="np-title">Sin selección</div>
+                <div class="channel" id="np-channel">--</div>
+            </div>
+            <div id="controls">
+                <button id="btn-retry">↻ Retry</button>
+                <button id="btn-next">Sig →</button>
+                <button id="btn-random">🎲 Random</button>
+            </div>
+        </div>
     </div>
-    
-    <div id="msg">Usa las flechas para navegar</div>
-    <div id="results"></div>
 </div>
 
-<script>
-var API='/api/search';
-var streams=[];
-var txt='';
-var pos=0;
+<div id="loading"><div class="spinner"></div></div>
+<div id="msg-toast"></div>
 
-var fondos=[
+<script>
+var API_BASE = '/api';
+var channels = [];
+var filteredChannels = [];
+var currentChannel = null;
+var currentStreamIndex = 0;
+var streams = [];
+var searchQuery = '';
+
+var video = document.getElementById('video');
+var channelList = document.getElementById('channel-list');
+var searchBox = document.getElementById('search-box');
+var noSignal = document.getElementById('no-signal');
+var loading = document.getElementById('loading');
+var msgToast = document.getElementById('msg-toast');
+var npTitle = document.getElementById('np-title');
+var npChannel = document.getElementById('np-channel');
+
+var fondos = [
     "https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUydzlra2lxdzRuODd0YWRxOW9tNjI5OTV3a3phMmU0cHhkemwyemN2ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/XvWz0PY5c7PjjbZ1hZ/giphy.gif",
-    "https://media2.giphy.com/media/v1.Y2lkPTZjMDliOTUyOTdub3BieHQwdGF0OXM4YjQybWhoNm5xeTB2M3FlN3N5anUxejd4ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/uRxDeUFDWUx7frR8JB/giphy.gif",
-    "https://media2.giphy.com/media/v1.Y2lkPTZjMDliOTUyYTFhMTFlbGxub2UzZTgzODJkZnpoODd3YXBlc3pkbGxhcmpybWhhdSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/iWU4XWUNbsGZzqSNkP/giphy.gif"
+    "https://media2.giphy.com/media/v1.Y2lkPTZjMDliOTUyOTdub3BieHQwdGF0OXM4YjQybWhoNm5xeTB2M3FlN3N5anUxejd4ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/uRxDeUFDWUx7frR8JB/giphy.gif"
 ];
 
 function fondoRandom(){
-    var i=Math.floor(Math.random()*fondos.length);
-    document.body.style.backgroundImage="url('"+fondos[i]+"')";
+    var i = Math.floor(Math.random() * fondos.length);
+    document.querySelector('.fondo-gif').style.backgroundImage = "url('" + fondos[i] + "')";
 }
 fondoRandom();
 
-var elIn=document.getElementById('in-box');
-var elRes=document.getElementById('results');
-var elMsg=document.getElementById('msg');
-var elVideo=document.getElementById('video');
-var elLoad=document.getElementById('loading');
-var btns=[document.getElementById('btn1'),document.getElementById('btn2'),document.getElementById('btn3')];
+function showLoading(){loading.style.display = 'flex'}
+function hideLoading(){loading.style.display = 'none'}
+function showToast(msg){
+    msgToast.textContent = msg;
+    msgToast.style.display = 'block';
+    setTimeout(() => msgToast.style.display = 'none', 3000);
+}
 
-function log(m){elMsg.textContent=m}
+function fetchJSON(url){
+    return fetch(url).then(r => r.json());
+}
 
-function renderIn(){
-    if(txt){
-        elIn.textContent=txt;
+async function loadChannels(){
+    try {
+        var data = await fetchJSON(API_BASE + '/channels');
+        channels = data.channels || [];
+        filteredChannels = [...channels];
+        renderChannels();
+    } catch(e){
+        showToast('Error cargando canales');
+    }
+}
+
+function renderChannels(){
+    channelList.innerHTML = '';
+    filteredChannels.forEach(function(ch, i){
+        var div = document.createElement('div');
+        div.className = 'channel-item';
+        div.innerHTML = '<div class="name">' + ch + '</div><div class="status"> Presiona Enter para ver</div>';
+        div.onclick = function(){ playChannel(ch); };
+        channelList.appendChild(div);
+    });
+}
+
+function filterChannels(){
+    var q = searchBox.value.toLowerCase();
+    if(!q){
+        filteredChannels = [...channels];
     }else{
-        elIn.textContent='Escribe el canal...';
+        filteredChannels = channels.filter(c => c.toLowerCase().includes(q));
     }
+    renderChannels();
 }
 
-function setPos(p){
-    pos=p;
-    updateUI();
-}
-
-function updateUI(){
-    elIn.className='';
-    btns[0].className='';
-    btns[1].className='';
-    btns[2].className='';
+async function playChannel(name){
+    showLoading();
+    currentChannel = name;
+    currentStreamIndex = 0;
+    npTitle.textContent = 'Cargando...';
+    npChannel.textContent = name;
     
-    var items=elRes.getElementsByTagName('div');
-    for(var i=0;i<items.length;i++){
-        items[i].className='result-item';
-    }
-    
-    if(streams.length>0){
-        elRes.style.display='block';
-    }else{
-        elRes.style.display='none';
-    }
-    
-    if(pos===0){
-        elIn.className='active';
-    }else if(pos>=1 && pos<=3){
-        btns[pos-1].className='active';
-    }else if(pos>3 && streams.length>0){
-        var idx=pos-4;
-        var items=elRes.getElementsByTagName('div');
-        if(idx>=0 && idx<items.length){
-            items[idx].className='result-item active';
-            items[idx].scrollIntoView(false);
-        }
-    }
-}
-
-function quickSearch(q){
-    txt=q;
-    renderIn();
-    buscar();
-    setPos(0);
-}
-
-function playStream(i){
-    var s=streams[i];
-    if(!s)return;
-    
-    elLoad.style.display='flex';
-    log('Cargando...');
-    
-    elVideo.preload='auto';
-    elVideo.src=s.url;
-    
-    elVideo.addEventListener('canplay', function onCanPlay(){
-        elVideo.removeEventListener('canplay', onCanPlay);
+    try {
+        var data = await fetchJSON(API_BASE + '/channel/' + encodeURIComponent(name));
         
-        setTimeout(function(){
-            elLoad.style.display='none';
-            elVideo.style.display='block';
-            document.getElementById('menu').style.display='none';
-            elVideo.play();
-            log(s.title);
-        }, 5000);
-    });
-    
-    elVideo.addEventListener('error', function onError(){
-        elVideo.removeEventListener('error', onError);
-        elLoad.style.display='none';
-        log('Error al cargar');
-    });
-}
-
-function buscar(){
-    if(!txt.trim())return;
-    
-    log('Buscando...');
-    elRes.innerHTML='';
-    streams=[];
-    pos=0;
-    
-    var x=new XMLHttpRequest();
-    x.open('GET',API+'?q='+encodeURIComponent(txt),true);
-    
-    x.onreadystatechange=function(){
-        if(x.readyState===4){
-            if(x.status===200){
-                try{
-                    var d=JSON.parse(x.responseText);
-                    
-                    if(d.error){
-                        log('Error: '+d.error);
-                        return;
-                    }
-                    
-                    if(!d.streams||!d.streams.length){
-                        log('Sin resultados');
-                        return;
-                    }
-                    
-                    streams=d.streams;
-                    
-                    for(var i=0;i<streams.length;i++){
-                        var div=document.createElement('div');
-                        div.textContent=(i+1)+'. '+streams[i].title.substring(0,50);
-                        elRes.appendChild(div);
-                    }
-                    
-                    log(streams.length+' streams - usa flechas');
-                    elIn.className='';
-                    setPos(4);
-                    
-                }catch(e){
-                    log('Error parse');
-                }
+        if(data.stream && data.stream.url){
+            streams = [data.stream];
+            playStream(data.stream.url);
+            npTitle.textContent = name;
+            showToast('Reproduciendo: ' + name);
+        }else{
+            // Try alternative - search directly
+            var searchData = await fetchJSON(API_BASE + '/search?q=' + encodeURIComponent(name));
+            if(searchData.streams && searchData.streams.length > 0){
+                streams = searchData.streams;
+                currentStreamIndex = 0;
+                playStream(streams[0].url);
+                npTitle.textContent = streams[0].title || name;
+                showToast('Reproduciendo: ' + (streams[0].title || name));
             }else{
-                log('Error: '+x.status);
+                showToast('Sin streams disponibles');
+                npTitle.textContent = 'Sin señal';
+                noSignal.style.display = 'flex';
+                video.style.display = 'none';
             }
         }
-    };
+    } catch(e){
+        showToast('Error: ' + e.message);
+        npTitle.textContent = 'Error';
+    }
     
-    x.send();
+    hideLoading();
+    highlightChannel(name);
 }
 
-document.onkeydown=function(e){
-    var k=e.key;
+function playStream(url){
+    noSignal.style.display = 'none';
+    video.style.display = 'block';
+    video.src = url;
+    video.play().catch(e => {
+        if(currentStreamIndex < streams.length - 1){
+            currentStreamIndex++;
+            showToast('Fallback al siguiente stream...');
+            playStream(streams[currentStreamIndex].url);
+        }else{
+            showToast('No hay streams disponibles');
+        }
+    });
+}
+
+function highlightChannel(name){
+    var items = channelList.getElementsByClassName('channel-item');
+    for(var i = 0; i < items.length; i++){
+        if(items[i].querySelector('.name').textContent === name){
+            items[i].classList.add('active');
+            items[i].scrollIntoView({block: 'nearest'});
+        }else{
+            items[i].classList.remove('active');
+        }
+    }
+}
+
+function retry(){
+    if(currentChannel && streams.length > 0){
+        currentStreamIndex = 0;
+        playStream(streams[0].url);
+    }
+}
+
+function nextStream(){
+    if(streams.length > 1){
+        currentStreamIndex = (currentStreamIndex + 1) % streams.length;
+        playStream(streams[currentStreamIndex].url);
+        showToast('Stream ' + (currentStreamIndex + 1) + '/' + streams.length);
+    }
+}
+
+function randomChannel(){
+    if(channels.length > 0){
+        var rand = channels[Math.floor(Math.random() * channels.length)];
+        playChannel(rand);
+    }
+}
+
+document.getElementById('btn-retry').onclick = retry;
+document.getElementById('btn-next').onclick = nextStream;
+document.getElementById('btn-random').onclick = randomChannel;
+searchBox.oninput = filterChannels;
+
+document.onkeydown = function(e){
+    var k = e.key;
     
-    if(elVideo.style.display==='block'){
-        if(k==='Escape'){
-            elVideo.pause();
-            elVideo.style.display='none';
-            document.getElementById('menu').style.display='flex';
-            log('Cerrado');
+    if(video.style.display === 'block'){
+        if(k === 'Escape'){
+            video.pause();
+            video.style.display = 'none';
+            noSignal.style.display = 'flex';
+            showToast('Pausado');
         }
         return;
     }
     
-    if(k==='Enter'){
-        if(pos===0){
-            buscar();
-        }else if(pos===1){
-            quickSearch('adult swim');
-        }else if(pos===2){
-            quickSearch('cartoon network');
-        }else if(pos===3){
-            quickSearch('espn');
-        }else if(pos>3 && streams.length>0){
-            var idx=pos-4;
-            if(idx>=0 && idx<streams.length){
-                playStream(idx);
+    if(k === 'Enter'){
+        var active = document.querySelector('.channel-item.active');
+        if(active){
+            var name = active.querySelector('.name').textContent;
+            playChannel(name);
+        }else if(searchBox.value && filteredChannels.length > 0){
+            playChannel(filteredChannels[0]);
+        }
+        return;
+    }
+    
+    if(k === 'ArrowUp'){
+        var active = document.querySelector('.channel-item.active');
+        if(active){
+            var prev = active.previousElementSibling;
+            if(prev){
+                active.classList.remove('active');
+                prev.classList.add('active');
+                prev.scrollIntoView({block: 'nearest'});
             }
+        }else if(filteredChannels.length > 0){
+            channelList.children[0].classList.add('active');
         }
+        e.preventDefault();
         return;
     }
     
-    if(k==='ArrowRight'){
-        if(pos===0){
-            setPos(1);
-        }else if(pos===1){
-            setPos(2);
-        }else if(pos===2){
-            setPos(3);
-        }else if(pos>3 && pos<3+streams.length){
-            setPos(pos+1);
-        }
-        return;
-    }
-    
-    if(k==='ArrowLeft'){
-        if(pos===1){
-            setPos(0);
-        }else if(pos===2){
-            setPos(1);
-        }else if(pos===3){
-            setPos(2);
-        }else if(pos>4){
-            setPos(pos-1);
-        }
-        return;
-    }
-    
-    if(k==='ArrowDown'){
-        if(pos===0){
-            setPos(1);
-        }else if(pos>=1 && pos<=2){
-            setPos(pos+1);
-        }else if(pos===3){
-            if(streams.length>0){
-                setPos(4);
+    if(k === 'ArrowDown'){
+        var active = document.querySelector('.channel-item.active');
+        if(active){
+            var next = active.nextElementSibling;
+            if(next){
+                active.classList.remove('active');
+                next.classList.add('active');
+                next.scrollIntoView({block: 'nearest'});
             }
-        }else if(pos>=4 && pos<3+streams.length){
-            setPos(pos+1);
+        }else if(filteredChannels.length > 0){
+            channelList.children[0].classList.add('active');
         }
+        e.preventDefault();
         return;
     }
     
-    if(k==='ArrowUp'){
-        if(pos===1 || pos===2){
-            setPos(pos-1);
-        }else if(pos===3){
-            setPos(2);
-        }else if(pos>3){
-            setPos(pos-1);
-        }
+    if(k === 'Backspace'){
+        searchBox.value = searchBox.value.slice(0, -1);
+        filterChannels();
+        e.preventDefault();
         return;
     }
     
-    if(k==='Backspace'){
-        txt=txt.slice(0,-1);
-        renderIn();
+    if(k.length === 1){
+        searchBox.value += k;
+        filterChannels();
+        searchBox.focus();
+        e.preventDefault();
         return;
-    }
-    
-    if(k.length===1){
-        txt+=k;
-        renderIn();
     }
 };
 
-renderIn();
-setPos(0);
+loadChannels();
 </script>
 </body>
 </html>
