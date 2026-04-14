@@ -13,19 +13,18 @@ def get_best_stream(channel):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
-    # Try exact match first
+    # Try exact match
     cursor.execute("SELECT best_url FROM channels WHERE LOWER(name)=?", (channel.lower(),))
     result = cursor.fetchone()
     
     if result and result[0]:
         url = result[0]
-        # Handle multiple URLs (pipe separated for fallback)
         if '|' in url:
             urls = url.split('|')
             return {'url': urls[0], 'fallbacks': urls[1:], 'channel': channel}
         return {'url': url, 'fallbacks': [], 'channel': channel}
     
-    # Try partial match
+    # Try partial
     cursor.execute("SELECT name, best_url FROM channels WHERE LOWER(name) LIKE ?", 
                   (f'%{channel.lower()}%',))
     result = cursor.fetchone()
@@ -37,7 +36,7 @@ def get_best_stream(channel):
             return {'url': urls[0], 'fallbacks': urls[1:], 'channel': result[0]}
         return {'url': url, 'fallbacks': [], 'channel': result[0]}
     
-    # Search in streams directly
+    # Direct search
     cursor.execute("""
         SELECT url, latency FROM streams 
         WHERE LOWER(channel) LIKE ? AND status='online'
