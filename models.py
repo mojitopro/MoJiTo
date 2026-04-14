@@ -24,8 +24,19 @@ CREATE TABLE IF NOT EXISTS nodes (
 )
 """
 
+SCHEMA_CHANNELS = """
+CREATE TABLE IF NOT EXISTS channels (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE,
+    stream_count INTEGER DEFAULT 0,
+    best_url TEXT,
+    category TEXT DEFAULT 'general'
+)
+"""
+
 SCHEMA_INDEXES = """
 CREATE INDEX IF NOT EXISTS idx_channel ON streams(channel);
 CREATE INDEX IF NOT EXISTS idx_status ON streams(status);
 CREATE INDEX IF NOT EXISTS idx_node_ip ON streams(node_ip);
+CREATE INDEX IF NOT EXISTS idx_channels_name ON channels(name);
 """
