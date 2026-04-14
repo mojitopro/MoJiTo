@@ -8,27 +8,33 @@ DB_PATH = os.environ.get('DB_PATH', 'streams.db')
 def normalize_channel_name(name):
     name = name.lower().strip()
     
-    name = re.sub(r'\s*-\s*[A-Z]{2}$', '', name)
-    name = re.sub(r'\s*\([A-Z]{2}\)\s*$', '', name)
+    # Remove country codes like -CO, -MX, -US, etc.
+    name = re.sub(r'\s*-\s*[A-Z]{2}(\s+\([^)]+\))?$', '', name)
     
+    # Remove numbers at the start like "010 ", "2.28 ", "117)"
     name = re.sub(r'^\d+\.?\s*', '', name)
-    name = re.sub(r'\s*\d+$', '', name)
-    name = re.sub(r'\s+[\da-f]{6,}$', '', name)
-    name = re.sub(r'\s+\d+[a-f]{6,}$', '', name)
+    name = re.sub(r'^\d+\)\s+', '', name)
     
-    name = re.sub(r'\s+(hd|sd|hd\s*-\s*\w+)$', '', name)
-    name = re.sub(r'(hd|sd|4k|1080p|720p)\s*$', '', name)
+    # Remove hashed/encrypted names like "47dllnef", "945a2db..."
+    name = re.sub(r'\s+[0-9a-f]{6,}.*$', '', name)
     
-    name = re.sub(r'\s+clone\s*$', '', name)
-    name = re.sub(r'\s+enviado\s*$', '', name)
-    name = re.sub(r'\s+sps\s*$', '', name)
-    name = re.sub(r'\s+sj\s*$', '', name)
-    name = re.sub(r'\s+cp\s*$', '', name)
-    name = re.sub(r'\s+\d+db\w+$', '', name)
+    # Remove quality indicators
+    name = re.sub(r'\s*(hd|sd|4k|1080p|720p)$', '', name, flags=re.IGNORECASE)
     
+    # Remove common suffixes
+    name = re.sub(r'\s+(clone|enviado|sps|sj|cp|ip|sd|hd)$', '', name, flags=re.IGNORECASE)
+    
+    # Clean up &T -> NT
     name = name.replace('&t.', 'nt.')
-    name = re.sub(r'\s+', ' ', name)
-    name = name.strip()
+    
+    # Normalize similar names
+    name = name.replace('cartoon network', 'cartoon network')
+    name = name.replace('cartoonito', 'cartoonito')
+    name = name.replace('adult swim', 'adult swim')
+    name = name.replace('nt.', 'nt ')
+    
+    # Remove extra spaces
+    name = re.sub(r'\s+', ' ', name).strip()
     
     return name
 
@@ -36,23 +42,25 @@ def build_unified_index():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
+    cursor.execute("DELETE FROM channels")
+    
     cursor.execute("SELECT channel, url, status, latency FROM streams WHERE status='online'")
     streams = cursor.fetchall()
     
     grouped = defaultdict(list)
     for ch, url, status, lat in streams:
         normalized = normalize_channel_name(ch)
-        grouped[normalized].append({
-            'url': url,
-            'latency': lat if lat else 999
-        })
+        if normalized:
+            grouped[normalized].append({
+                'url': url,
+                'latency': lat if lat else 999
+            })
     
     unified = {}
     for norm_ch, items in grouped.items():
         items.sort(key=lambda x: x['latency'])
         unified[norm_ch] = items
     
-    cursor.execute("DELETE FROM channels")
     for ch, items in unified.items():
         cursor.execute("""
             INSERT INTO channels (name, stream_count, best_url)
@@ -60,7 +68,6 @@ def build_unified_index():
         """, (ch, len(items), items[0]['url'] if items else None))
     
     conn.commit()
-    
     print(f"Unificados a {len(unified)} canales")
     return len(unified)
 
