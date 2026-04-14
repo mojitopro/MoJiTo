@@ -1,32 +1,34 @@
 import urllib, time
 
-SEARCHTV = "https://searchtv.net/"
-_scraper = None
+SEARCHTV = 'https://searchtv.net/'
 _last_error = None
 
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Referer': SEARCHTV,
+}
+
 def get_scraper():
-    global _scraper
-    if _scraper is None:
-        try:
-            import cloudscraper
-            _scraper = cloudscraper.create_scraper()
-            _scraper.get(SEARCHTV, timeout=10)
-        except:
-            _scraper = False
-    return _scraper if _scraper else None
+    from curl_cffi import requests as cf_requests
+    session = cf_requests.Session(impersonate='chrome124')
+    try:
+        session.get(SEARCHTV, timeout=10, headers=HEADERS)
+    except:
+        pass
+    return session
 
 def search(query, limit=20, offset=0):
     global _last_error
-    scraper = get_scraper()
     result = {'streams': [], 'status': 'ok', 'results': 0, 'total': 0}
     
-    if not scraper:
-        result['status'] = 'error'
-        result['error'] = 'scraper unavailable'
-        return result
-    
     try:
-        resp = scraper.get(SEARCHTV + "search/?query=" + urllib.parse.quote(query), timeout=10)
+        scraper = get_scraper()
+        resp = scraper.get(
+            SEARCHTV + 'search/?query=' + urllib.parse.quote(query),
+            timeout=10,
+            headers=HEADERS
+        )
         if resp.status_code != 200:
             result['status'] = 'blocked'
             result['error'] = 'HTTP ' + str(resp.status_code)
@@ -41,7 +43,11 @@ def search(query, limit=20, offset=0):
         streams = []
         for item_id, info in paginated:
             try:
-                r = scraper.get(SEARCHTV + "stream/uuid/" + item_id + "/", timeout=3)
+                r = scraper.get(
+                    SEARCHTV + 'stream/uuid/' + item_id + '/',
+                    timeout=5,
+                    headers=HEADERS
+                )
                 if 'EXTM3U' in r.text:
                     for line in r.text.strip().split('\n'):
                         if line.startswith('http'):
@@ -64,4 +70,4 @@ def search(query, limit=20, offset=0):
     return result
 
 def get_status():
-    return {'scraper_ready': bool(_scraper), 'last_error': _last_error}
+    return {'scraper_ready': True, 'last_error': _last_error}
