@@ -4,16 +4,25 @@ SEARCHTV = 'https://searchtv.net/'
 _last_error = None
 
 HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    'Accept-Language': 'en-US,en;q=0.9',
-    'Referer': SEARCHTV,
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9,es;q=0.8',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Connection': 'keep-alive',
+    'Upgrade-Insecure-Requests': '1',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'none',
+    'Sec-Fetch-User': '?1',
+    'Cache-Control': 'max-age=0',
+    'x-vercel-protection-bypass': 'mojitopro-bypass-2024',
 }
 
 def get_scraper():
-    from curl_cffi import requests as cf_requests
-    session = cf_requests.Session(impersonate='chrome124')
+    from curl_cffi.requests import Session
+    session = Session(impersonate='chrome', timeout=15)
     try:
-        session.get(SEARCHTV, timeout=10, headers=HEADERS)
+        session.get(SEARCHTV, headers=HEADERS, timeout=15)
     except:
         pass
     return session
