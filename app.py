@@ -157,5 +157,32 @@ def api_discover():
     except Exception as e:
         return jsonify({'status': 'error', 'error': str(e)})
 
+@app.route('/api/unified_ingest')
+def api_unified_ingest():
+    from unified_ingest import load_all_raw
+    try:
+        streams, nodes = load_all_raw()
+        return jsonify({'status': 'ok', 'streams': streams, 'nodes': nodes})
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)})
+
+@app.route('/api/validate')
+def api_validate():
+    from validate import validate_batch
+    try:
+        count = validate_batch(200, 30)
+        return jsonify({'status': 'ok', 'validated': count})
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)})
+
+@app.route('/api/validate/all')
+def api_validate_all():
+    from validate import validate_all
+    try:
+        validate_all(500, 50)
+        return jsonify({'status': 'ok', 'message': 'validation complete'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)})
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, threaded=True, debug=False)
