@@ -6,477 +6,190 @@
 <style>
 *{margin:0;padding:0}
 html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial}
-#app{width:100%;height:100%}
-#app.fs{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999}
-
-/* VIDEO */
 #video{width:100%;height:100%;position:fixed;top:0;left:0;display:none;background:#000}
-#video.active{display:block}
+#menu{padding:50px 10px 0 10px;height:100%;display:flex;flex-direction:column}
+.logo{font-size:48px;font-weight:bold;text-align:center;line-height:1;margin-bottom:10px}
+.logo .sof{color:#8b0000;text-shadow:0 0 10px #ff0000,0 0 20px #8b0000}
+.logo .mojito{color:#dc143c;text-shadow:0 0 10px #ff0000,0 0 20px #dc143c}
+.logo .tv{color:#ff0000;font-size:20px;vertical-align:top;margin-left:5px;text-shadow:0 0 10px #ff0000}
+#in{font-size:24px;padding:10px;background:transparent;border:none;color:#666;text-align:center;margin-bottom:10px;outline:none;width:80%}
+#in.focused{color:#aaa;text-shadow:0 0 10px rgba(255,0,0,0.5)}
+#msg{font-size:14px;padding:10px;color:#dc143c;min-height:25px;text-align:center}
 
-/* FS LOGO */
-#fs-logo{position:fixed;top:10px;left:10px;font-size:14px;color:#dc143c;z-index:100;opacity:0.7;display:none;text-shadow:0 0 10px #8b0000}
-#app.fs #fs-logo{display:block}
-
-/* FS CONTROLS */
-#fs-btns{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);padding:8px 20px;border-radius:20px;z-index:100;display:none;gap:10px}
-#app.fs #fs-btns{display:flex}
-.fs-btn{background:#1a1a1a;color:#8b0000;border:1px solid #8b0000;padding:6px 15px;border-radius:15px;font-size:12px;cursor:pointer}
-.fs-btn:active{background:#dc143c;color:#fff}
-
-/* MENU */
-#menu{height:100%;display:flex;flex-direction:column;padding:0 15px}
-#menu.hidden{display:none}
-
-/* HEADER */
-#header{height:60px;display:flex;align-items:center;gap:20px;border-bottom:1px solid #222;margin-bottom:10px}
-.logo{font-size:28px;font-weight:bold}
-.logo .s{color:#8b0000;text-shadow:0 0 10px #ff0000}
-.logo .m{color:#dc143c;text-shadow:0 0 10px #dc143c}
-.logo .t{color:#ff0000;font-size:18px;vertical-align:top;margin-left:3px;text-shadow:0 0 10px #ff0000}
-
-#ch-count{font-size:12px;color:#555;margin-left:auto}
-
-/* TABS */
-#tabs{display:flex;gap:5px;padding:10px 0;overflow-x:auto;white-space:nowrap}
-.tab{padding:8px 14px;background:#1a1a1a;border:1px solid #333;border-radius:15px;font-size:12px;color:#666;cursor:pointer;flex-shrink:0}
-.tab.sel{border-color:#dc143c;color:#dc143c;background:rgba(220,20,60,0.1)}
-
-/* SEARCH */
-#search{height:50px;display:flex;align-items:center;gap:10px;padding:0 5px;margin-bottom:5px}
-#s-hash{color:#dc143c;font-size:20px;text-shadow:0 0 5px #8b0000}
-#s-num{font-size:24px;color:#888;min-width:60px}
-#s-hint{font-size:10px;color:#444;margin-left:auto}
-
-/* GRID */
+/* GRID with pagination */
 #grid{flex:1;overflow-y:auto;padding:5px 0}
-#grid-inner{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
-.ch{background:#111;border:2px solid #222;border-radius:6px;padding:10px;cursor:pointer;min-height:55px;display:flex;flex-direction:column;justify-content:center}
-.ch.sel{border-color:#dc143c;background:#1a0000}
-.ch-name{font-size:12px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ch-cat{font-size:9px;color:#555;text-transform:uppercase;margin-top:3px}
+#grid-inner{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.ch{background:#111;border:2px solid #222;border-radius:6px;padding:10px;cursor:pointer;min-height:50px;display:flex;flex-direction:column;justify-content:center}
+.ch:hover,.ch.sel{border-color:#dc143c;background:#1a0000}
+.ch-name{font-size:11px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch-cat{font-size:9px;color:#666;text-transform:uppercase;margin-top:3px}
 
-/* MSG */
-#msg{height:35px;display:flex;align-items:center;padding:0 5px;font-size:13px;color:#8b0000;border-top:1px solid #222}
-#msg.ok{color:#dc143c}
+/* Pagination */
+#pages{display:flex;justify-content:center;gap:10px;padding:10px;background:#111}
+.page-btn{padding:5px 15px;background:#222;border:1px solid #333;border-radius:15px;color:#888;font-size:12px;cursor:pointer}
+.page-btn.sel{background:#dc143c;color:#000;border-color:#dc143c}
+.page-btn:active{background:#8b0000}
 
-/* LOAD */
-#load{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:100;display:none}
-#load.active{display:block}
-.ld{width:40px;height:40px;border:3px solid rgba(220,20,60,0.2);border-top-color:#dc143c;border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* ERR */
-#err{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(139,0,0,0.9);padding:20px 40px;border-radius:10px;z-index:200;display:none;text-align:center}
-#err.active{display:block}
-#err-msg{color:#ff0000;font-size:18px}
-#err-hint{color:#ccc;font-size:12px;margin-top:8px}
+/* Hints */
+#hints{position:fixed;bottom:0;left:0;width:100%;background:#111;padding:8px;display:flex;justify-content:center;gap:20px;font-size:10px;color:#555;border-top:1px solid #222}
+#hints b{background:#222;padding:2px 6px;border-radius:3px;margin-right:3px;color:#888}
 </style>
 </head>
 <body>
 
-<div id="app">
-    <div id="fs-logo">MoJiTo</div>
-    
-    <video id="video" controls></video>
-    
-    <div id="fs-btns">
-        <button class="fs-btn" id="btn-exit">VOLVER</button>
-        <button class="fs-btn" id="btn-fs">PANTALLA</button>
-    </div>
-    
-    <div id="menu">
-        <div id="header">
-            <div class="logo"><span class="s">Mo</span><span class="m">Ji</span><span class="t">To</span></div>
-            <div id="ch-count">14,247</div>
-        </div>
-        
-        <div id="tabs">
-            <div class="tab sel" data-t="all">Todos</div>
-            <div class="tab" data-t="Deportes">Deportes</div>
-            <div class="tab" data-t="Cine">Cine</div>
-            <div class="tab" data-t="Noticias">Noticias</div>
-            <div class="tab" data-t="Mexico">Mexico</div>
-            <div class="tab" data-t="Argentina">Argentina</div>
-            <div class="tab" data-t="Espana">Espana</div>
-            <div class="tab" data-t="Infantil">Infantil</div>
-            <div class="tab" data-t="Musica">Musica</div>
-            <div class="tab" data-t="Documental">Documental</div>
-            <div class="tab" data-t="Entretenimiento">Entretenimiento</div>
-        </div>
-        
-        <div id="search">
-            <div id="s-hash">#</div>
-            <div id="s-num">-</div>
-            <div id="s-hint">0-9 canal | OK sel | BACK vol</div>
-        </div>
-        
-        <div id="grid">
-            <div id="grid-inner"></div>
-        </div>
-        
-        <div id="msg">↑↓←→ navegar | OK seleccionar | 0-9 canal directo</div>
-    </div>
-    
-    <div id="load"><div class="ld"></div></div>
-    <div id="err"><div id="err-msg">Sin senal</div><div id="err-hint">OK para reintentar</div></div>
+<video id="video" controls></video>
+
+<div id="menu">
+<div class="logo"><span class="sof">SŌF</span><span class="mojito">MoJiTo</span><span class="tv">TV</span></div>
+<input type="text" id="in" placeholder="Buscar canal...">
+<div id="msg">Usa las flechas para navegar</div>
+<div id="grid"><div id="grid-inner"></div></div>
+<div id="pages"></div>
+</div>
+
+<div id="hints">
+<b>↑↓</b> Navegar <b>OK</b> Seleccionar <b>BACK</b> Salir <b>PAG</b> Paginas
 </div>
 
 <script>
-var API='';
-var app=document.getElementById('app');
-var menu=document.getElementById('menu');
-var video=document.getElementById('video');
-var grid=document.getElementById('grid-inner');
-var tabs=document.getElementById('tabs');
-var search=document.getElementById('search');
-var sNum=document.getElementById('s-num');
-var msg=document.getElementById('msg');
-var load=document.getElementById('load');
-var err=document.getElementById('err');
-var errMsg=document.getElementById('err-msg');
+var API=window.location.origin;
+var streams=[], idx=0, txt='', page=1, perPage=48;
 
-var chans=[];
-var filt=[];
-var sel=0;
-var curT='all';
-var isFS=false;
-var isWatch=false;
-var isSearch=false;
-var searchVal='';
+function log(m){document.getElementById('msg').textContent=m;}
 
-function log(m,t){
-    msg.textContent=m;
-    msg.className=t||'';
-}
-
-function ql(t){
-    if(/1080|4k|uhd/i.test(t))return' [1080p]';
-    if(/720|hd/i.test(t))return' [HD]';
-    if(/480|sd/i.test(t))return' [SD]';
-    return'';
-}
-
-function matchCat(n){
-    if(/espn|sports|tudn|futbol|fox sports|bein/i.test(n))return'Deportes';
-    if(/hbo|cinemax|showtime|movie|cine|star/i.test(n))return'Cine';
-    if(/cnn|bbc|news|telesur|dw/i.test(n))return'Noticias';
-    if(/azteca|estrellas|canal 5|televisa|mexico/i.test(n))return'Mexico';
-    if(/trece|telefe|argentina|tyc/i.test(n))return'Argentina';
-    if(/la 1|antena|tve|espana|telecinco/i.test(n))return'Espana';
-    if(/cartoon|nick|disney|kids/i.test(n))return'Infantil';
-    if(/mt[rv]|musica|vh1/i.test(n))return'Musica';
-    if(/discovery|history|nat.*geo|animal/i.test(n))return'Documental';
-    if(/fox|warner|universal|sony|adult|paramount/i.test(n))return'Entretenimiento';
-    return null;
-}
-
-function loadChans(){
-    load.classList.add('active');
-    var x=new XMLHttpRequest();
-    x.open('GET',API+'/api/channels',true);
-    x.onreadystatechange=function(){
-        if(x.readyState===4&&x.status===200){
-            chans=JSON.parse(x.responseText);
-            filt=chans.slice();
-            renderAll();
-            load.classList.remove('active');
-        }
-    };
-    x.onerror=function(){load.classList.remove('active');log('Sin conexion');};
-    x.send();
-}
-
-function renderAll(){
-    if(curT==='all'){
-        filt=chans.slice();
-    }else{
-        filt=chans.filter(function(c){
-            var cat=(c.category||'').toLowerCase();
-            var name=(c.name||'').toLowerCase();
-            if(cat.indexOf(curT.toLowerCase())>-1)return true;
-            return matchCat(name)===curT;
-        });
-    }
-    sel=0;
-    renderGrid();
-}
-
-function renderGrid(){
-    grid.innerHTML='';
-    for(var i=0;i<filt.length;i++){
-        var c=filt[i];
+function renderGrid(start,end){
+    var g=document.getElementById('grid-inner');
+    g.innerHTML='';
+    var slice=streams.slice(start,end);
+    slice.forEach(function(s,i){
         var d=document.createElement('div');
-        d.className='ch'+(i===sel&&!isSearch?' sel':'');
-        d.dataset.i=i;
-        d.innerHTML='<div class="ch-name">'+c.name+'</div><div class="ch-cat">'+(c.category||matchCat((c.name||'').toLowerCase())||'General')+'</div>';
-        d.onclick=function(){watchChan(filt[this.dataset.i]);};
-        grid.appendChild(d);
-    }
+        d.className='ch'+(start+i===idx?' sel':'');
+        d.innerHTML='<div class="ch-name">'+s.title.substring(0,30)+'</div><div class="ch-cat">'+(s.quality||'HD')+'</div>';
+        d.onclick=function(){playStream(start+i);};
+        g.appendChild(d);
+    });
     updateFocus();
 }
 
 function updateFocus(){
-    var chs=grid.querySelectorAll('.ch');
-    for(var i=0;i<chs.length;i++)chs[i].classList.remove('sel');
-    var ts=tabs.querySelectorAll('.tab');
-    for(var i=0;i<ts.length;i++)ts[i].classList.remove('sel');
-    if(isSearch)return;
-    if(sel>=0&&sel<chs.length){
-        chs[sel].classList.add('sel');
-        chs[sel].scrollIntoView({block:'nearest'});
-        log(chs[sel].querySelector('.ch-name').textContent+' - '+chs[sel].querySelector('.ch-cat').textContent,'ok');
+    var chs=document.querySelectorAll('.ch');
+    chs.forEach(function(c){c.classList.remove('sel');});
+    var relIdx=idx%perPage;
+    if(chs[relIdx])chs[relIdx].classList.add('sel');
+}
+
+function renderPages(){
+    var total=Math.ceil(streams.length/perPage);
+    var p=document.getElementById('pages');
+    p.innerHTML='';
+    for(var i=1;i<=Math.min(total,10);i++){
+        var b=document.createElement('div');
+        b.className='page-btn'+(i===page?' sel':'');
+        b.textContent=i;
+        b.onclick=function(){page=parseInt(this.textContent);loadPage();};
+        p.appendChild(b);
     }
-    for(var i=0;i<ts.length;i++){
-        if(ts[i].dataset.t===curT)ts[i].classList.add('sel');
-    }
 }
 
-function move(d){
-    if(isSearch)return;
-    var cols=Math.max(1,Math.floor(document.getElementById('grid').offsetWidth/148));
-    if(d==='up')sel-=cols;
-    if(d==='down')sel+=cols;
-    if(d==='left')sel--;
-    if(d==='right')sel++;
-    if(sel<0)sel=0;
-    if(sel>=filt.length)sel=filt.length-1;
-    updateFocus();
+function loadPage(){
+    var start=(page-1)*perPage;
+    var end=Math.min(start+perPage,streams.length);
+    renderGrid(start,end);
+    renderPages();
+    log('Pag '+page+'/'+Math.ceil(streams.length/perPage)+' - '+streams.length+' canales');
 }
 
-function setTab(t){
-    curT=t;
-    isSearch=false;
-    search.style.background='';
-    sNum.textContent='-';
-    renderAll();
+function move(dir){
+    if(dir==='up'&&idx>0)idx--;
+    if(dir==='down'&&idx<streams.length-1)idx++;
+    if(dir==='left'&&idx>=perPage)idx-=perPage;
+    if(dir==='right'&&idx+perPage<streams.length)idx+=perPage;
+    var start=(page-1)*perPage;
+    if(idx>=start+perPage){page=Math.ceil((idx+1)/perPage);loadPage();}
+    else if(idx<start){page=Math.ceil((idx+1)/perPage);loadPage();}
+    else{updateFocus();}
+    log((idx+1)+'/'+streams.length+' - '+streams[idx].title.substring(0,30));
 }
 
-function watchChan(c){
-    isWatch=true;
-    err.classList.remove('active');
-    
-    // recents
-    var rec=JSON.parse(localStorage.getItem('moj_rec')||'[]');
-    rec=rec.filter(function(n){return n!==c.name;});
-    rec.unshift(c.name);
-    if(rec.length>20)rec.pop();
-    localStorage.setItem('moj_rec',JSON.stringify(rec));
-    
-    log('Cargando: '+c.name.substring(0,30)+ql(c.name));
-    menu.style.display='none';
-    video.style.display='block';
-    
+function search(){
+    if(!txt.trim()){log('Escribe un canal');return;}
+    log('Buscando...');
     var x=new XMLHttpRequest();
-    x.open('GET',API+'/api/stream/'+encodeURIComponent(c.name),true);
+    x.open('GET',API+'/api/search?q='+encodeURIComponent(txt),true);
     x.onreadystatechange=function(){
-        if(x.readyState===4){
-            var d=JSON.parse(x.responseText);
-            if(d.url){
-                video.src=d.url;
-                video.play().then(function(){
-                    log('Reproduciendo: '+c.name.substring(0,30)+ql(c.name),'ok');
-                }).catch(function(){
-                    showErr('Error al reproducir');
-                });
-            }else{
-                showErr('Sin senal');
-            }
+        if(x.readyState===4&&x.status===200){
+            try{
+                var d=JSON.parse(x.responseText);
+                streams=d.map(function(s){return {title:s.name,url:s.url,quality:s.streams>3?'HD':'SD'}});
+                if(streams.length===0){log('Sin resultados');return;}
+                idx=0;page=1;
+                loadPage();
+            }catch(e){log('Error');}
         }
     };
-    x.onerror=function(){showErr('Error de conexion');};
+    x.onerror=function(){log('Sin conexion');};
     x.send();
 }
 
-function showErr(m){
-    errMsg.textContent=m;
-    err.classList.add('active');
-}
-
-function backMenu(){
-    video.pause();
-    video.src='';
-    video.style.display='none';
-    menu.style.display='flex';
-    isWatch=false;
-    isFS=false;
-    app.classList.remove('fs');
-    err.classList.remove('active');
-    isSearch=false;
-    search.style.background='';
-    sNum.textContent='-';
-    renderAll();
-}
-
-function toggleFS(){
-    if(!isWatch)return;
-    if(!isFS){
-        if(video.requestFullscreen)video.requestFullscreen();
-        else if(video.webkitRequestFullscreen)video.webkitRequestFullscreen();
-        isFS=true;
-        app.classList.add('fs');
-    }else{
-        if(document.exitFullscreen)document.exitFullscreen();
-        else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
-        isFS=false;
-        app.classList.remove('fs');
-    }
-}
-
-function startSearch(){
-    isSearch=true;
-    searchVal='';
-    sNum.textContent='-';
-    search.style.background='#111';
-}
-
-function addNum(n){
-    if(searchVal.length<4){
-        searchVal+=n;
-        sNum.textContent=searchVal;
-        if(searchVal.length>=2){
-            var idx=parseInt(searchVal,10)-1;
-            if(idx>=0&&idx<chans.length){
-                searchVal='';
-                sNum.textContent='-';
-                isSearch=false;
-                search.style.background='';
-                watchChan(chans[idx]);
-            }
+function loadAll(){
+    log('Cargando canales...');
+    var x=new XMLHttpRequest();
+    x.open('GET',API+'/api/channels',true);
+    x.onreadystatechange=function(){
+        if(x.readyState===4&&x.status===200){
+            try{
+                var d=JSON.parse(x.responseText);
+                streams=d.map(function(c){return {title:c.name,url:'',quality:c.streams||'1'}});
+                streams.sort(function(a,b){return a.title.localeCompare(b.title)});
+                idx=0;page=1;
+                loadPage();
+            }catch(e){log('Error');}
         }
-    }
+    };
+    x.onerror=function(){log('Sin conexion');};
+    x.send();
 }
 
-// KEYBOARD
+function playStream(i){
+    if(!streams[i].url)return;
+    document.getElementById('video').src=streams[i].url;
+    document.getElementById('video').style.display='block';
+    document.getElementById('menu').style.display='none';
+    document.getElementById('video').play();
+    log('Reproduciendo: '+streams[i].title);
+}
+
+document.getElementById('in').onkeydown=function(e){
+    if(e.key==='Enter'){search();}
+    else if(e.key==='Backspace'&&txt.length===0){
+        document.getElementById('in').blur();
+        loadAll();
+    }
+    else if(e.key.length===1){txt+=e.key;}
+};
+
 document.onkeydown=function(e){
-    var k=e.keyCode;
-    var key=e.key||'';
-    
-    if([37,38,39,40,13,8,48,49,50,51,52,53,54,55,56,57,33,34,70].indexOf(k)>-1){
-        e.preventDefault();
-    }
-    
-    // BACK
-    if(k===8||k===27){
-        if(isSearch){
-            isSearch=false;
-            search.style.background='';
-            sNum.textContent='-';
-        }else if(isWatch){
-            backMenu();
-        }
+    var k=e.key;
+    if(document.getElementById('video').style.display==='block'){
+        if(k==='Escape'){document.getElementById('video').style.display='none';document.getElementById('menu').style.display='flex';log('Cerrado');}
         return;
     }
-    
-    // WATCHING
-    if(isWatch){
-        if(k===13||k===23||k===66){
-            if(err.classList.contains('active')){
-                err.classList.remove('active');
-                if(filt[sel])watchChan(filt[sel]);
-            }else{
-                backMenu();
-            }
-            return;
-        }
-        if(k===70){toggleFS();return;}
-        return;
+    if(k==='ArrowDown'){e.preventDefault();move('down');}
+    else if(k==='ArrowUp'){e.preventDefault();move('up');}
+    else if(k==='ArrowLeft'){e.preventDefault();move('left');}
+    else if(k==='ArrowRight'){e.preventDefault();move('right');}
+    else if(k==='Enter'){if(streams[idx])playStream(idx);}
+    else if(k==='Backspace'){
+        var inp=document.getElementById('in');
+        if(document.activeElement===inp){txt=txt.slice(0,-1);inp.value=txt;}
+        else if(document.getElementById('video').style.display==='none'){document.getElementById('video').style.display='none';document.getElementById('menu').style.display='flex';log('Cerrado');}
     }
-    
-    // SEARCH
-    if(isSearch){
-        if(k===13||k===23||k===66){
-            if(searchVal.length>0){
-                var idx=parseInt(searchVal,10)-1;
-                if(idx>=0&&idx<chans.length){
-                    searchVal='';
-                    sNum.textContent='-';
-                    isSearch=false;
-                    search.style.background='';
-                    watchChan(chans[idx]);
-                }
-            }
-            return;
-        }
-        if(k>=48&&k<=57){
-            addNum((k-48).toString());
-            return;
-        }
-        return;
-    }
-    
-    // MENU
-    if(k===37||k===39||k===38||k===40){
-        if(k===37)move('left');
-        if(k===39)move('right');
-        if(k===38)move('up');
-        if(k===40)move('down');
-        return;
-    }
-    
-    if(k===13||k===23||k===66){
-        if(filt[sel])watchChan(filt[sel]);
-        return;
-    }
-    
-    if(k===33){
-        var cols=Math.max(1,Math.floor(document.getElementById('grid').offsetWidth/148));
-        sel=Math.max(0,sel-cols*5);
-        updateFocus();
-        return;
-    }
-    if(k===34){
-        var cols=Math.max(1,Math.floor(document.getElementById('grid').offsetWidth/148));
-        sel=Math.min(filt.length-1,sel+cols*5);
-        updateFocus();
-        return;
-    }
-    
-    if(k>=48&&k<=57){
-        startSearch();
-        addNum((k-48).toString());
-        return;
-    }
-    
-    if(k===70){toggleFS();return;}
+    else if(k==='PageDown'){if(page<Math.ceil(streams.length/perPage)){page++;loadPage();}}
+    else if(k==='PageUp'){if(page>1){page--;loadPage();}}
+    else if(k==='Home'){txt='';document.getElementById('in').value='';loadAll();}
 };
 
-// Clicks
-document.getElementById('btn-exit').onclick=backMenu;
-document.getElementById('btn-fs').onclick=toggleFS;
-
-tabs.onclick=function(e){
-    var t=e.target;
-    if(t.className==='tab')setTab(t.dataset.t);
-};
-
-// Fullscreen
-document.addEventListener('fullscreenchange',function(){
-    isFS=!!document.fullscreenElement;
-    app.classList.toggle('fs',isFS);
-});
-document.addEventListener('webkitfullscreenchange',function(){
-    isFS=!!document.webkitFullscreenElement;
-    app.classList.toggle('fs',isFS);
-});
-
-// Video
-video.onerror=function(){showErr('Error de reproduccion');};
-video.onplaying=function(){load.classList.remove('active');};
-
-// Touch
-var tx=0,ty=0;
-document.ontouchstart=function(e){
-    tx=e.touches[0].clientX;
-    ty=e.touches[0].clientY;
-};
-document.ontouchend=function(e){
-    var dx=tx-e.changedTouches[0].clientX;
-    var dy=ty-e.changedTouches[0].clientY;
-    if(Math.abs(dx)>40)dx>0?move('left'):move('right');
-    else if(Math.abs(dy)>40)dy>0?move('up'):move('down');
-};
-
-loadChans();
+loadAll();
 console.log('MoJiTo loaded');
 </script>
 </body>
