@@ -104,6 +104,9 @@ html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial,He
 var Hls = window.Hls;
 var hls = null;
 
+// CORS PROXY - añade este prefijo a todas las URLs
+var CORS_PROXY = 'https://corsproxy.io/?';
+
 var app=document.getElementById('app');
 var menu=document.getElementById('menu');
 var video=document.getElementById('video');
@@ -119,7 +122,7 @@ var chCount=document.getElementById('ch-count');
 var CATS=['Todos','Deportes','Cine','Noticias','Mexico','Argentina','Espana','Infantil','Musica','Documental','Entretenimiento'];
 
 var chans=[
-{name:'ESPN',urls:['http://45.177.21.6:9000/play/a015','http://38.137.192.250:8000/play/a0b5'],category:'Deportes'},
+{name:'ESPN',urls:['http://45.177.21.6:9000/play/a015'],category:'Deportes'},
 {name:'ESPN 2',urls:['http://45.177.21.6:9000/play/a017'],category:'Deportes'},
 {name:'ESPN 3',urls:['http://45.177.21.6:9000/play/a01i'],category:'Deportes'},
 {name:'ESPN 4',urls:['http://45.177.21.6:9000/play/a01c'],category:'Deportes'},
@@ -231,39 +234,34 @@ function move(d){
     if(filt[sel])log((sel+1)+'/'+filt.length+' - '+filt[sel].name);
 }
 
-// PLAY WITH HLS.JS
+// PLAY CON CORS PROXY
 function playStream(url, onSuccess, onFail){
-    // Destroy previous hls instance
-    if(hls){
-        hls.destroy();
-        hls = null;
-    }
+    if(hls){hls.destroy();hls=null;}
+    
+    // Añadir proxy CORS
+    var proxyUrl = CORS_PROXY + encodeURIComponent(url);
     
     if(url.indexOf('.m3u8') > -1){
-        // Use HLS.js for m3u8 streams
         if(Hls.isSupported()){
             hls = new Hls();
-            hls.loadSource(url);
+            hls.loadSource(proxyUrl);
             hls.attachMedia(video);
             hls.on(Hls.Events.MANIFEST_PARSED, function(){
                 video.play().then(onSuccess).catch(onFail);
             });
             hls.on(Hls.Events.ERROR, function(event, data){
                 if(data.fatal){
-                    hls.destroy();
-                    hls = null;
+                    hls.destroy();hls=null;
                     onFail();
                 }
             });
         }else if(video.canPlayType('application/vnd.apple.mpegurl')){
-            // Native HLS support (Safari)
-            video.src = url;
+            video.src = proxyUrl;
             video.play().then(onSuccess).catch(onFail);
         }else{
             onFail();
         }
     }else{
-        // Direct stream
         video.src = url;
         video.play().then(onSuccess).catch(onFail);
     }
@@ -275,7 +273,7 @@ function tryPlayUrls(urls, index, onSuccess, onFail){
         return;
     }
     playStream(urls[index], onSuccess, function(){
-        setTimeout(function(){tryPlayUrls(urls, index+1, onSuccess, onFail);}, 500);
+        setTimeout(function(){tryPlayUrls(urls, index+1, onSuccess, onFail);}, 300);
     });
 }
 
@@ -399,7 +397,7 @@ chCount.textContent=chans.length+' canales';
 filterChans();
 renderTabs();
 renderGrid();
-log('Listo - HLS enabled');
+log('Listo - CORS proxy');
 
 console.log('MoJiTo ready');
 })();
