@@ -10,7 +10,41 @@ def get_all_channels():
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute("SELECT id, name, category, stream_count FROM channels ORDER BY name")
-    return [{'id': r[0], 'name': r[1], 'category': r[2], 'streams': r[3]} for r in cursor.fetchall()]
+    channels = []
+    for r in cursor.fetchall():
+        name = r[1] or ''
+        category = r[2] or auto_categorize(name)
+        channels.append({'id': r[0], 'name': name, 'category': category, 'streams': r[3]})
+    return channels
+
+def auto_categorize(name):
+    """Categoriza un canal por su nombre"""
+    name_lower = name.lower()
+    if any(x in name_lower for x in ['espn', 'sports', 'tudn', 'futbol', 'fox sports']):
+        return 'Deportes'
+    if any(x in name_lower for x in ['hbo', 'cinemax', 'showtime', 'movie', 'cine']):
+        return 'Cine'
+    if any(x in name_lower for x in ['cnn', 'bbc', 'news', 'telesur', 'dw']):
+        return 'Noticias'
+    if any(x in name_lower for x in ['azteca', 'estrellas', 'canal 5', 'televisa']):
+        return 'Mexico'
+    if any(x in name_lower for x in ['trece', 'telefe', 'america tv']):
+        return 'Argentina'
+    if any(x in name_lower for x in ['tvn', 'canal 13', 'chile']):
+        return 'Chile'
+    if any(x in name_lower for x in ['caracol', 'rcn']):
+        return 'Colombia'
+    if any(x in name_lower for x in ['la 1', 'antena', 'tve', 'espana']):
+        return 'Espana'
+    if any(x in name_lower for x in ['cartoon', 'nick', 'disney', 'kids']):
+        return 'Infantil'
+    if any(x in name_lower for x in ['discovery', 'history', 'nat geo', 'animal']):
+        return 'Documental'
+    if any(x in name_lower for x in ['mt', 'vh1', 'musica']):
+        return 'Musica'
+    if any(x in name_lower for x in ['fox', 'warner', 'universal', 'sony', 'adult']):
+        return 'Entretenimiento'
+    return 'General'
 
 def get_channel_streams(channel):
     """Obtiene TODOS los streams de un canal para redundancia"""
