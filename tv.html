@@ -1,349 +1,483 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoJiTo TV</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#0a0a0a;color:#fff;font-family:Arial,sans-serif;height:100vh;overflow:hidden}
-        
-        /* Modo Video */
-        #video-mode{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:1;display:none}
-        #video{width:100%;height:100%;object-fit:contain}
-        #video-mode.active{display:block}
-        
-        /* Barra Superior */
-        #top-bar{position:fixed;top:0;left:0;width:100%;height:50px;background:linear-gradient(to bottom,rgba(0,0,0,0.95),transparent);z-index:10;display:flex;align-items:center;padding:0 15px}
-        #logo{font-size:20px;font-weight:bold;color:#f39c12;margin-right:15px}
-        #current-ch{font-size:16px;color:#fff;opacity:0.9}
-        
-        /* Canal Grande */
-        #big-channel{position:fixed;top:60px;left:50%;transform:translateX(-50%);text-align:center;z-index:10;display:none}
-        #big-channel.active{display:block}
-        #big-channel-name{font-size:28px;color:#f39c12;margin-bottom:5px}
-        #big-channel-cat{font-size:14px;color:#888}
-        
-        /* Lista de Canales */
-        #list-mode{position:fixed;top:50px;left:0;width:100%;height:100%;z-index:5;display:block;background:linear-gradient(to bottom,#0a0a0a,#151515)}
-        #list-mode.hidden{display:none}
-        
-        /* Categorias */
-        #cats{display:flex;gap:8px;padding:10px 15px;overflow-x:auto;background:#1a1a1a;border-bottom:1px solid #333}
-        .cat{background:#2a2a2a;padding:8px 16px;border-radius:20px;font-size:13px;color:#ccc;cursor:pointer;white-space:nowrap;border:2px solid transparent}
-        .cat:hover,.cat.sel{border-color:#f39c12;color:#fff}
-        .cat.sel{background:#f39c12;color:#000}
-        
-        /* Grid de Canales */
-        #grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;padding:15px;height:calc(100% - 110px);overflow-y:auto}
-        .ch{background:#1a1a1a;border-radius:8px;padding:12px;cursor:pointer;border:3px solid transparent;transition:border-color 0.15s}
-        .ch:hover,.ch.sel{border-color:#f39c12}
-        .ch-name{font-size:14px;font-weight:bold;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .ch-cat{font-size:11px;color:#888;text-transform:uppercase}
-        
-        /* Navegacion inferior */
-        #nav-bar{position:fixed;bottom:0;left:0;width:100%;background:#1a1a1a;padding:10px 15px;display:flex;justify-content:center;gap:20px;z-index:10;border-top:1px solid #333}
-        .nav-hint{font-size:11px;color:#666;text-align:center}
-        .nav-key{background:#333;padding:3px 8px;border-radius:4px;margin-right:5px}
-        
-        /* Loading */
-        #loading{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:100;display:none}
-        #loading.active{display:block}
-        .spin{width:50px;height:50px;border:3px solid rgba(255,255,255,0.1);border-top-color:#f39c12;border-radius:50%;animation:spin 0.8s linear infinite}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        
-        /* Error */
-        #error{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(200,0,0,0.9);padding:20px 40px;border-radius:10px;z-index:200;display:none;text-align:center}
-        #error.active{display:block}
-        #error-msg{font-size:16px}
-        #error-sub{font-size:12px;color:#ccc;margin-top:5px}
-    </style>
+<meta charset="utf-8">
+<title>MoJiTo TV</title>
+<style>
+*{margin:0;padding:0}
+html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial}
+#app{width:100%;height:100%}
+#app.fs{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999}
+
+/* VIDEO */
+#video{width:100%;height:100%;position:fixed;top:0;left:0;display:none;background:#000}
+#video.active{display:block}
+
+/* FS LOGO */
+#fs-logo{position:fixed;top:10px;left:10px;font-size:14px;color:#dc143c;z-index:100;opacity:0.7;display:none;text-shadow:0 0 10px #8b0000}
+#app.fs #fs-logo{display:block}
+
+/* FS CONTROLS */
+#fs-btns{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);padding:8px 20px;border-radius:20px;z-index:100;display:none;gap:10px}
+#app.fs #fs-btns{display:flex}
+.fs-btn{background:#1a1a1a;color:#8b0000;border:1px solid #8b0000;padding:6px 15px;border-radius:15px;font-size:12px;cursor:pointer}
+.fs-btn:active{background:#dc143c;color:#fff}
+
+/* MENU */
+#menu{height:100%;display:flex;flex-direction:column;padding:0 15px}
+#menu.hidden{display:none}
+
+/* HEADER */
+#header{height:60px;display:flex;align-items:center;gap:20px;border-bottom:1px solid #222;margin-bottom:10px}
+.logo{font-size:28px;font-weight:bold}
+.logo .s{color:#8b0000;text-shadow:0 0 10px #ff0000}
+.logo .m{color:#dc143c;text-shadow:0 0 10px #dc143c}
+.logo .t{color:#ff0000;font-size:18px;vertical-align:top;margin-left:3px;text-shadow:0 0 10px #ff0000}
+
+#ch-count{font-size:12px;color:#555;margin-left:auto}
+
+/* TABS */
+#tabs{display:flex;gap:5px;padding:10px 0;overflow-x:auto;white-space:nowrap}
+.tab{padding:8px 14px;background:#1a1a1a;border:1px solid #333;border-radius:15px;font-size:12px;color:#666;cursor:pointer;flex-shrink:0}
+.tab.sel{border-color:#dc143c;color:#dc143c;background:rgba(220,20,60,0.1)}
+
+/* SEARCH */
+#search{height:50px;display:flex;align-items:center;gap:10px;padding:0 5px;margin-bottom:5px}
+#s-hash{color:#dc143c;font-size:20px;text-shadow:0 0 5px #8b0000}
+#s-num{font-size:24px;color:#888;min-width:60px}
+#s-hint{font-size:10px;color:#444;margin-left:auto}
+
+/* GRID */
+#grid{flex:1;overflow-y:auto;padding:5px 0}
+#grid-inner{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.ch{background:#111;border:2px solid #222;border-radius:6px;padding:10px;cursor:pointer;min-height:55px;display:flex;flex-direction:column;justify-content:center}
+.ch.sel{border-color:#dc143c;background:#1a0000}
+.ch-name{font-size:12px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch-cat{font-size:9px;color:#555;text-transform:uppercase;margin-top:3px}
+
+/* MSG */
+#msg{height:35px;display:flex;align-items:center;padding:0 5px;font-size:13px;color:#8b0000;border-top:1px solid #222}
+#msg.ok{color:#dc143c}
+
+/* LOAD */
+#load{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:100;display:none}
+#load.active{display:block}
+.ld{width:40px;height:40px;border:3px solid rgba(220,20,60,0.2);border-top-color:#dc143c;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ERR */
+#err{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(139,0,0,0.9);padding:20px 40px;border-radius:10px;z-index:200;display:none;text-align:center}
+#err.active{display:block}
+#err-msg{color:#ff0000;font-size:18px}
+#err-hint{color:#ccc;font-size:12px;margin-top:8px}
+</style>
 </head>
 <body>
-    <!-- Video Mode -->
-    <div id="video-mode">
-        <video id="video" autoplay playsinline></video>
-    </div>
-    
-    <!-- Top Bar -->
-    <div id="top-bar">
-        <span id="logo">MoJiTo</span>
-        <span id="current-ch">Selecciona un canal</span>
-    </div>
-    
-    <!-- Big Channel Info -->
-    <div id="big-channel">
-        <div id="big-channel-name"></div>
-        <div id="big-channel-cat"></div>
-    </div>
-    
-    <!-- List Mode -->
-    <div id="list-mode">
-        <div id="cats"></div>
-        <div id="grid"></div>
-    </div>
-    
-    <!-- Navigation Hints -->
-    <div id="nav-bar">
-        <div class="nav-hint"><span class="nav-key">^v</span><span class="nav-key">&lt;&gt;</span> Mover</div>
-        <div class="nav-hint"><span class="nav-key">OK</span> Ver canal</div>
-        <div class="nav-hint"><span class="nav-key">BACK</span> Atras</div>
-    </div>
-    
-    <!-- Loading -->
-    <div id="loading"><div class="spin"></div></div>
-    
-    <!-- Error -->
-    <div id="error">
-        <div id="error-msg">Sin senal</div>
-        <div id="error-sub">Presiona OK para intentar otro stream</div>
-    </div>
 
-    <script>
-        const API = '';
-        let channels = [];
-        let filtered = [];
-        let selectedIdx = 0;
-        let currentCat = 'all';
-        let isWatching = false;
+<div id="app">
+    <div id="fs-logo">MoJiTo</div>
+    
+    <video id="video" controls></video>
+    
+    <div id="fs-btns">
+        <button class="fs-btn" id="btn-exit">VOLVER</button>
+        <button class="fs-btn" id="btn-fs">PANTALLA</button>
+    </div>
+    
+    <div id="menu">
+        <div id="header">
+            <div class="logo"><span class="s">Mo</span><span class="m">Ji</span><span class="t">To</span></div>
+            <div id="ch-count">14,247</div>
+        </div>
         
-        const video = document.getElementById('video');
-        const grid = document.getElementById('grid');
-        const cats = document.getElementById('cats');
-        const listMode = document.getElementById('list-mode');
-        const videoMode = document.getElementById('video-mode');
-        const bigChannel = document.getElementById('big-channel');
-        const currentCh = document.getElementById('current-ch');
-        const loading = document.getElementById('loading');
-        const error = document.getElementById('error');
+        <div id="tabs">
+            <div class="tab sel" data-t="all">Todos</div>
+            <div class="tab" data-t="Deportes">Deportes</div>
+            <div class="tab" data-t="Cine">Cine</div>
+            <div class="tab" data-t="Noticias">Noticias</div>
+            <div class="tab" data-t="Mexico">Mexico</div>
+            <div class="tab" data-t="Argentina">Argentina</div>
+            <div class="tab" data-t="Espana">Espana</div>
+            <div class="tab" data-t="Infantil">Infantil</div>
+            <div class="tab" data-t="Musica">Musica</div>
+            <div class="tab" data-t="Documental">Documental</div>
+            <div class="tab" data-t="Entretenimiento">Entretenimiento</div>
+        </div>
         
-        // Categorias esenciales
-        const CATEGORIES = [
-            {id:'all', name:'Todos'},
-            {id:'Deportes', name:'Deportes'},
-            {id:'Cine', name:'Cine'},
-            {id:'Noticias', name:'Noticias'},
-            {id:'Mexico', name:'Mexico'},
-            {id:'Argentina', name:'Argentina'},
-            {id:'Espana', name:'Espana'},
-            {id:'Infantil', name:'Infantil'},
-            {id:'Musica', name:'Musica'},
-            {id:'Documental', name:'Documental'},
-            {id:'Entretenimiento', name:'Entretenimiento'}
-        ];
+        <div id="search">
+            <div id="s-hash">#</div>
+            <div id="s-num">-</div>
+            <div id="s-hint">0-9 canal | OK sel | BACK vol</div>
+        </div>
         
-        // Cargar canales
-        async function loadChannels() {
-            loading.classList.add('active');
-            try {
-                const res = await fetch(API + '/api/channels');
-                channels = await res.json();
-                filtered = [...channels];
-                renderCats();
-                renderGrid();
-            } catch(e) {
-                console.error(e);
-            }
-            loading.classList.remove('active');
+        <div id="grid">
+            <div id="grid-inner"></div>
+        </div>
+        
+        <div id="msg">↑↓←→ navegar | OK seleccionar | 0-9 canal directo</div>
+    </div>
+    
+    <div id="load"><div class="ld"></div></div>
+    <div id="err"><div id="err-msg">Sin senal</div><div id="err-hint">OK para reintentar</div></div>
+</div>
+
+<script>
+var API='';
+var app=document.getElementById('app');
+var menu=document.getElementById('menu');
+var video=document.getElementById('video');
+var grid=document.getElementById('grid-inner');
+var tabs=document.getElementById('tabs');
+var search=document.getElementById('search');
+var sNum=document.getElementById('s-num');
+var msg=document.getElementById('msg');
+var load=document.getElementById('load');
+var err=document.getElementById('err');
+var errMsg=document.getElementById('err-msg');
+
+var chans=[];
+var filt=[];
+var sel=0;
+var curT='all';
+var isFS=false;
+var isWatch=false;
+var isSearch=false;
+var searchVal='';
+
+function log(m,t){
+    msg.textContent=m;
+    msg.className=t||'';
+}
+
+function ql(t){
+    if(/1080|4k|uhd/i.test(t))return' [1080p]';
+    if(/720|hd/i.test(t))return' [HD]';
+    if(/480|sd/i.test(t))return' [SD]';
+    return'';
+}
+
+function matchCat(n){
+    if(/espn|sports|tudn|futbol|fox sports|bein/i.test(n))return'Deportes';
+    if(/hbo|cinemax|showtime|movie|cine|star/i.test(n))return'Cine';
+    if(/cnn|bbc|news|telesur|dw/i.test(n))return'Noticias';
+    if(/azteca|estrellas|canal 5|televisa|mexico/i.test(n))return'Mexico';
+    if(/trece|telefe|argentina|tyc/i.test(n))return'Argentina';
+    if(/la 1|antena|tve|espana|telecinco/i.test(n))return'Espana';
+    if(/cartoon|nick|disney|kids/i.test(n))return'Infantil';
+    if(/mt[rv]|musica|vh1/i.test(n))return'Musica';
+    if(/discovery|history|nat.*geo|animal/i.test(n))return'Documental';
+    if(/fox|warner|universal|sony|adult|paramount/i.test(n))return'Entretenimiento';
+    return null;
+}
+
+function loadChans(){
+    load.classList.add('active');
+    var x=new XMLHttpRequest();
+    x.open('GET',API+'/api/channels',true);
+    x.onreadystatechange=function(){
+        if(x.readyState===4&&x.status===200){
+            chans=JSON.parse(x.responseText);
+            filt=chans.slice();
+            renderAll();
+            load.classList.remove('active');
         }
-        
-        // Render categorias
-        function renderCats() {
-            cats.innerHTML = CATEGORIES.map(c => 
-                `<div class="cat ${c.id===currentCat?'sel':''}" onclick="selectCat('${c.id}')">${c.name}</div>`
-            ).join('');
-        }
-        
-        // Seleccionar categoria
-        function selectCat(catId) {
-            currentCat = catId;
-            if (catId === 'all') {
-                filtered = [...channels];
-            } else {
-                filtered = channels.filter(ch => {
-                    const cat = (ch.category || '').toLowerCase();
-                    const name = (ch.name || '').toLowerCase();
-                    return cat.includes(catId.toLowerCase()) || matchCategory(name) === catId;
+    };
+    x.onerror=function(){load.classList.remove('active');log('Sin conexion');};
+    x.send();
+}
+
+function renderAll(){
+    if(curT==='all'){
+        filt=chans.slice();
+    }else{
+        filt=chans.filter(function(c){
+            var cat=(c.category||'').toLowerCase();
+            var name=(c.name||'').toLowerCase();
+            if(cat.indexOf(curT.toLowerCase())>-1)return true;
+            return matchCat(name)===curT;
+        });
+    }
+    sel=0;
+    renderGrid();
+}
+
+function renderGrid(){
+    grid.innerHTML='';
+    for(var i=0;i<filt.length;i++){
+        var c=filt[i];
+        var d=document.createElement('div');
+        d.className='ch'+(i===sel&&!isSearch?' sel':'');
+        d.dataset.i=i;
+        d.innerHTML='<div class="ch-name">'+c.name+'</div><div class="ch-cat">'+(c.category||matchCat((c.name||'').toLowerCase())||'General')+'</div>';
+        d.onclick=function(){watchChan(filt[this.dataset.i]);};
+        grid.appendChild(d);
+    }
+    updateFocus();
+}
+
+function updateFocus(){
+    var chs=grid.querySelectorAll('.ch');
+    for(var i=0;i<chs.length;i++)chs[i].classList.remove('sel');
+    var ts=tabs.querySelectorAll('.tab');
+    for(var i=0;i<ts.length;i++)ts[i].classList.remove('sel');
+    if(isSearch)return;
+    if(sel>=0&&sel<chs.length){
+        chs[sel].classList.add('sel');
+        chs[sel].scrollIntoView({block:'nearest'});
+        log(chs[sel].querySelector('.ch-name').textContent+' - '+chs[sel].querySelector('.ch-cat').textContent,'ok');
+    }
+    for(var i=0;i<ts.length;i++){
+        if(ts[i].dataset.t===curT)ts[i].classList.add('sel');
+    }
+}
+
+function move(d){
+    if(isSearch)return;
+    var cols=Math.max(1,Math.floor(document.getElementById('grid').offsetWidth/148));
+    if(d==='up')sel-=cols;
+    if(d==='down')sel+=cols;
+    if(d==='left')sel--;
+    if(d==='right')sel++;
+    if(sel<0)sel=0;
+    if(sel>=filt.length)sel=filt.length-1;
+    updateFocus();
+}
+
+function setTab(t){
+    curT=t;
+    isSearch=false;
+    search.style.background='';
+    sNum.textContent='-';
+    renderAll();
+}
+
+function watchChan(c){
+    isWatch=true;
+    err.classList.remove('active');
+    
+    // recents
+    var rec=JSON.parse(localStorage.getItem('moj_rec')||'[]');
+    rec=rec.filter(function(n){return n!==c.name;});
+    rec.unshift(c.name);
+    if(rec.length>20)rec.pop();
+    localStorage.setItem('moj_rec',JSON.stringify(rec));
+    
+    log('Cargando: '+c.name.substring(0,30)+ql(c.name));
+    menu.style.display='none';
+    video.style.display='block';
+    
+    var x=new XMLHttpRequest();
+    x.open('GET',API+'/api/stream/'+encodeURIComponent(c.name),true);
+    x.onreadystatechange=function(){
+        if(x.readyState===4){
+            var d=JSON.parse(x.responseText);
+            if(d.url){
+                video.src=d.url;
+                video.play().then(function(){
+                    log('Reproduciendo: '+c.name.substring(0,30)+ql(c.name),'ok');
+                }).catch(function(){
+                    showErr('Error al reproducir');
                 });
+            }else{
+                showErr('Sin senal');
             }
-            selectedIdx = 0;
-            renderCats();
-            renderGrid();
         }
-        
-        // Matching por nombre
-        function matchCategory(name) {
-            if (/espn|sports|tudn|futbol/.test(name)) return 'Deportes';
-            if (/hbo|cinemax|showtime|movie|cine/.test(name)) return 'Cine';
-            if (/cnn|bbc|news|telesur/.test(name)) return 'Noticias';
-            if (/azteca|estrellas|canal 5|televisa|mexico/.test(name)) return 'Mexico';
-            if (/trece|telefe|america.*tv|argentina/.test(name)) return 'Argentina';
-            if (/la 1|antena|tve|espana|espana/.test(name)) return 'Espana';
-            if (/cartoon|nick|disney|kids|infantil/.test(name)) return 'Infantil';
-            if (/mt[rv]|musica|vh1/.test(name)) return 'Musica';
-            if (/discovery|history|nat.*geo|animal/.test(name)) return 'Documental';
-            if (/fox|warner|universal|sony/.test(name)) return 'Entretenimiento';
-            return null;
+    };
+    x.onerror=function(){showErr('Error de conexion');};
+    x.send();
+}
+
+function showErr(m){
+    errMsg.textContent=m;
+    err.classList.add('active');
+}
+
+function backMenu(){
+    video.pause();
+    video.src='';
+    video.style.display='none';
+    menu.style.display='flex';
+    isWatch=false;
+    isFS=false;
+    app.classList.remove('fs');
+    err.classList.remove('active');
+    isSearch=false;
+    search.style.background='';
+    sNum.textContent='-';
+    renderAll();
+}
+
+function toggleFS(){
+    if(!isWatch)return;
+    if(!isFS){
+        if(video.requestFullscreen)video.requestFullscreen();
+        else if(video.webkitRequestFullscreen)video.webkitRequestFullscreen();
+        isFS=true;
+        app.classList.add('fs');
+    }else{
+        if(document.exitFullscreen)document.exitFullscreen();
+        else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
+        isFS=false;
+        app.classList.remove('fs');
+    }
+}
+
+function startSearch(){
+    isSearch=true;
+    searchVal='';
+    sNum.textContent='-';
+    search.style.background='#111';
+}
+
+function addNum(n){
+    if(searchVal.length<4){
+        searchVal+=n;
+        sNum.textContent=searchVal;
+        if(searchVal.length>=2){
+            var idx=parseInt(searchVal,10)-1;
+            if(idx>=0&&idx<chans.length){
+                searchVal='';
+                sNum.textContent='-';
+                isSearch=false;
+                search.style.background='';
+                watchChan(chans[idx]);
+            }
         }
-        
-        // Render grid
-        function renderGrid() {
-            grid.innerHTML = filtered.map((ch, i) => 
-                `<div class="ch ${i===selectedIdx?'sel':''}" data-idx="${i}">
-                    <div class="ch-name">${ch.name}</div>
-                    <div class="ch-cat">${ch.category || matchCategory((ch.name||'').toLowerCase()) || 'General'}</div>
-                </div>`
-            ).join('');
+    }
+}
+
+// KEYBOARD
+document.onkeydown=function(e){
+    var k=e.keyCode;
+    var key=e.key||'';
+    
+    if([37,38,39,40,13,8,48,49,50,51,52,53,54,55,56,57,33,34,70].indexOf(k)>-1){
+        e.preventDefault();
+    }
+    
+    // BACK
+    if(k===8||k===27){
+        if(isSearch){
+            isSearch=false;
+            search.style.background='';
+            sNum.textContent='-';
+        }else if(isWatch){
+            backMenu();
         }
-        
-        // Ver canal
-        async function watchChannel(idx) {
-            if (idx < 0 || idx >= filtered.length) return;
-            selectedIdx = idx;
-            const ch = filtered[idx];
-            
-            loading.classList.add('active');
-            error.classList.remove('active');
-            
-            currentCh.textContent = ch.name;
-            document.getElementById('big-channel-name').textContent = ch.name;
-            document.getElementById('big-channel-cat').textContent = ch.category || 'General';
-            bigChannel.classList.add('active');
-            
-            listMode.classList.add('hidden');
-            videoMode.classList.add('active');
-            isWatching = true;
-            
-            try {
-                const res = await fetch(API + `/api/stream/${encodeURIComponent(ch.name)}`);
-                const data = await res.json();
-                
-                if (data.url) {
-                    video.src = data.url;
-                    video.play().catch(() => tryFallback(data.fallbacks));
-                } else {
-                    showError();
+        return;
+    }
+    
+    // WATCHING
+    if(isWatch){
+        if(k===13||k===23||k===66){
+            if(err.classList.contains('active')){
+                err.classList.remove('active');
+                if(filt[sel])watchChan(filt[sel]);
+            }else{
+                backMenu();
+            }
+            return;
+        }
+        if(k===70){toggleFS();return;}
+        return;
+    }
+    
+    // SEARCH
+    if(isSearch){
+        if(k===13||k===23||k===66){
+            if(searchVal.length>0){
+                var idx=parseInt(searchVal,10)-1;
+                if(idx>=0&&idx<chans.length){
+                    searchVal='';
+                    sNum.textContent='-';
+                    isSearch=false;
+                    search.style.background='';
+                    watchChan(chans[idx]);
                 }
-            } catch(e) {
-                showError();
             }
-            
-            loading.classList.remove('active');
+            return;
         }
-        
-        // Intentar fallbacks
-        async function tryFallback(urls) {
-            if (!urls || urls.length === 0) {
-                showError();
-                return;
-            }
-            for (const url of urls) {
-                try {
-                    video.src = url;
-                    await video.play();
-                    return;
-                } catch(e) {}
-            }
-            showError();
+        if(k>=48&&k<=57){
+            addNum((k-48).toString());
+            return;
         }
-        
-        // Mostrar error
-        function showError() {
-            error.classList.add('active');
-        }
-        
-        // Volver a lista
-        function backToList() {
-            video.pause();
-            video.src = '';
-            listMode.classList.remove('hidden');
-            videoMode.classList.remove('active');
-            bigChannel.classList.remove('active');
-            isWatching = false;
-            error.classList.remove('active');
-            renderGrid();
-        }
-        
-        // Navegacion
-        function move(dir) {
-            if (isWatching) return;
-            
-            const cols = Math.floor(grid.offsetWidth / 190);
-            if (dir === 'up') selectedIdx -= cols;
-            if (dir === 'down') selectedIdx += cols;
-            if (dir === 'left') selectedIdx--;
-            if (dir === 'right') selectedIdx++;
-            
-            if (selectedIdx < 0) selectedIdx = 0;
-            if (selectedIdx >= filtered.length) selectedIdx = filtered.length - 1;
-            
-            renderGrid();
-            
-            // Scroll into view
-            const el = grid.children[selectedIdx];
-            if (el) el.scrollIntoView({block:'nearest'});
-        }
-        
-        // Keyboard
-        document.addEventListener('keydown', e => {
-            switch(e.key) {
-                case 'ArrowUp': move('up'); break;
-                case 'ArrowDown': move('down'); break;
-                case 'ArrowLeft': move('left'); break;
-                case 'ArrowRight': move('right'); break;
-                case 'Enter':
-                case 'OK':
-                    if (isWatching) {
-                        if (error.classList.contains('active')) {
-                            error.classList.remove('active');
-                            watchChannel(selectedIdx);
-                        } else {
-                            backToList();
-                        }
-                    } else {
-                        watchChannel(selectedIdx);
-                    }
-                    break;
-                case 'Backspace':
-                case 'Escape':
-                case 'Back':
-                    if (isWatching) backToList();
-                    break;
-            }
-        });
-        
-        // Touch
-        let touchY = 0;
-        document.addEventListener('touchstart', e => touchY = e.touches[0].clientY);
-        document.addEventListener('touchend', e => {
-            const diff = touchY - e.changedTouches[0].clientY;
-            if (Math.abs(diff) > 30) {
-                if (diff > 0) move('up');
-                else move('down');
-            }
-        });
-        
-        // Click en canal
-        grid.addEventListener('click', e => {
-            const ch = e.target.closest('.ch');
-            if (ch) {
-                const idx = parseInt(ch.dataset.idx);
-                watchChannel(idx);
-            }
-        });
-        
-        // Video error
-        video.addEventListener('error', () => {
-            loading.classList.remove('active');
-            showError();
-        });
-        
-        video.addEventListener('playing', () => {
-            loading.classList.remove('active');
-        });
-        
-        // Init
-        loadChannels();
-    </script>
+        return;
+    }
+    
+    // MENU
+    if(k===37||k===39||k===38||k===40){
+        if(k===37)move('left');
+        if(k===39)move('right');
+        if(k===38)move('up');
+        if(k===40)move('down');
+        return;
+    }
+    
+    if(k===13||k===23||k===66){
+        if(filt[sel])watchChan(filt[sel]);
+        return;
+    }
+    
+    if(k===33){
+        var cols=Math.max(1,Math.floor(document.getElementById('grid').offsetWidth/148));
+        sel=Math.max(0,sel-cols*5);
+        updateFocus();
+        return;
+    }
+    if(k===34){
+        var cols=Math.max(1,Math.floor(document.getElementById('grid').offsetWidth/148));
+        sel=Math.min(filt.length-1,sel+cols*5);
+        updateFocus();
+        return;
+    }
+    
+    if(k>=48&&k<=57){
+        startSearch();
+        addNum((k-48).toString());
+        return;
+    }
+    
+    if(k===70){toggleFS();return;}
+};
+
+// Clicks
+document.getElementById('btn-exit').onclick=backMenu;
+document.getElementById('btn-fs').onclick=toggleFS;
+
+tabs.onclick=function(e){
+    var t=e.target;
+    if(t.className==='tab')setTab(t.dataset.t);
+};
+
+// Fullscreen
+document.addEventListener('fullscreenchange',function(){
+    isFS=!!document.fullscreenElement;
+    app.classList.toggle('fs',isFS);
+});
+document.addEventListener('webkitfullscreenchange',function(){
+    isFS=!!document.webkitFullscreenElement;
+    app.classList.toggle('fs',isFS);
+});
+
+// Video
+video.onerror=function(){showErr('Error de reproduccion');};
+video.onplaying=function(){load.classList.remove('active');};
+
+// Touch
+var tx=0,ty=0;
+document.ontouchstart=function(e){
+    tx=e.touches[0].clientX;
+    ty=e.touches[0].clientY;
+};
+document.ontouchend=function(e){
+    var dx=tx-e.changedTouches[0].clientX;
+    var dy=ty-e.changedTouches[0].clientY;
+    if(Math.abs(dx)>40)dx>0?move('left'):move('right');
+    else if(Math.abs(dy)>40)dy>0?move('up'):move('down');
+};
+
+loadChans();
+console.log('MoJiTo loaded');
+</script>
 </body>
 </html>
