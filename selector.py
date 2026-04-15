@@ -1,250 +1,239 @@
 import sqlite3
 import os
 import time
-import requests
 
 DB_PATH = os.environ.get('DB_PATH', 'streams.db')
 
 def get_all_channels():
-    db_path = os.environ.get('DB_PATH', 'streams.db')
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("SELECT id, name, category, stream_count FROM channels ORDER BY name")
+    cursor.execute("SELECT name, category, best_url FROM channels ORDER BY name")
+    
     channels = []
     for r in cursor.fetchall():
-        name = r[1] or ''
-        category = r[2] or auto_categorize(name)
-        channels.append({'id': r[0], 'name': name, 'category': category, 'streams': r[3]})
+        name = r[0] or ''
+        category = r[1] or auto_categorize(name)
+        best_url = r[2] or ''
+        
+        # Count streams from streams table
+        cursor.execute(
+            "SELECT COUNT(*) FROM streams WHERE LOWER(channel) = LOWER(?)",
+            (name,)
+        )
+        stream_cnt = cursor.fetchall()[0][0]
+        
+        # Count URLs in best_url if pipe-separated
+        url_cnt = len(best_url.split('|')) if best_url else 0
+        total = max(stream_cnt, url_cnt)
+        
+        channels.append({
+            'name': name,
+            'category': category,
+            'streams': total
+        })
+    
+    conn.close()
     return channels
 
 def auto_categorize(name):
-    """Categoriza un canal por su nombre"""
     name_lower = name.lower()
-    if any(x in name_lower for x in ['espn', 'sports', 'tudn', 'futbol', 'fox sports']):
+    if any(x in name_lower for x in ['espn', 'sports', 'tudn', 'futbol', 'fox sports', 'bein']):
         return 'Deportes'
-    if any(x in name_lower for x in ['hbo', 'cinemax', 'showtime', 'movie', 'cine']):
+    if any(x in name_lower for x in ['hbo', 'cinemax', 'showtime', 'movie', 'cine', 'star']):
         return 'Cine'
-    if any(x in name_lower for x in ['cnn', 'bbc', 'news', 'telesur', 'dw']):
+    if any(x in name_lower for x in ['cnn', 'bbc', 'news', 'telesur', 'dw', 'aljazeera']):
         return 'Noticias'
-    if any(x in name_lower for x in ['azteca', 'estrellas', 'canal 5', 'televisa']):
+    if any(x in name_lower for x in ['azteca', 'estrellas', 'canal 5', 'televisa', 'mexico']):
         return 'Mexico'
-    if any(x in name_lower for x in ['trece', 'telefe', 'america tv']):
+    if any(x in name_lower for x in ['trece', 'telefe', 'argentina', 'tyc', 'america tv']):
         return 'Argentina'
-    if any(x in name_lower for x in ['tvn', 'canal 13', 'chile']):
-        return 'Chile'
-    if any(x in name_lower for x in ['caracol', 'rcn']):
-        return 'Colombia'
-    if any(x in name_lower for x in ['la 1', 'antena', 'tve', 'espana']):
+    if any(x in name_lower for x in ['la 1', 'antena', 'tve', 'espana', 'telecinco', 'cuatro']):
         return 'Espana'
-    if any(x in name_lower for x in ['cartoon', 'nick', 'disney', 'kids']):
+    if any(x in name_lower for x in ['cartoon', 'nick', 'disney', 'kids', 'nickelodeon']):
         return 'Infantil'
-    if any(x in name_lower for x in ['discovery', 'history', 'nat geo', 'animal']):
-        return 'Documental'
-    if any(x in name_lower for x in ['mt', 'vh1', 'musica']):
+    if any(x in name_lower for x in ['mt', 'vh1', 'musica', 'telefe']):
         return 'Musica'
-    if any(x in name_lower for x in ['fox', 'warner', 'universal', 'sony', 'adult']):
+    if any(x in name_lower for x in ['discovery', 'history', 'nat geo', 'animal', 'smithsonian']):
+        return 'Documental'
+    if any(x in name_lower for x in ['fox', 'warner', 'universal', 'sony', 'adult', 'paramount']):
         return 'Entretenimiento'
     return 'General'
 
-def get_channel_streams(channel):
-    """Obtiene TODOS los streams de un canal para redundancia"""
-    db_path = os.environ.get('DB_PATH', 'streams.db')
-    conn = sqlite3.connect(db_path)
+def get_all_streams_for_channel(channel_name):
+    """Obtiene TODOS los streams disponibles para un canal desde cualquier fuente"""
+    all_urls = []
+    
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
-    streams = []
-    
-    # Buscar por nombre exacto
+    # 1. Streams desde tabla streams (prioridad por score)
     cursor.execute("""
-        SELECT url, latency, failures, last_check, score 
+        SELECT url, score, latency, status
         FROM streams 
         WHERE LOWER(channel) = LOWER(?)
-        ORDER BY score DESC, latency ASC, failures ASC
-    """, (channel,))
+        ORDER BY 
+            CASE status WHEN 'online' THEN 1 WHEN 'unknown' THEN 2 ELSE 3 END,
+            score DESC,
+            latency ASC
+    """, (channel_name,))
     
     for r in cursor.fetchall():
-        streams.append({
-            'url': r[0],
-            'latency': r[1],
-            'failures': r[2],
-            'last_check': r[3],
-            'score': r[4]
-        })
-    
-    # Si no hay, buscar por similitud
-    if not streams:
-        cursor.execute("""
-            SELECT url, latency, failures, last_check, score 
-            FROM streams 
-            WHERE LOWER(channel) LIKE ?
-            ORDER BY score DESC, latency ASC, failures ASC
-            LIMIT 20
-        """, (f'%{channel.lower()}%',))
-        
-        for r in cursor.fetchall():
-            streams.append({
-                'url': r[0],
-                'latency': r[1],
-                'failures': r[2],
-                'last_check': r[3],
-                'score': r[4]
+        url = r[0]
+        if url and url not in all_urls:
+            all_urls.append({
+                'url': url,
+                'source': 'db',
+                'score': r[1] or 0,
+                'latency': r[2] or 999,
+                'status': r[3]
             })
     
+    # 2. URLs desde best_url en channels (puede tener pipes)
+    cursor.execute(
+        "SELECT best_url FROM channels WHERE LOWER(name) = LOWER(?)",
+        (channel_name,)
+    )
+    row = cursor.fetchone()
+    if row and row[0]:
+        for url in row[0].split('|'):
+            url = url.strip()
+            if url and url not in [u['url'] for u in all_urls]:
+                all_urls.append({
+                    'url': url,
+                    'source': 'best_url',
+                    'score': 0,
+                    'latency': 999,
+                    'status': 'unknown'
+                })
+    
+    # 3. Busqueda fuzzy si no hay resultados
+    if not all_urls:
+        cursor.execute("""
+            SELECT url, score, latency, status
+            FROM streams 
+            WHERE LOWER(channel) LIKE LOWER(?)
+            ORDER BY score DESC
+            LIMIT 20
+        """, (f'%{channel_name}%',))
+        
+        for r in cursor.fetchall():
+            url = r[0]
+            if url and url not in [u['url'] for u in all_urls]:
+                all_urls.append({
+                    'url': url,
+                    'source': 'search',
+                    'score': r[1] or 0,
+                    'latency': r[2] or 999,
+                    'status': r[3]
+                })
+    
     conn.close()
-    return streams
+    return all_urls
 
-def get_best_stream(channel, max_retries=3, validate=False):
+def get_best_stream(channel_name, max_retries=3):
     """
-    Obtiene el mejor stream con redundancia automatica.
-    Si validate=True, prueba streams reales. Si no, usa el score.
+    Obtiene el mejor stream con redundancia completa.
+    Retorna: {url, fallbacks[], source}
     """
-    streams = get_channel_streams(channel)
+    streams = get_all_streams_for_channel(channel_name)
     
     if not streams:
         return None
     
-    # Si no hay streams en DB, buscar directo
-    if validate:
-        return _validate_streams(channel, streams, max_retries)
+    # Filtrar URLs invalidas
+    valid = []
+    skip = ['youtube.com', 'youtu.be', '.mp4', '.avi', '.mkv', '.zip']
+    for s in streams:
+        if not s['url'] or len(s['url']) < 10:
+            continue
+        if any(x in s['url'].lower() for x in skip):
+            continue
+        valid.append(s)
     
-    # Solo retornar el primero (mas alto score)
-    best = streams[0]
+    if not valid:
+        return None
+    
+    # Ordenar: online primero, luego por score
+    def sort_key(s):
+        status_order = {'online': 0, 'unknown': 1, 'offline': 2, 'error': 3, 'timeout': 4, 'not_found': 5}
+        so = status_order.get(s['status'], 1)
+        return (so, -s['score'], s['latency'])
+    
+    valid.sort(key=sort_key)
+    
+    # Mejor stream
+    best = valid[0]
+    
+    # Fallbacks (hasta 8)
+    fallbacks = [s['url'] for s in valid[1:9] if s['url'] != best['url']]
+    
     return {
         'url': best['url'],
-        'channel': channel,
-        'latency': best['latency'],
-        'failures': best['failures']
+        'channel': channel_name,
+        'fallbacks': fallbacks,
+        'total_available': len(valid),
+        'best_status': best['status']
     }
-
-def _validate_streams(channel, streams, max_retries=3):
-    """Valida streams reales"""
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': '*/*',
-    }
-    
-    checked = 0
-    for stream in streams:
-        if checked >= max_retries:
-            break
-        
-        url = stream['url']
-        if not url or len(url) < 10:
-            continue
-        
-        if any(x in url.lower() for x in ['youtube.com', 'youtu.be', '.mp4', '.avi', '.mkv']):
-            continue
-        
-        try:
-            start = time.time()
-            r = requests.head(url, timeout=3, allow_redirects=True, headers=headers)
-            latency_ms = int((time.time() - start) * 1000)
-            
-            if r.status_code == 200:
-                ct = r.headers.get('Content-Type', '').lower()
-                if any(t in ct for t in ['video', 'application', 'stream', 'mpeg', 'mp4', 'octet', 'x-mpegurl', 'vnd.apple']):
-                    r.close()
-                    update_stream_score(url, latency_ms, success=True)
-                    return {
-                        'url': url,
-                        'channel': channel,
-                        'latency': latency_ms,
-                        'failures': stream['failures']
-                    }
-            r.close()
-        except:
-            pass
-        
-        checked += 1
-        update_stream_score(url, 0, success=False)
-    
-    return None
-
-def update_stream_score(url, latency, success):
-    """Actualiza el score de un stream"""
-    try:
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-        
-        now = int(time.time())
-        
-        if success:
-            cursor.execute("""
-                UPDATE streams 
-                SET status='online', latency=?, last_check=?, 
-                    failures=0, score = score + 1
-                WHERE url=?
-            """, (latency, now, url))
-        else:
-            cursor.execute("""
-                UPDATE streams 
-                SET status='offline', failures = failures + 1, 
-                    last_check=?, score = MAX(0, score - 0.5)
-                WHERE url=?
-            """, (now, url))
-        
-        conn.commit()
-        conn.close()
-    except:
-        pass
 
 def search_channels(query):
-    """Busca canales por nombre"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
     cursor.execute("""
-        SELECT id, name, category, stream_count 
+        SELECT DISTINCT name, category
         FROM channels 
-        WHERE LOWER(name) LIKE ?
-        ORDER BY stream_count DESC, name
-        LIMIT 50
-    """, (f'%{query.lower()}%',))
-    
-    results = [{'id': r[0], 'name': r[1], 'category': r[2], 'streams': r[3]} for r in cursor.fetchall()]
-    conn.close()
-    return results
-
-def get_category_channels(category):
-    """Obtiene canales de una categoria"""
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    
-    cursor.execute("""
-        SELECT id, name, category, stream_count 
-        FROM channels 
-        WHERE LOWER(category) LIKE ?
+        WHERE LOWER(name) LIKE LOWER(?)
         ORDER BY name
-    """, (f'%{category.lower()}%',))
+        LIMIT 50
+    """, (f'%{query}%',))
     
-    results = [{'id': r[0], 'name': r[1], 'category': r[2], 'streams': r[3]} for r in cursor.fetchall()]
+    results = []
+    for r in cursor.fetchall():
+        name = r[0]
+        cursor.execute(
+            "SELECT COUNT(*) FROM streams WHERE LOWER(channel) = LOWER(?)",
+            (name,)
+        )
+        cnt = cursor.fetchone()[0]
+        results.append({
+            'name': name,
+            'category': r[1] or auto_categorize(name),
+            'streams': cnt
+        })
+    
     conn.close()
     return results
 
 def get_stats():
-    """Obtiene estadisticas de la DB"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    
-    cursor.execute("SELECT COUNT(*) FROM streams")
-    total_streams = cursor.fetchone()[0]
-    
-    cursor.execute("SELECT COUNT(*) FROM streams WHERE status='online'")
-    online_streams = cursor.fetchone()[0]
     
     cursor.execute("SELECT COUNT(*) FROM channels")
     total_channels = cursor.fetchone()[0]
     
-    cursor.execute("SELECT COUNT(*) FROM channels WHERE stream_count > 1")
-    redundant_channels = cursor.fetchone()[0]
+    cursor.execute("SELECT COUNT(*) FROM streams")
+    total_streams = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT COUNT(*) FROM streams WHERE status = 'online'")
+    online = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT COUNT(DISTINCT LOWER(channel)) FROM streams WHERE status = 'online'")
+    channels_with_online = cursor.fetchone()[0] or 0
+    
+    cursor.execute("""
+        SELECT COUNT(*) FROM channels 
+        WHERE best_url LIKE '%|%'
+    """)
+    multi_url = cursor.fetchone()[0]
     
     conn.close()
     
     return {
-        'total_streams': total_streams,
-        'online_streams': online_streams,
         'total_channels': total_channels,
-        'redundant_channels': redundant_channels
+        'total_streams': total_streams,
+        'online_streams': online,
+        'channels_with_online': channels_with_online,
+        'channels_with_redundancy': multi_url
     }
 
 if __name__ == '__main__':
