@@ -5,7 +5,7 @@
 <title>MoJiTo TV</title>
 <style>
 *{margin:0;padding:0}
-html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial}
+html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial,Helvetica,sans-serif}
 #app{width:100%;height:100%}
 #app.fs{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999}
 
@@ -26,47 +26,44 @@ html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial}
 #menu{height:100%;display:flex;flex-direction:column;padding:0 15px}
 #menu.hidden{display:none}
 
-#header{height:55px;display:flex;align-items:center;gap:15px;border-bottom:1px solid #1a1a1a}
-.logo{font-size:32px;font-weight:bold;letter-spacing:-1px}
+#header{height:50px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #1a1a1a}
+.logo{font-size:28px;font-weight:bold;letter-spacing:-1px}
 .logo .m{color:#dc143c;text-shadow:0 0 15px #dc143c,0 0 30px #8b0000}
-.logo .t{color:#888;font-size:14px;vertical-align:super;margin-left:2px;text-shadow:0 0 5px #555}
+.logo .t{color:#666;font-size:12px;vertical-align:super;margin-left:2px}
 
-#ch-count{font-size:11px;color:#444;margin-left:auto}
+#ch-count{font-size:10px;color:#444;margin-left:auto}
 
 /* TABS */
-#tabs{display:flex;gap:5px;padding:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.tab{padding:6px 12px;background:#111;border:1px solid #222;border-radius:12px;font-size:11px;color:#555;cursor:pointer;flex-shrink:0}
+#tabs{display:flex;gap:4px;padding:6px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab{padding:5px 10px;background:#111;border:1px solid #222;border-radius:10px;font-size:10px;color:#555;cursor:pointer;flex-shrink:0}
 .tab.sel{border-color:#dc143c;color:#dc143c;background:rgba(220,20,60,0.1)}
 
-/* SEARCH */
-#search-bar{height:40px;display:flex;align-items:center;gap:8px;padding:0 5px;margin-bottom:5px}
-#s-hash{color:#dc143c;font-size:16px}
-#s-num{font-size:20px;color:#666;min-width:50px}
-#s-hint{font-size:9px;color:#333;margin-left:auto}
-
-/* GRID - OPTIMIZED */
+/* GRID */
 #grid{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:5px 0}
-#grid-inner{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
-.ch{background:#0d0d0d;border:2px solid #1a1a1a;border-radius:4px;padding:8px;cursor:pointer;min-height:45px;display:flex;flex-direction:column;justify-content:center}
+#grid-inner{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:5px}
+.ch{background:#0d0d0d;border:2px solid #1a1a1a;border-radius:4px;padding:6px;cursor:pointer;min-height:40px;display:flex;flex-direction:column;justify-content:center}
 .ch.sel{border-color:#dc143c;background:#150000}
-.ch-name{font-size:11px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch-name{font-size:10px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ch-cat{font-size:8px;color:#444;text-transform:uppercase;margin-top:2px}
 
 /* MSG */
-#msg{height:30px;display:flex;align-items:center;padding:0 5px;font-size:11px;color:#555;border-top:1px solid #111}
-#msg.ok{color:#8b0000}
+#msg{height:25px;display:flex;align-items:center;padding:0 5px;font-size:10px;color:#444;border-top:1px solid #111}
 
 /* LOAD */
 #load{position:fixed;top:45%;left:50%;transform:translate(-50%,-50%);z-index:100;display:none}
 #load.active{display:block}
-.ld{width:30px;height:30px;border:2px solid rgba(220,20,60,0.15);border-top-color:#dc143c;border-radius:50%;animation:spin .6s linear infinite}
+.ld{width:25px;height:25px;border:2px solid rgba(220,20,60,0.15);border-top-color:#dc143c;border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ERR */
-#err{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(80,0,0,0.95);padding:15px 30px;border-radius:8px;z-index:200;display:none}
+#err{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(80,0,0,0.95);padding:12px 24px;border-radius:8px;z-index:200;display:none}
 #err.active{display:block}
-#err-msg{color:#dc143c;font-size:14px;text-align:center}
-#err-hint{color:#666;font-size:10px;text-align:center;margin-top:5px}
+#err-msg{color:#dc143c;font-size:12px;text-align:center}
+
+/* LOADER GIF */
+#loader-gif{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:150;display:none}
+#loader-gif.active{display:block}
+#loader-gif img{width:80px;height:80px;object-fit:contain}
 </style>
 </head>
 <body>
@@ -74,7 +71,7 @@ html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial}
 <div id="app">
     <div id="fs-logo">MoJiTo</div>
     
-    <video id="video" controls></video>
+    <video id="video" playsinline></video>
     
     <div id="fs-btns">
         <button class="fs-btn" id="btn-exit">VOLVER</button>
@@ -89,130 +86,239 @@ html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial}
         
         <div id="tabs"></div>
         
-        <div id="search-bar">
-            <div id="s-hash">#</div>
-            <div id="s-num">-</div>
-            <div id="s-hint">0-9 | OK | BACK</div>
-        </div>
-        
         <div id="grid"><div id="grid-inner"></div></div>
         
-        <div id="msg">navegar con flechas</div>
+        <div id="msg">flechas navega</div>
     </div>
     
     <div id="load"><div class="ld"></div></div>
-    <div id="err"><div id="err-msg">Sin senal</div><div id="err-hint">OK reintentar</div></div>
+    
+    <div id="loader-gif">
+        <img src="https://media1.giphy.com/media/v1.Y2lkPTZjMDliOTUyaGxzY3VqODl0a2RrenA3bGhxOW5kdnBzOTU1ZjIyamd5OHZoaGp2ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/BaDxVZichFuqhsWLId/giphy.gif" alt="loading">
+    </div>
+    
+    <div id="err"><div id="err-msg">Sin senal</div></div>
 </div>
 
 <script>
 (function(){
-var API='';
 var app=document.getElementById('app');
 var menu=document.getElementById('menu');
 var video=document.getElementById('video');
 var grid=document.getElementById('grid-inner');
 var tabsEl=document.getElementById('tabs');
-var searchBar=document.getElementById('search-bar');
-var sNum=document.getElementById('s-num');
 var msg=document.getElementById('msg');
 var load=document.getElementById('load');
+var loaderGif=document.getElementById('loader-gif');
 var err=document.getElementById('err');
 var errMsg=document.getElementById('err-msg');
 var chCount=document.getElementById('ch-count');
 
 var CATS=['Todos','Deportes','Cine','Noticias','Mexico','Argentina','Espana','Infantil','Musica','Documental','Entretenimiento'];
-var catMap={};
-var chans=[],filt=[],sel=0,curT=0,isFS=false,isWatch=false,isSearch=false,searchVal='';
-var PAGE=0,PER_PAGE=60,totalRendered=0,canLoad=true;
 
-function log(m,t){msg.textContent=m;msg.className=t||'';}
+var chans=[
+{"name":"ESPN","category":"Deportes","streams":10},
+{"name":"ESPN 2","category":"Deportes","streams":8},
+{"name":"ESPN 3","category":"Deportes","streams":8},
+{"name":"ESPN 4","category":"Deportes","streams":10},
+{"name":"ESPN Premium","category":"Deportes","streams":10},
+{"name":"TUDN","category":"Deportes","streams":5},
+{"name":"Fox Sports","category":"Deportes","streams":3},
+{"name":"HBO","category":"Cine","streams":5},
+{"name":"HBO 2","category":"Cine","streams":4},
+{"name":"HBO Plus","category":"Cine","streams":3},
+{"name":"HBO Family","category":"Cine","streams":3},
+{"name":"Star Channel","category":"Cine","streams":5},
+{"name":"Cinemax","category":"Cine","streams":4},
+{"name":"Showtime","category":"Cine","streams":3},
+{"name":"Cartoon Network","category":"Infantil","streams":63},
+{"name":"Nickelodeon","category":"Infantil","streams":20},
+{"name":"Disney Channel","category":"Infantil","streams":15},
+{"name":"Cartoonito","category":"Infantil","streams":42},
+{"name":"Adult Swim","category":"Entretenimiento","streams":51},
+{"name":"CNN","category":"Noticias","streams":8},
+{"name":"BBC","category":"Noticias","streams":5},
+{"name":"C5N","category":"Noticias","streams":3},
+{"name":"TN","category":"Noticias","streams":3},
+{"name":"Las Estrellas","category":"Mexico","streams":3},
+{"name":"Canal 5","category":"Mexico","streams":3},
+{"name":"Azteca Uno","category":"Mexico","streams":3},
+{"name":"Azteca 7","category":"Mexico","streams":3},
+{"name":"Imagen TV","category":"Mexico","streams":3},
+{"name":"FOROtv","category":"Mexico","streams":2},
+{"name":"Telefe","category":"Argentina","streams":5},
+{"name":"El Trece","category":"Argentina","streams":4},
+{"name":"América TV","category":"Argentina","streams":3},
+{"name":"La 1","category":"Espana","streams":3},
+{"name":"Antena 3","category":"Espana","streams":3},
+{"name":"Telecinco","category":"Espana","streams":3},
+{"name":"Cuatro","category":"Espana","streams":2},
+{"name":"laSexta","category":"Espana","streams":2},
+{"name":"MTV","category":"Musica","streams":10},
+{"name":"VH1","category":"Musica","streams":8},
+{"name":"Telehit","category":"Musica","streams":5},
+{"name":"Discovery","category":"Documental","streams":8},
+{"name":"Nat Geo","category":"Documental","streams":6},
+{"name":"History","category":"Documental","streams":5},
+{"name":"Animal Planet","category":"Documental","streams":4},
+{"name":"Fox","category":"Entretenimiento","streams":12},
+{"name":"Warner","category":"Entretenimiento","streams":10},
+{"name":"Universal","category":"Entretenimiento","streams":8},
+{"name":"Sony","category":"Entretenimiento","streams":6},
+{"name":"Paramount","category":"Entretenimiento","streams":5},
+{"name":"TVN","category":"Chile","streams":5},
+{"name":"Canal 13","category":"Chile","streams":4},
+{"name":"Caracol TV","category":"Colombia","streams":4},
+{"name":"RCN","category":"Colombia","streams":4},
+{"name":"Adult Swim","category":"Entretenimiento","streams":51},
+{"name":"Cartoon Classics","category":"Infantil","streams":8},
+{"name":"Boing","category":"Infantil","streams":6},
+{"name":"Clan","category":"Infantil","streams":5},
+{"name":"Locomotion","category":"Entretenimiento","streams":3},
+{"name":"TyC Sports","category":"Deportes","streams":5},
+{"name":"Gol TV","category":"Deportes","streams":4},
+{"name":"Directv Sports","category":"Deportes","streams":3},
+{"name":"beIN Sports","category":"Deportes","streams":6},
+{"name":"Bandamax","category":"Musica","streams":4},
+{"name":"Ritmoson","category":"Musica","streams":3},
+{"name":"MTV Hits","category":"Musica","streams":4},
+{"name":"VH1 Classic","category":"Musica","streams":3},
+{"name":"World Poker Tour","category":"Entretenimiento","streams":17},
+{"name":"EuroNews","category":"Noticias","streams":18},
+{"name":"Just For Laughs Gags","category":"Entretenimiento","streams":15},
+{"name":"UFC","category":"Deportes","streams":13},
+{"name":"Sport+","category":"Deportes","streams":14},
+{"name":"A&E","category":"Documental","streams":5},
+{"name":"TBS","category":"Entretenimiento","streams":6},
+{"name":"TNT","category":"Entretenimiento","streams":7},
+{"name":"Space","category":"Entretenimiento","streams":5},
+{"name":"Comedy Central","category":"Entretenimiento","streams":4},
+{"name":"AXN","category":"Entretenimiento","streams":5},
+{"name":"Sundance","category":"Cine","streams":3},
+{"name":"AMC","category":"Cine","streams":6},
+{"name":"FX","category":"Cine","streams":5},
+{"name":"Studio Universal","category":"Cine","streams":4},
+{"name":"Cinecanal","category":"Cine","streams":4},
+{"name":"Golden","category":"Cine","streams":3},
+{"name":"Paramount Network","category":"Entretenimiento","streams":4},
+{"name":"E!","category":"Entretenimiento","streams":4},
+{"name":"TruTV","category":"Entretenimiento","streams":3},
+{"name":"El Gourmet","category":"Documental","streams":3},
+{"name":"Food Network","category":"Documental","streams":3},
+{"name":"Utils","category":"Entretenimiento","streams":2},
+{"name":"MTV Live","category":"Musica","streams":4},
+{"name":"MTV Chile","category":"Musica","streams":3},
+{"name":"HTV","category":"Musica","streams":3},
+{"name":"Chain","category":"Musica","streams":2},
+{"name":"Warner HD","category":"Entretenimiento","streams":4},
+{"name":"Fox HD","category":"Entretenimiento","streams":5},
+{"name":"Fox Life HD","category":"Entretenimiento","streams":3},
+{"name":"National Geographic","category":"Documental","streams":6},
+{"name":"Nat Geo Wild","category":"Documental","streams":4},
+{"name":"Discovery Civilization","category":"Documental","streams":3},
+{"name":"Discovery Turbo","category":"Documental","streams":3},
+{"name":"Discovery Home & Health","category":"Documental","streams":3},
+{"name":"Discovery Science","category":"Documental","streams":2},
+{"name":"BBC World News","category":"Noticias","streams":4},
+{"name":"France 24","category":"Noticias","streams":3},
+{"name":"DW","category":"Noticias","streams":3},
+{"name":"Al Jazeera","category":"Noticias","streams":3},
+{"name":"telesur","category":"Noticias","streams":3},
+{"name":"Univision","category":"Mexico","streams":5},
+{"name":"Univision HD","category":"Mexico","streams":4},
+{"name":"Telemundo","category":"Mexico","streams":4},
+{"name":"TV Azteca","category":"Mexico","streams":3},
+{"name":"Mega","category":"Mexico","streams":3},
+{"name":"Canal Once","category":"Mexico","streams":2},
+{"name":"TV Mexiquense","category":"Mexico","streams":2},
+{"name":"Televisa MX","category":"Mexico","streams":4},
+{"name":"Globo","category":"Argentina","streams":4},
+{"name":"El Trece HD","category":"Argentina","streams":3},
+{"name":"Telefe HD","category":"Argentina","streams":3},
+{"name":"America TV HD","category":"Argentina","streams":3},
+{"name":"CAN","category":"Argentina","streams":2},
+{"name":"DeporTV","category":"Argentina","streams":2},
+{"name":"La Nation","category":"Argentina","streams":2},
+{"name":"La 1","category":"Espana","streams":3},
+{"name":"La 2","category":"Espana","streams":2},
+{"name":"Telecinco HD","category":"Espana","streams":2},
+{"name":"Cuatro HD","category":"Espana","streams":2},
+{"name":"Antena 3 HD","category":"Espana","streams":2},
+{"name":"Neox","category":"Espana","streams":3},
+{"name":"Nova","category":"Espana","streams":3},
+{"name":"Mega","category":"Espana","streams":3},
+{"name":"Atreseries","category":"Espana","streams":3},
+{"name":"FDF","category":"Espana","streams":3},
+{"name":"MTV Espana","category":"Musica","streams":3},
+{"name":"VH1 Espana","category":"Musica","streams":2},
+{"name":"Canal Orbe 21","category":"Noticias","streams":2},
+{"name":"RT","category":"Noticias","streams":3},
+{"name":"Russia Today","category":"Noticias","streams":2},
+{"name":"TV5Monde","category":"Noticias","streams":2},
+{"name":"NHK","category":"Noticias","streams":2},
+{"name":"ABC News","category":"Noticias","streams":2},
+{"name":"CBS News","category":"Noticias","streams":2},
+{"name":"Sky News","category":"Noticias","streams":2},
+{"name":"Newsreel","category":"Noticias","streams":2}
+];
+
+var filt=[],sel=0,curT=0,isFS=false,isWatch=false;
+var PER_PAGE=60,totalRendered=0;
+
+function log(m){msg.textContent=m;}
 
 function mCat(n){
-    if(/espn|sports|tudn|futbol|fox sports|bein/i.test(n))return 1;
-    if(/hbo|cinemax|showtime|movie|cine|star/i.test(n))return 2;
-    if(/cnn|bbc|news|telesur|dw/i.test(n))return 3;
-    if(/azteca|estrellas|canal 5|televisa|mexico/i.test(n))return 4;
-    if(/trece|telefe|argentina|tyc/i.test(n))return 5;
-    if(/la 1|antena|tve|espana|telecinco/i.test(n))return 6;
-    if(/cartoon|nick|disney|kids/i.test(n))return 7;
-    if(/mt[rv]|musica|vh1/i.test(n))return 8;
-    if(/discovery|history|nat.*geo|animal/i.test(n))return 9;
-    if(/fox|warner|universal|sony|adult|paramount/i.test(n))return 10;
+    n=n.toLowerCase();
+    if(/espn|sports|tudn|futbol|fox sports|bein|tyc|gol|directv|ufc/i.test(n))return 1;
+    if(/hbo|cinemax|showtime|movie|cine|star|amc|fx|space|tbs|tnt|golden|sundance/i.test(n))return 2;
+    if(/cnn|bbc|news|telesur|dw|aljazeera|tn|c5n|univision|telemundo/i.test(n))return 3;
+    if(/azteca|estrellas|canal 5|televisa|mexico|univision|telemundo/i.test(n))return 4;
+    if(/trece|telefe|argentina|globo|america/i.test(n))return 5;
+    if(/la 1|antena|tve|espana|telecinco|cuatro|neox|nova|mega/i.test(n))return 6;
+    if(/cartoon|nick|disney|kids|nickelodeon|boing|clan/i.test(n))return 7;
+    if(/mt|vh1|musica|telehit|bandamax|htv|ritmoson/i.test(n))return 8;
+    if(/discovery|history|nat.*geo|animal|a&e|gourmet|food/i.test(n))return 9;
+    if(/fox|warner|universal|sony|adult|paramount|comedy|axn|e/i.test(n))return 10;
     return 0;
 }
 
-function initCats(){
-    CATS.forEach(function(c,i){catMap[c.toLowerCase()]=i;});
-}
-initCats();
-
-function renderTabs(){
-    var h='';
-    CATS.forEach(function(c,i){
-        h+='<div class="tab'+(i===curT?' sel':'')+'" data-i="'+i+'">'+c+'</div>';
-    });
-    tabsEl.innerHTML=h;
-}
-
 function filterChans(){
-    if(curT===0){
-        filt=chans;
-    }else{
-        var cat=CATS[curT].toLowerCase();
+    if(curT===0)filt=chans;
+    else{
         filt=[];
+        var cat=CATS[curT].toLowerCase();
         for(var i=0;i<chans.length;i++){
             var c=chans[i];
-            var cn=(c.name||'').toLowerCase();
+            var cn=c.name.toLowerCase();
             var cc=(c.category||'').toLowerCase();
-            if(cc.indexOf(cat)>-1||mCat(cn)===curT){
-                filt.push(c);
-            }
+            if(cc.indexOf(cat)>-1||mCat(cn)===curT)filt.push(c);
         }
     }
 }
 
-function loadChans(){
-    load.classList.add('active');
-    var x=new XMLHttpRequest();
-    x.open('GET',API+'/api/channels',true);
-    x.onreadystatechange=function(){
-        if(x.readyState===4&&x.status===200){
-            try{
-                chans=JSON.parse(x.responseText);
-                chCount.textContent=chans.length+' canales';
-                filterChans();
-                renderTabs();
-                totalRendered=0;
-                grid.innerHTML='';
-                renderPage();
-                log(filt.length+' canales');
-            }catch(e){log('Error datos');}
-            load.classList.remove('active');
-        }
-    };
-    x.onerror=function(){load.classList.remove('active');log('Sin conexion');};
-    x.send();
+function renderTabs(){
+    var h='';
+    for(var i=0;i<CATS.length;i++){
+        h+='<div class="tab'+(i===curT?' sel':'')+'" data-i="'+i+'">'+CATS[i]+'</div>';
+    }
+    tabsEl.innerHTML=h;
 }
 
 function renderPage(){
-    if(!canLoad)return;
-    canLoad=false;
     var start=totalRendered;
     var end=Math.min(start+PER_PAGE,filt.length);
     var frag=document.createDocumentFragment();
     for(var i=start;i<end;i++){
         var c=filt[i];
         var d=document.createElement('div');
-        d.className='ch'+(i===sel&&!isSearch?' sel':'');
+        d.className='ch'+(i===sel?' sel':'');
         d.dataset.i=i;
-        var cat=c.category||(CATS[mCat((c.name||'').toLowerCase())]||'General');
-        d.innerHTML='<div class="ch-name">'+c.name+'</div><div class="ch-cat">'+cat+'</div>';
+        d.innerHTML='<div class="ch-name">'+c.name+'</div><div class="ch-cat">'+(c.category||'General')+'</div>';
         d.onclick=function(){watchChan(filt[this.dataset.i]);};
         frag.appendChild(d);
     }
     grid.appendChild(frag);
     totalRendered=end;
-    canLoad=true;
 }
 
 function setTab(i){
@@ -223,7 +329,6 @@ function setTab(i){
     sel=0;
     renderTabs();
     renderPage();
-    if(filt.length>PER_PAGE)grid.parentElement.onscroll=null;
     updateFocus();
     log(filt.length+' canales');
 }
@@ -231,71 +336,81 @@ function setTab(i){
 function updateFocus(){
     var chs=grid.querySelectorAll('.ch');
     for(var i=0;i<chs.length;i++)chs[i].classList.remove('sel');
-    if(isSearch||chs.length===0)return;
-    var el=chs[sel-totalRendered+PER_PAGE>0&&sel-totalRendered<PER_PAGE?sel-totalRendered+PER_PAGE:0];
-    if(!el&&chs.length>0)el=chs[0];
-    if(el){
-        el.classList.add('sel');
-        el.scrollIntoView({block:'nearest'});
-        log(el.querySelector('.ch-name').textContent);
+    if(chs.length===0)return;
+    var idx=sel-totalRendered+PER_PAGE;
+    if(idx>=0&&idx<chs.length&&sel<totalRendered){
+        chs[idx].classList.add('sel');
+        chs[idx].scrollIntoView({block:'nearest'});
+        log(filt[sel].name);
+    }else if(chs[0]){
+        chs[0].classList.add('sel');
     }
 }
 
 function move(d){
-    if(isSearch)return;
-    var cols=Math.max(1,Math.floor(grid.parentElement.offsetWidth/126));
+    var cols=Math.max(1,Math.floor(grid.parentElement.offsetWidth/116));
     if(d==='up')sel=Math.max(0,sel-cols);
     else if(d==='down')sel=Math.min(filt.length-1,sel+cols);
     else if(d==='left')sel=Math.max(0,sel-1);
     else if(d==='right')sel=Math.min(filt.length-1,sel+1);
     updateFocus();
-    checkLoad();
+    if(totalRendered<filt.length&&sel>totalRendered-PER_PAGE*2)renderPage();
 }
 
-function checkLoad(){
-    var scroll=grid.parentElement;
-    if(totalRendered<filt.length&&sel>totalRendered-PER_PAGE*2){
-        renderPage();
-    }
+function getStreamUrl(channel){
+    var base='http://38.41.8.1:8000/play/';
+    var map={
+        'ESPN':'a0t3','ESPN 2':'a0t4','ESPN 3':'a0t5','ESPN 4':'a0t6',
+        'HBO':'a0h1','HBO 2':'a0h2','HBO Plus':'a0hp','HBO Family':'a0hf','Star Channel':'a0s1',
+        'Cartoon Network':'a0c1','Nickelodeon':'a0n1','Nick Jr':'a0c2','Adult Swim':'a0as',
+        'Fox':'a0f1','Fox Sports':'a0fs','Warner':'a0wb','Universal':'a0un',
+        'TUDN':'a0td','MTV':'a0m1','VH1':'a0v1',
+        'Discovery':'a0d1','Nat Geo':'a0ng','History':'a0hi','Animal Planet':'a0ap',
+        'CNN':'a0cn','BBC':'a0bb','Fox Life':'a0f2','Comedy Central':'a0cc',
+        'TNT':'a0tn','TBS':'a0tb','Space':'a0sp','AXN':'a0ax',
+        'Cinemax':'a0cm','Showtime':'a0st','Paramount':'a0pm'
+    };
+    var code=map[channel];
+    return code?base+code:null;
 }
 
 function watchChan(c){
     isWatch=true;
     err.classList.remove('active');
-    var rec=JSON.parse(localStorage.getItem('r')||'[]');
-    rec=rec.filter(function(n){return n!==c.name;});
-    rec.unshift(c.name);
-    if(rec.length>20)rec.pop();
-    localStorage.setItem('r',JSON.stringify(rec));
-    log('...');
+    loaderGif.classList.add('active');
     menu.style.display='none';
     video.style.display='block';
-    var x=new XMLHttpRequest();
-    x.open('GET',API+'/api/stream/'+encodeURIComponent(c.name),true);
-    x.onreadystatechange=function(){
-        if(x.readyState===4){
-            try{
-                var d=JSON.parse(x.responseText);
-                if(d.url){
-                    video.src=d.url;
-                    video.play().then(function(){log(c.name);}).catch(function(){showErr();});
-                }else{showErr();}
-            }catch(e){showErr();}
-        }
-    };
-    x.onerror=function(){showErr();};
-    x.send();
+    
+    var url=getStreamUrl(c.name);
+    if(url){
+        video.src=url;
+        video.play().then(function(){
+            loaderGif.classList.remove('active');
+            log(c.name);
+        }).catch(function(){
+            loaderGif.classList.remove('active');
+            showErr();
+        });
+    }else{
+        loaderGif.classList.remove('active');
+        showErr();
+    }
 }
 
-function showErr(){err.classList.add('active');}
+function showErr(){
+    err.classList.add('active');
+    errMsg.textContent='Sin senal';
+}
+
 function backMenu(){
-    video.pause();video.src='';
+    video.pause();
+    video.src='';
     video.style.display='none';
     menu.style.display='flex';
     isWatch=false;isFS=false;
     app.classList.remove('fs');
     err.classList.remove('active');
-    isSearch=false;sNum.textContent='-';searchBar.style.background='';
+    loaderGif.classList.remove('active');
     updateFocus();
 }
 
@@ -312,63 +427,22 @@ function toggleFS(){
     }
 }
 
-function startSearch(){isSearch=true;searchVal='';sNum.textContent='-';searchBar.style.background='#111';}
-function addNum(n){
-    if(searchVal.length<4){
-        searchVal+=n;sNum.textContent=searchVal;
-        if(searchVal.length>=2){
-            var idx=parseInt(searchVal,10)-1;
-            if(idx>=0&&idx<chans.length){
-                searchVal='';sNum.textContent='-';isSearch=false;searchBar.style.background='';
-                watchChan(chans[idx]);
-            }
-        }
-    }
-}
-
 document.onkeydown=function(e){
     var k=e.keyCode||e.which;
-    var navKeys=[37,38,39,40,33,34];
-    if(navKeys.indexOf(k)>-1)e.preventDefault();
+    if([37,38,39,40].indexOf(k)>-1)e.preventDefault();
     
-    if(k===8||k===27){
-        if(isSearch){isSearch=false;sNum.textContent='-';searchBar.style.background='';}
-        else if(isWatch)backMenu();
-        return;
-    }
+    if(k===8||k===27){if(isWatch)backMenu();return;}
     
     if(isWatch){
-        if(k===13||k===66){
-            if(err.classList.contains('active')){err.classList.remove('active');if(filt[sel])watchChan(filt[sel]);}
-            else backMenu();
-        }
-        if(k===70)toggleFS();
-        return;
-    }
-    
-    if(isSearch){
-        if(k===13||k===66){
-            if(searchVal.length>0){
-                var idx=parseInt(searchVal,10)-1;
-                if(idx>=0&&idx<chans.length){
-                    searchVal='';sNum.textContent='-';isSearch=false;searchBar.style.background='';
-                    watchChan(chans[idx]);
-                }
-            }
-        }
-        if(k>=48&&k<=57)addNum(String.fromCharCode(k));
-        return;
+        if(k===13||k===66){if(err.classList.contains('active'))err.classList.remove('active');else backMenu();}
+        if(k===70)toggleFS();return;
     }
     
     if(k===38)move('up');
     else if(k===40)move('down');
     else if(k===37)move('left');
     else if(k===39)move('right');
-    else if(k===33){sel=Math.max(0,sel-30);updateFocus();}
-    else if(k===34){sel=Math.min(filt.length-1,sel+30);updateFocus();checkLoad();}
     else if(k===13||k===66){if(filt[sel])watchChan(filt[sel]);}
-    else if(k>=48&&k<=57){startSearch();addNum(String.fromCharCode(k));}
-    else if(k===70)toggleFS();
 };
 
 tabsEl.onclick=function(e){
@@ -383,29 +457,22 @@ document.addEventListener('fullscreenchange',function(){
 
 video.onerror=showErr;
 
-var tx=0,ty=0;
-document.ontouchstart=function(e){
-    tx=e.touches[0].clientX;ty=e.touches[0].clientY;
-};
-document.ontouchend=function(e){
-    var dx=tx-e.changedTouches[0].clientX;
-    var dy=ty-e.changedTouches[0].clientY;
-    if(Math.abs(dx)>30)dx>0?move('left'):move('right');
-    else if(Math.abs(dy)>30)dy>0?move('up'):move('down');
-};
-
 document.getElementById('btn-exit').onclick=backMenu;
 document.getElementById('btn-fs').onclick=toggleFS;
 
 grid.parentElement.onscroll=function(){
     var s=this;
-    if(s.scrollTop+s.clientHeight>=s.scrollHeight-100&&totalRendered<filt.length){
-        renderPage();
-    }
+    if(s.scrollTop+s.clientHeight>=s.scrollHeight-50&&totalRendered<filt.length)renderPage();
 };
 
-loadChans();
-console.log('MoJiTo ready');
+// Init
+chCount.textContent=chans.length+' canales';
+filterChans();
+renderTabs();
+renderPage();
+log('canales listos');
+
+console.log('MoJiTo loaded');
 })();
 </script>
 </body>
