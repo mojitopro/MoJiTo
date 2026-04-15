@@ -7,32 +7,32 @@
 *{margin:0;padding:0}
 html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial}
 #video{width:100%;height:100%;position:fixed;top:0;left:0;display:none;background:#000}
-#menu{padding:50px 10px 0 10px;height:100%;display:flex;flex-direction:column}
-.logo{font-size:48px;font-weight:bold;text-align:center;line-height:1;margin-bottom:10px}
-.logo .sof{color:#8b0000;text-shadow:0 0 10px #ff0000,0 0 20px #8b0000}
-.logo .mojito{color:#dc143c;text-shadow:0 0 10px #ff0000,0 0 20px #dc143c}
-.logo .tv{color:#ff0000;font-size:20px;vertical-align:top;margin-left:5px;text-shadow:0 0 10px #ff0000}
-#in{font-size:24px;padding:10px;background:transparent;border:none;color:#666;text-align:center;margin-bottom:10px;outline:none;width:80%}
-#in.focused{color:#aaa;text-shadow:0 0 10px rgba(255,0,0,0.5)}
-#msg{font-size:14px;padding:10px;color:#dc143c;min-height:25px;text-align:center}
+#menu{padding:20px 10px;height:100%;display:flex;flex-direction:column}
+.logo{font-size:36px;font-weight:bold;text-align:center;margin-bottom:10px}
+.logo .sof{color:#8b0000;text-shadow:0 0 10px #ff0000}
+.logo .mojito{color:#dc143c;text-shadow:0 0 10px #dc143c}
+.logo .tv{color:#ff0000;font-size:16px;vertical-align:top;margin-left:3px}
+#in{font-size:18px;padding:8px;background:transparent;border:1px solid #333;border-radius:5px;color:#888;text-align:center;width:70%;margin-bottom:8px}
+#in:focus{color:#aaa;outline:none;border-color:#dc143c}
+#msg{font-size:12px;padding:5px;color:#666;text-align:center;min-height:20px}
 
-/* GRID with pagination */
+/* GRID */
 #grid{flex:1;overflow-y:auto;padding:5px 0}
-#grid-inner{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
-.ch{background:#111;border:2px solid #222;border-radius:6px;padding:10px;cursor:pointer;min-height:50px;display:flex;flex-direction:column;justify-content:center}
-.ch:hover,.ch.sel{border-color:#dc143c;background:#1a0000}
-.ch-name{font-size:11px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ch-cat{font-size:9px;color:#666;text-transform:uppercase;margin-top:3px}
+#grid-inner{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px}
+.ch{background:#111;border:2px solid #222;border-radius:4px;padding:8px;cursor:pointer;min-height:40px;display:flex;flex-direction:column;justify-content:center}
+.ch.sel{border-color:#dc143c;background:#1a0000}
+.ch-name{font-size:10px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch-cat{font-size:8px;color:#555;text-transform:uppercase}
 
-/* Pagination */
-#pages{display:flex;justify-content:center;gap:10px;padding:10px;background:#111}
-.page-btn{padding:5px 15px;background:#222;border:1px solid #333;border-radius:15px;color:#888;font-size:12px;cursor:pointer}
-.page-btn.sel{background:#dc143c;color:#000;border-color:#dc143c}
+/* PAGES */
+#pages{display:flex;justify-content:center;gap:8px;padding:8px;background:#111;flex-wrap:wrap}
+.page-btn{padding:4px 10px;background:#222;border:1px solid #333;border-radius:10px;color:#666;font-size:10px;cursor:pointer}
+.page-btn.sel{background:#dc143c;color:#000}
 .page-btn:active{background:#8b0000}
 
 /* Hints */
-#hints{position:fixed;bottom:0;left:0;width:100%;background:#111;padding:8px;display:flex;justify-content:center;gap:20px;font-size:10px;color:#555;border-top:1px solid #222}
-#hints b{background:#222;padding:2px 6px;border-radius:3px;margin-right:3px;color:#888}
+#hints{position:fixed;bottom:0;left:0;width:100%;background:#111;padding:5px;display:flex;justify-content:center;gap:15px;font-size:9px;color:#444}
+#hints b{background:#1a1a1a;padding:2px 5px;border-radius:3px;color:#666}
 </style>
 </head>
 <body>
@@ -41,89 +41,88 @@ html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial}
 
 <div id="menu">
 <div class="logo"><span class="sof">SŌF</span><span class="mojito">MoJiTo</span><span class="tv">TV</span></div>
-<input type="text" id="in" placeholder="Buscar canal...">
-<div id="msg">Usa las flechas para navegar</div>
+<input type="text" id="in" placeholder="Buscar..." maxlength="20">
+<div id="msg">Flechas navega | OK selecciona</div>
 <div id="grid"><div id="grid-inner"></div></div>
 <div id="pages"></div>
 </div>
 
 <div id="hints">
-<b>↑↓</b> Navegar <b>OK</b> Seleccionar <b>BACK</b> Salir <b>PAG</b> Paginas
+<b>↑↓</b> Nav <b>←→</b> Pag <b>OK</b> Sel <b>BACK</b> Salir
 </div>
 
 <script>
 var API=window.location.origin;
-var streams=[], idx=0, txt='', page=1, perPage=48;
+var allChans=[], pageChans=[], idx=0, page=1, perPage=40;
 
 function log(m){document.getElementById('msg').textContent=m;}
 
-function renderGrid(start,end){
+function renderPage(){
+    var start=(page-1)*perPage;
+    var end=Math.min(start+perPage,allChans.length);
+    pageChans=allChans.slice(start,end);
+    
     var g=document.getElementById('grid-inner');
     g.innerHTML='';
-    var slice=streams.slice(start,end);
-    slice.forEach(function(s,i){
+    pageChans.forEach(function(c,i){
         var d=document.createElement('div');
-        d.className='ch'+(start+i===idx?' sel':'');
-        d.innerHTML='<div class="ch-name">'+s.title.substring(0,30)+'</div><div class="ch-cat">'+(s.quality||'HD')+'</div>';
-        d.onclick=function(){playStream(start+i);};
+        d.className='ch'+(i===idx?' sel':'');
+        d.innerHTML='<div class="ch-name">'+c.name.substring(0,20)+'</div><div class="ch-cat">'+(c.category||'TV')+'</div>';
+        d.onclick=function(){playChan(start+i);};
         g.appendChild(d);
     });
-    updateFocus();
-}
-
-function updateFocus(){
-    var chs=document.querySelectorAll('.ch');
-    chs.forEach(function(c){c.classList.remove('sel');});
-    var relIdx=idx%perPage;
-    if(chs[relIdx])chs[relIdx].classList.add('sel');
-}
-
-function renderPages(){
-    var total=Math.ceil(streams.length/perPage);
+    
+    // Page buttons
+    var totalPages=Math.ceil(allChans.length/perPage);
     var p=document.getElementById('pages');
     p.innerHTML='';
-    for(var i=1;i<=Math.min(total,10);i++){
+    for(var i=1;i<=Math.min(totalPages,8);i++){
         var b=document.createElement('div');
         b.className='page-btn'+(i===page?' sel':'');
         b.textContent=i;
-        b.onclick=function(){page=parseInt(this.textContent);loadPage();};
+        b.onclick=function(){page=parseInt(this.textContent);idx=0;renderPage();};
         p.appendChild(b);
     }
-}
-
-function loadPage(){
-    var start=(page-1)*perPage;
-    var end=Math.min(start+perPage,streams.length);
-    renderGrid(start,end);
-    renderPages();
-    log('Pag '+page+'/'+Math.ceil(streams.length/perPage)+' - '+streams.length+' canales');
+    if(totalPages>8){
+        var m=document.createElement('div');
+        m.className='page-btn';
+        m.textContent='...';
+        p.appendChild(m);
+    }
+    
+    var selIdx=(page-1)*perPage+idx;
+    log((selIdx+1)+'/'+allChans.length+' - '+allChans[selIdx].name.substring(0,25));
 }
 
 function move(dir){
+    var totalPages=Math.ceil(allChans.length/perPage);
     if(dir==='up'&&idx>0)idx--;
-    if(dir==='down'&&idx<streams.length-1)idx++;
-    if(dir==='left'&&idx>=perPage)idx-=perPage;
-    if(dir==='right'&&idx+perPage<streams.length)idx+=perPage;
-    var start=(page-1)*perPage;
-    if(idx>=start+perPage){page=Math.ceil((idx+1)/perPage);loadPage();}
-    else if(idx<start){page=Math.ceil((idx+1)/perPage);loadPage();}
-    else{updateFocus();}
-    log((idx+1)+'/'+streams.length+' - '+streams[idx].title.substring(0,30));
+    if(dir==='down'&&idx<pageChans.length-1)idx++;
+    if(dir==='left'&&page>1){page--;idx=0;renderPage();}
+    if(dir==='right'&&page<totalPages){page++;idx=0;renderPage();}
+    
+    var selIdx=(page-1)*perPage+idx;
+    document.querySelectorAll('.ch').forEach(function(c,i){c.classList.toggle('sel',i===idx);});
+    log((selIdx+1)+'/'+allChans.length+' - '+allChans[selIdx].name.substring(0,25));
 }
 
-function search(){
-    if(!txt.trim()){log('Escribe un canal');return;}
-    log('Buscando...');
+function playChan(i){
+    var ch=allChans[i];
+    if(!ch.name)return;
+    log('Cargando...');
     var x=new XMLHttpRequest();
-    x.open('GET',API+'/api/search?q='+encodeURIComponent(txt),true);
+    x.open('GET',API+'/api/stream/'+encodeURIComponent(ch.name),true);
     x.onreadystatechange=function(){
-        if(x.readyState===4&&x.status===200){
+        if(x.readyState===4){
             try{
                 var d=JSON.parse(x.responseText);
-                streams=d.map(function(s){return {title:s.name,url:s.url,quality:s.streams>3?'HD':'SD'}});
-                if(streams.length===0){log('Sin resultados');return;}
-                idx=0;page=1;
-                loadPage();
+                if(d.url){
+                    document.getElementById('video').src=d.url;
+                    document.getElementById('video').style.display='block';
+                    document.getElementById('menu').style.display='none';
+                    document.getElementById('video').play();
+                    log(ch.name);
+                }else{log('Sin senal');}
             }catch(e){log('Error');}
         }
     };
@@ -131,66 +130,62 @@ function search(){
     x.send();
 }
 
-function loadAll(){
-    log('Cargando canales...');
-    var x=new XMLHttpRequest();
-    x.open('GET',API+'/api/channels',true);
-    x.onreadystatechange=function(){
-        if(x.readyState===4&&x.status===200){
-            try{
-                var d=JSON.parse(x.responseText);
-                streams=d.map(function(c){return {title:c.name,url:'',quality:c.streams||'1'}});
-                streams.sort(function(a,b){return a.title.localeCompare(b.title)});
-                idx=0;page=1;
-                loadPage();
-            }catch(e){log('Error');}
-        }
-    };
-    x.onerror=function(){log('Sin conexion');};
-    x.send();
-}
-
-function playStream(i){
-    if(!streams[i].url)return;
-    document.getElementById('video').src=streams[i].url;
-    document.getElementById('video').style.display='block';
-    document.getElementById('menu').style.display='none';
-    document.getElementById('video').play();
-    log('Reproduciendo: '+streams[i].title);
-}
-
-document.getElementById('in').onkeydown=function(e){
-    if(e.key==='Enter'){search();}
-    else if(e.key==='Backspace'&&txt.length===0){
-        document.getElementById('in').blur();
-        loadAll();
-    }
-    else if(e.key.length===1){txt+=e.key;}
+// Input
+var txt='';
+document.getElementById('in').oninput=function(){
+    txt=this.value.toLowerCase();
+    if(txt.length<2){loadAll();return;}
+    var filtered=allChans.filter(function(c){return c.name.toLowerCase().indexOf(txt)>-1;});
+    if(filtered.length>0){allChans=filtered;page=1;idx=0;renderPage();}
+    else{log('Sin resultados');}
 };
 
+document.getElementById('in').onkeydown=function(e){
+    if(e.key==='Enter'){
+        var filtered=allChans.filter(function(c){return c.name.toLowerCase().indexOf(txt)>-1;});
+        if(filtered.length>0 && idx<filtered.length)playChan((page-1)*perPage+idx);
+    }
+};
+
+// Keyboard
 document.onkeydown=function(e){
     var k=e.key;
-    if(document.getElementById('video').style.display==='block'){
-        if(k==='Escape'){document.getElementById('video').style.display='none';document.getElementById('menu').style.display='flex';log('Cerrado');}
+    var v=document.getElementById('video');
+    if(v.style.display==='block'){
+        if(k==='Escape'){v.pause();v.style.display='none';document.getElementById('menu').style.display='flex';log('Cerrado');}
         return;
     }
     if(k==='ArrowDown'){e.preventDefault();move('down');}
     else if(k==='ArrowUp'){e.preventDefault();move('up');}
     else if(k==='ArrowLeft'){e.preventDefault();move('left');}
     else if(k==='ArrowRight'){e.preventDefault();move('right');}
-    else if(k==='Enter'){if(streams[idx])playStream(idx);}
-    else if(k==='Backspace'){
-        var inp=document.getElementById('in');
-        if(document.activeElement===inp){txt=txt.slice(0,-1);inp.value=txt;}
-        else if(document.getElementById('video').style.display==='none'){document.getElementById('video').style.display='none';document.getElementById('menu').style.display='flex';log('Cerrado');}
+    else if(k==='Enter'){playChan((page-1)*perPage+idx);}
+    else if(k==='Backspace'||k==='Escape'){
+        if(document.activeElement===document.getElementById('in')){document.getElementById('in').blur();}
+        else{document.getElementById('video').style.display='none';document.getElementById('menu').style.display='flex';log('Cerrado');}
     }
-    else if(k==='PageDown'){if(page<Math.ceil(streams.length/perPage)){page++;loadPage();}}
-    else if(k==='PageUp'){if(page>1){page--;loadPage();}}
-    else if(k==='Home'){txt='';document.getElementById('in').value='';loadAll();}
 };
 
+// Load channels
+function loadAll(){
+    var x=new XMLHttpRequest();
+    x.open('GET',API+'/api/channels',true);
+    x.onreadystatechange=function(){
+        if(x.readyState===4&&x.status===200){
+            try{
+                allChans=JSON.parse(x.responseText);
+                allChans.sort(function(a,b){return a.name.localeCompare(b.name)});
+                page=1;idx=0;
+                renderPage();
+            }catch(e){log('Error datos');}
+        }
+    };
+    x.onerror=function(){log('Sin conexion - intenta de nuevo');};
+    x.send();
+}
+
 loadAll();
-console.log('MoJiTo loaded');
+console.log('MoJiTo ready');
 </script>
 </body>
 </html>
