@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>MoJiTo TV</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <style>
 *{margin:0;padding:0}
 html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial,Helvetica,sans-serif}
@@ -41,7 +42,7 @@ html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial,He
 
 /* GRID */
 #grid{flex:1;overflow-y:auto;padding:5px 0}
-#grid-inner{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:5px}
+#grid-inner{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
 
 .sel{border-color:#dc143c !important;background:#150000 !important;box-shadow:0 0 10px rgba(220,20,60,0.6) !important}
 
@@ -52,13 +53,7 @@ html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial,He
 /* MSG */
 #msg{height:25px;display:flex;align-items:center;padding:0 5px;font-size:10px;color:#444;border-top:1px solid #111}
 
-/* LOAD */
-#load{position:fixed;top:45%;left:50%;transform:translate(-50%,-50%);z-index:100;display:none}
-#load.active{display:block}
-.ld{width:25px;height:25px;border:2px solid rgba(220,20,60,0.15);border-top-color:#dc143c;border-radius:50%;animation:spin .6s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* LOADER GIF */
+/* LOADER */
 #loader-gif{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:150;display:none}
 #loader-gif.active{display:block}
 #loader-gif img{width:80px;height:80px}
@@ -95,8 +90,6 @@ html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial,He
         <div id="msg">flechas nav | OK sel | BACK sal</div>
     </div>
     
-    <div id="load"><div class="ld"></div></div>
-    
     <div id="loader-gif">
         <img src="https://media1.giphy.com/media/v1.Y2lkPTZjMDliOTUyaGxzY3VqODl0a2RrenA3bGhxOW5kdnBzOTU1ZjIyamd5OHZoaGp2ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/BaDxVZichFuqhsWLId/giphy.gif">
     </div>
@@ -108,7 +101,9 @@ html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial,He
 </div>
 
 <script>
-(function(){
+var Hls = window.Hls;
+var hls = null;
+
 var app=document.getElementById('app');
 var menu=document.getElementById('menu');
 var video=document.getElementById('video');
@@ -116,7 +111,6 @@ var gridInner=document.getElementById('grid-inner');
 var grid=document.getElementById('grid');
 var tabsEl=document.getElementById('tabs');
 var msg=document.getElementById('msg');
-var load=document.getElementById('load');
 var loaderGif=document.getElementById('loader-gif');
 var err=document.getElementById('err');
 var errMsg=document.getElementById('err-msg');
@@ -124,42 +118,41 @@ var chCount=document.getElementById('ch-count');
 
 var CATS=['Todos','Deportes','Cine','Noticias','Mexico','Argentina','Espana','Infantil','Musica','Documental','Entretenimiento'];
 
-// Canales con MULTIPLES fallbacks - probar hasta que funcione
 var chans=[
-{name:'ESPN',urls:['http://45.177.21.6:9000/play/a015','http://38.137.192.250:8000/play/a0b5','http://45.177.21.6:9000/play/a017'],category:'Deportes'},
-{name:'ESPN 2',urls:['http://45.177.21.6:9000/play/a017','http://38.137.192.250:8000/play/a01u'],category:'Deportes'},
-{name:'ESPN 3',urls:['http://45.177.21.6:9000/play/a01i','http://38.137.192.250:8000/play/a01v'],category:'Deportes'},
-{name:'ESPN 4',urls:['http://45.177.21.6:9000/play/a01c','http://38.137.192.250:8000/play/a048'],category:'Deportes'},
-{name:'HBO',urls:['http://45.181.120.65:9087/play/148/index.m3u8','http://38.187.3.110:8000/play/a07z/index.m3u8','http://38.250.125.162:9800/play/148/index.m3u8'],category:'Cine'},
-{name:'HBO 2',urls:['http://45.181.120.65:9087/play/130/index.m3u8','http://38.250.125.162:9800/play/094/index.m3u8'],category:'Cine'},
-{name:'HBO Plus',urls:['http://45.181.120.65:9087/play/093/index.m3u8','http://38.250.125.162:9800/play/093/index.m3u8'],category:'Cine'},
-{name:'HBO Family',urls:['http://45.181.120.65:9087/play/131/index.m3u8','http://38.187.3.110:8000/play/a0dd/index.m3u8'],category:'Cine'},
-{name:'HBO Xtreme',urls:['http://45.181.120.65:9087/play/128/index.m3u8','http://38.187.3.110:8000/play/a0de/index.m3u8'],category:'Cine'},
+{name:'ESPN',urls:['http://45.177.21.6:9000/play/a015','http://38.137.192.250:8000/play/a0b5'],category:'Deportes'},
+{name:'ESPN 2',urls:['http://45.177.21.6:9000/play/a017'],category:'Deportes'},
+{name:'ESPN 3',urls:['http://45.177.21.6:9000/play/a01i'],category:'Deportes'},
+{name:'ESPN 4',urls:['http://45.177.21.6:9000/play/a01c'],category:'Deportes'},
+{name:'HBO',urls:['http://45.181.120.65:9087/play/148/index.m3u8'],category:'Cine'},
+{name:'HBO 2',urls:['http://45.181.120.65:9087/play/130/index.m3u8'],category:'Cine'},
+{name:'HBO Plus',urls:['http://45.181.120.65:9087/play/093/index.m3u8'],category:'Cine'},
+{name:'HBO Family',urls:['http://45.181.120.65:9087/play/131/index.m3u8'],category:'Cine'},
+{name:'HBO Xtreme',urls:['http://45.181.120.65:9087/play/128/index.m3u8'],category:'Cine'},
 {name:'Star Channel',urls:['http://181.118.156.46:8000/play/a02b/index.m3u8'],category:'Cine'},
-{name:'Cartoon Network',urls:['http://45.181.120.65:9087/play/010/index.m3u8','http://38.250.125.162:9800/play/032/index.m3u8','http://45.5.119.43:4000/play/a0l0/index.m3u8'],category:'Infantil'},
-{name:'Cartoonito',urls:['http://38.250.125.162:9800/play/043/index.m3u8','http://45.177.21.6:9000/play/a00p','http://8.243.126.131:8000/play/a05p/index.m3u8'],category:'Infantil'},
-{name:'Nickelodeon',urls:['http://181.119.111.25:4000/play/a0hd/index.m3u8','http://45.5.119.43:4000/play/a0l0/index.m3u8'],category:'Infantil'},
-{name:'Adult Swim',urls:['http://168.228.44.241:9997/play/a08p/index.m3u8','http://148.222.230.197:8000/play/a0f8/index.m3u8','http://177.53.153.207:8000/play/a011/index.m3u8'],category:'Entretenimiento'},
-{name:'Fox',urls:['http://38.41.8.1:8000/play/a0f1','http://45.181.120.65:9087/play/020/index.m3u8'],category:'Entretenimiento'},
-{name:'Fox Life',urls:['http://38.41.8.1:8000/play/a0f2','http://45.181.120.65:9087/play/021/index.m3u8'],category:'Entretenimiento'},
-{name:'Warner',urls:['http://38.41.8.1:8000/play/a0wb','http://45.181.120.65:9087/play/030/index.m3u8'],category:'Entretenimiento'},
-{name:'Universal',urls:['http://38.41.8.1:8000/play/a0un','http://45.181.120.65:9087/play/040/index.m3u8'],category:'Entretenimiento'},
-{name:'TNT',urls:['http://38.41.8.1:8000/play/a0tn','http://45.181.120.65:9087/play/050/index.m3u8'],category:'Cine'},
-{name:'TBS',urls:['http://38.41.8.1:8000/play/a0tb','http://45.181.120.65:9087/play/051/index.m3u8'],category:'Entretenimiento'},
-{name:'Space',urls:['http://38.41.8.1:8000/play/a0sp','http://45.181.120.65:9087/play/052/index.m3u8'],category:'Cine'},
-{name:'AXN',urls:['http://38.41.8.1:8000/play/a0ax','http://45.181.120:9087/play/053/index.m3u8'],category:'Entretenimiento'},
+{name:'Cartoon Network',urls:['http://45.181.120.65:9087/play/010/index.m3u8'],category:'Infantil'},
+{name:'Cartoonito',urls:['http://38.250.125.162:9800/play/043/index.m3u8'],category:'Infantil'},
+{name:'Nickelodeon',urls:['http://181.119.111.25:4000/play/a0hd/index.m3u8'],category:'Infantil'},
+{name:'Adult Swim',urls:['http://168.228.44.241:9997/play/a08p/index.m3u8'],category:'Entretenimiento'},
+{name:'Fox',urls:['http://38.41.8.1:8000/play/a0f1'],category:'Entretenimiento'},
+{name:'Fox Life',urls:['http://38.41.8.1:8000/play/a0f2'],category:'Entretenimiento'},
+{name:'Warner',urls:['http://38.41.8.1:8000/play/a0wb'],category:'Entretenimiento'},
+{name:'Universal',urls:['http://38.41.8.1:8000/play/a0un'],category:'Entretenimiento'},
+{name:'TNT',urls:['http://38.41.8.1:8000/play/a0tn'],category:'Cine'},
+{name:'TBS',urls:['http://38.41.8.1:8000/play/a0tb'],category:'Entretenimiento'},
+{name:'Space',urls:['http://38.41.8.1:8000/play/a0sp'],category:'Cine'},
+{name:'AXN',urls:['http://38.41.8.1:8000/play/a0ax'],category:'Entretenimiento'},
 {name:'CNN',urls:['http://38.41.8.1:8000/play/a0cn'],category:'Noticias'},
-{name:'Discovery',urls:['http://38.41.8.1:8000/play/a0d1','http://45.181.120.65:9087/play/060/index.m3u8'],category:'Documental'},
-{name:'Nat Geo',urls:['http://38.41.8.1:8000/play/a0ng','http://45.181.120.65:9087/play/061/index.m3u8'],category:'Documental'},
-{name:'History',urls:['http://38.41.8.1:8000/play/a0hi','http://45.181.120.65:9087/play/062/index.m3u8'],category:'Documental'},
-{name:'Animal Planet',urls:['http://38.41.8.1:8000/play/a0ap','http://45.181.120.65:9087/play/063/index.m3u8'],category:'Documental'},
-{name:'MTV',urls:['http://38.41.8.1:8000/play/a0m1','http://45.181.120.65:9087/play/070/index.m3u8'],category:'Musica'},
-{name:'VH1',urls:['http://38.41.8.1:8000/play/a0v1','http://45.181.120.65:9087/play/071/index.m3u8'],category:'Musica'},
+{name:'Discovery',urls:['http://38.41.8.1:8000/play/a0d1'],category:'Documental'},
+{name:'Nat Geo',urls:['http://38.41.8.1:8000/play/a0ng'],category:'Documental'},
+{name:'History',urls:['http://38.41.8.1:8000/play/a0hi'],category:'Documental'},
+{name:'Animal Planet',urls:['http://38.41.8.1:8000/play/a0ap'],category:'Documental'},
+{name:'MTV',urls:['http://38.41.8.1:8000/play/a0m1'],category:'Musica'},
+{name:'VH1',urls:['http://38.41.8.1:8000/play/a0v1'],category:'Musica'},
 {name:'TUDN',urls:['http://38.41.8.1:8000/play/a0td'],category:'Deportes'},
 {name:'Azteca Uno',urls:['https://mdstrm.com/live-stream-playlist/609b243156cca108312822a6.m3u8'],category:'Mexico'},
 {name:'Azteca 7',urls:['http://aztecalive-lh.akamaihd.net/i/azteca7nde_1@44505/index_3_av-b.m3u8'],category:'Mexico'},
-{name:'Las Estrellas',urls:['http://181.78.105.146:2000/play/a00h','http://45.68.35.218:4001/play/a00h/index.m3u8'],category:'Mexico'},
-{name:'Canal 5',urls:['http://181.78.105.146:2000/play/a038','http://45.68.35.218:4001/play/a009/index.m3u8'],category:'Mexico'},
+{name:'Las Estrellas',urls:['http://181.78.105.146:2000/play/a00h'],category:'Mexico'},
+{name:'Canal 5',urls:['http://181.78.105.146:2000/play/a038'],category:'Mexico'},
 {name:'Imagen TV',urls:['http://181.78.105.146:2000/play/a00g'],category:'Mexico'},
 {name:'Telefe',urls:['http://190.104.226.30/Live/870787012c00961adaf9b2304d704b57/telefe_720.m3u8'],category:'Argentina'},
 {name:'El Trece',urls:['https://live-01-02-eltrece.vodgc.net/eltrecetv/index.m3u8'],category:'Argentina'},
@@ -173,7 +166,7 @@ var chans=[
 ];
 
 var filt=[],sel=0,curT=0,isFS=false,isWatch=false;
-var cols=4;
+var COLS = 4;
 
 function log(m){msg.textContent=m;}
 
@@ -211,12 +204,7 @@ function setTab(i){
     sel=0;
     renderTabs();
     renderGrid();
-    calcCols();
     log(filt.length+' canales');
-}
-
-function calcCols(){
-    cols=Math.max(1,Math.floor(grid.offsetWidth/116));
 }
 
 function updateFocus(){
@@ -224,56 +212,77 @@ function updateFocus(){
     chs.forEach(function(c){c.classList.remove('sel');});
     if(sel>=0&&sel<chs.length){
         chs[sel].classList.add('sel');
-        chs[sel].scrollIntoView({block:'nearest',behavior:'smooth'});
+        var rect = chs[sel].getBoundingClientRect();
+        var container = grid.getBoundingClientRect();
+        if(rect.top < container.top || rect.bottom > container.bottom){
+            chs[sel].scrollIntoView({block:'nearest',behavior:'smooth'});
+        }
     }
-    if(filt[sel])log(filt[sel].name);
+    if(filt[sel])log((sel+1)+'/'+filt.length+' - '+filt[sel].name);
 }
 
 function move(d){
-    calcCols();
-    var max=filt.length-1;
-    
-    if(d==='up'){
-        if(sel-cols>=0)sel-=cols;
-    }
-    else if(d==='down'){
-        if(sel+cols<=max)sel+=cols;
-        else sel=max;
-    }
-    else if(d==='left'){
-        if(sel>0)sel--;
-    }
-    else if(d==='right'){
-        if(sel<max)sel++;
-    }
-    
+    var max = filt.length - 1;
+    if(d==='up'){if(sel>0)sel--;}
+    else if(d==='down'){if(sel<max)sel++;}
+    else if(d==='left'){if(sel>=COLS)sel-=COLS;}
+    else if(d==='right'){if(sel+COLS<=max)sel+=COLS;}
     renderGrid();
-    if(filt[sel])log(filt[sel].name);
+    if(filt[sel])log((sel+1)+'/'+filt.length+' - '+filt[sel].name);
 }
 
-// TRY MULTIPLE URLS
+// PLAY WITH HLS.JS
+function playStream(url, onSuccess, onFail){
+    // Destroy previous hls instance
+    if(hls){
+        hls.destroy();
+        hls = null;
+    }
+    
+    if(url.indexOf('.m3u8') > -1){
+        // Use HLS.js for m3u8 streams
+        if(Hls.isSupported()){
+            hls = new Hls();
+            hls.loadSource(url);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, function(){
+                video.play().then(onSuccess).catch(onFail);
+            });
+            hls.on(Hls.Events.ERROR, function(event, data){
+                if(data.fatal){
+                    hls.destroy();
+                    hls = null;
+                    onFail();
+                }
+            });
+        }else if(video.canPlayType('application/vnd.apple.mpegurl')){
+            // Native HLS support (Safari)
+            video.src = url;
+            video.play().then(onSuccess).catch(onFail);
+        }else{
+            onFail();
+        }
+    }else{
+        // Direct stream
+        video.src = url;
+        video.play().then(onSuccess).catch(onFail);
+    }
+}
+
 function tryPlayUrls(urls, index, onSuccess, onFail){
-    if(index>=urls.length){
+    if(index>=urls.length || !urls || urls.length===0){
         onFail();
         return;
     }
-    
-    var testUrl = urls[index];
-    video.src = testUrl;
-    
-    video.play().then(function(){
-        onSuccess();
-    }).catch(function(){
-        // Try next URL
-        setTimeout(function(){
-            tryPlayUrls(urls, index+1, onSuccess, onFail);
-        }, 500);
+    playStream(urls[index], onSuccess, function(){
+        setTimeout(function(){tryPlayUrls(urls, index+1, onSuccess, onFail);}, 500);
     });
 }
 
 function watchChan(c){
     isWatch=true;
     video.pause();
+    if(hls){hls.destroy();hls=null;}
     video.removeAttribute('src');
     video.load();
     video.style.display='none';
@@ -301,6 +310,7 @@ function watchChan(c){
 function showErr(){
     loaderGif.classList.remove('active');
     video.pause();
+    if(hls){hls.destroy();hls=null;}
     video.removeAttribute('src');
     video.load();
     video.style.display='none';
@@ -314,6 +324,7 @@ function showErr(){
 
 function backMenu(){
     video.pause();
+    if(hls){hls.destroy();hls=null;}
     video.removeAttribute('src');
     video.load();
     video.style.display='none';
@@ -325,7 +336,7 @@ function backMenu(){
     isFS=false;
     app.classList.remove('fs');
     renderGrid();
-    if(filt[sel])log(filt[sel].name);
+    if(filt[sel])log((sel+1)+'/'+filt.length+' - '+filt[sel].name);
 }
 
 function toggleFS(){
@@ -343,36 +354,19 @@ function toggleFS(){
     }
 }
 
-// KEYBOARD
 document.onkeydown=function(e){
     var k=e.keyCode||e.which;
     if([37,38,39,40,13,8,27,66,70].indexOf(k)>-1)e.preventDefault();
-    
-    if(k===8||k===27){
-        if(isWatch)backMenu();
-        return;
-    }
-    
+    if(k===8||k===27){if(isWatch)backMenu();return;}
     if(isWatch){
-        if(k===13||k===66){
-            if(err.classList.contains('active')){
-                err.classList.remove('active');
-                if(filt[sel])watchChan(filt[sel]);
-            }else{
-                backMenu();
-            }
-        }
-        if(k===70)toggleFS();
-        return;
+        if(k===13||k===66){if(err.classList.contains('active')){err.classList.remove('active');if(filt[sel])watchChan(filt[sel]);}else{backMenu();}}
+        if(k===70)toggleFS();return;
     }
-    
     if(k===38)move('up');
     else if(k===40)move('down');
     else if(k===37)move('left');
     else if(k===39)move('right');
-    else if(k===13||k===66){
-        if(filt[sel])watchChan(filt[sel]);
-    }
+    else if(k===13||k===66){if(filt[sel])watchChan(filt[sel]);}
 };
 
 tabsEl.onclick=function(e){
@@ -390,11 +384,9 @@ video.onerror=showErr;
 document.getElementById('btn-exit').onclick=backMenu;
 document.getElementById('btn-fs').onclick=toggleFS;
 
-// Touch
 var tx=0,ty=0;
 document.ontouchstart=function(e){
-    tx=e.touches[0].clientX;
-    ty=e.touches[0].clientY;
+    tx=e.touches[0].clientX;ty=e.touches[0].clientY;
 };
 document.ontouchend=function(e){
     var dx=tx-e.changedTouches[0].clientX;
@@ -403,13 +395,11 @@ document.ontouchend=function(e){
     else if(Math.abs(dy)>30)dy>0?move('up'):move('down');
 };
 
-// Init
 chCount.textContent=chans.length+' canales';
 filterChans();
 renderTabs();
 renderGrid();
-calcCols();
-log('Listo');
+log('Listo - HLS enabled');
 
 console.log('MoJiTo ready');
 })();
