@@ -6,25 +6,29 @@
 <style>
 *{margin:0;padding:0}
 html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial,Helvetica,sans-serif}
-#app{width:100%;height:100%}
-#app.fs{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999}
+#app{width:100%;height:100%;position:relative}
 
-/* VIDEO */
-#video{width:100%;height:100%;position:fixed;top:0;left:0;display:none;background:#000;z-index:10}
+/* VIDEO - asegurar que queda atrás */
+#video{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:5;display:none}
 #video.active{display:block}
 
+/* MENU - siempre visible y adelante */
+#menu{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;padding:0 15px;z-index:10;background:#000}
+#menu.hidden{display:none}
+
+/* FS APP */
+#app.fs{position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999}
+#app.fs #menu{display:none}
+
 /* FS */
-#fs-logo{position:fixed;top:10px;left:10px;font-size:12px;color:#dc143c;z-index:100;opacity:0.7;display:none;text-shadow:0 0 10px #8b0000}
+#fs-logo{position:fixed;top:10px;left:10px;font-size:12px;color:#dc143c;z-index:100;opacity:0.7;display:none}
 #app.fs #fs-logo{display:block}
 
 #fs-btns{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);padding:8px 20px;border-radius:20px;z-index:100;display:none;gap:10px}
 #app.fs #fs-btns{display:flex}
 .fs-btn{background:#1a1a1a;color:#8b0000;border:1px solid #8b0000;padding:6px 15px;border-radius:15px;font-size:12px;cursor:pointer}
 
-/* MENU */
-#menu{height:100%;display:flex;flex-direction:column;padding:0 15px;position:relative;z-index:20}
-#menu.hidden{display:none}
-
+/* HEADER */
 #header{height:50px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #1a1a1a}
 .logo{font-size:28px;font-weight:bold;letter-spacing:-1px}
 .logo .m{color:#dc143c;text-shadow:0 0 15px #dc143c,0 0 30px #8b0000}
@@ -37,10 +41,10 @@ html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial,He
 .tab.sel{border-color:#dc143c;color:#dc143c;background:rgba(220,20,60,0.1)}
 
 /* GRID */
-#grid{height:calc(100% - 100px);overflow-y:auto;padding:5px 0}
+#grid{flex:1;overflow-y:auto;padding:5px 0}
 #grid-inner{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:5px}
 .ch{background:#0d0d0d;border:2px solid #1a1a1a;border-radius:4px;padding:6px;cursor:pointer;min-height:40px;display:flex;flex-direction:column;justify-content:center}
-.ch.sel{border-color:#dc143c;background:#150000}
+.ch.sel{border-color:#dc143c;background:#150000;box-shadow:0 0 8px rgba(220,20,60,0.5)}
 .ch-name{font-size:10px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ch-cat{font-size:8px;color:#444;text-transform:uppercase;margin-top:2px}
 
@@ -119,7 +123,7 @@ var chCount=document.getElementById('ch-count');
 
 var CATS=['Todos','Deportes','Cine','Noticias','Mexico','Argentina','Espana','Infantil','Musica','Documental','Entretenimiento'];
 
-// Canales con streams reales
+// Canales con streams reales verificados
 var chans=[
 {"name":"ESPN","category":"Deportes","url":"http://38.41.8.1:8000/play/a0t3"},
 {"name":"ESPN 2","category":"Deportes","url":"http://38.41.8.1:8000/play/a0t4"},
@@ -127,7 +131,6 @@ var chans=[
 {"name":"ESPN 4","category":"Deportes","url":"http://38.41.8.1:8000/play/a0t6"},
 {"name":"TUDN","category":"Deportes","url":"http://38.41.8.1:8000/play/a0td"},
 {"name":"Fox Sports","category":"Deportes","url":"http://38.41.8.1:8000/play/a0fs"},
-{"name":"beIN Sports","category":"Deportes","url":""},
 {"name":"HBO","category":"Cine","url":"http://38.41.8.1:8000/play/a0h1"},
 {"name":"HBO 2","category":"Cine","url":"http://38.41.8.1:8000/play/a0h2"},
 {"name":"HBO Plus","category":"Cine","url":"http://38.41.8.1:8000/play/a0hp"},
@@ -135,38 +138,23 @@ var chans=[
 {"name":"Star Channel","category":"Cine","url":"http://38.41.8.1:8000/play/a0s1"},
 {"name":"Cinemax","category":"Cine","url":"http://38.41.8.1:8000/play/a0cm"},
 {"name":"Showtime","category":"Cine","url":"http://38.41.8.1:8000/play/a0st"},
-{"name":"AMC","category":"Cine","url":""},
-{"name":"FX","category":"Cine","url":""},
 {"name":"TNT","category":"Cine","url":"http://38.41.8.1:8000/play/a0tn"},
 {"name":"Space","category":"Cine","url":"http://38.41.8.1:8000/play/a0sp"},
 {"name":"Cartoon Network","category":"Infantil","url":"http://38.41.8.1:8000/play/a0c1"},
 {"name":"Nickelodeon","category":"Infantil","url":"http://38.41.8.1:8000/play/a0n1"},
 {"name":"Nick Jr","category":"Infantil","url":"http://38.41.8.1:8000/play/a0c2"},
-{"name":"Disney Channel","category":"Infantil","url":""},
-{"name":"Boing","category":"Infantil","url":""},
-{"name":"Clan","category":"Infantil","url":""},
 {"name":"Adult Swim","category":"Entretenimiento","url":"http://38.41.8.1:8000/play/a0as"},
 {"name":"CNN","category":"Noticias","url":"http://38.41.8.1:8000/play/a0cn"},
-{"name":"C5N","category":"Noticias","url":""},
-{"name":"TN","category":"Noticias","url":""},
-{"name":"BBC","category":"Noticias","url":""},
 {"name":"Las Estrellas","category":"Mexico","url":"http://181.78.105.146:2000/play/a00h"},
-{"name":"Canal 5","category":"Mexico","url":"http://181.78.105.146:2000/play/a038"},
-{"name":"Azteca Uno","category":"Mexico","url":""},
-{"name":"Azteca 7","category":"Mexico","url":""},
+{"name":"Canal 5","category":"Mexico","url":"http://181.41.16.122:8000/play/a038"},
 {"name":"Imagen TV","category":"Mexico","url":"http://181.78.105.146:2000/play/a00g"},
-{"name":"FOROtv","category":"Mexico","url":"http://181.78.105.146:2000/play/a00i"},
 {"name":"Telefe","category":"Argentina","url":"http://190.104.226.30/Live/870787012c00961adaf9b2304d704b57/telefe_720.m3u8"},
 {"name":"El Trece","category":"Argentina","url":"https://live-01-02-eltrece.vodgc.net/eltrecetv/index.m3u8"},
-{"name":"América TV","category":"Argentina","url":"https://prepublish.f.qaotic.net/a07/americahls-100056/playlist_720p.m3u8"},
 {"name":"La 1","category":"Espana","url":"https://hlsliveamdgl7-lh.akamaihd.net/i/hlsdvrlive_1@583042/master.m3u8"},
 {"name":"Antena 3","category":"Espana","url":"https://livestartover.atresmedia.com/antena3/master.m3u8"},
 {"name":"Telecinco","category":"Espana","url":"https://livehlsdai-i.akamaihd.net/hls/live/571640/telecinco/bitrate_2.m3u8"},
-{"name":"Cuatro","category":"Espana","url":"https://livehlsdai-i.akamaihd.net/hls/live/571643/cuatro/bitrate_2.m3u8"},
-{"name":"laSexta","category":"Espana","url":"https://livestartover.atresmedia.com/lasexta/master.m3u8"},
 {"name":"MTV","category":"Musica","url":"http://38.41.8.1:8000/play/a0m1"},
 {"name":"VH1","category":"Musica","url":"http://38.41.8.1:8000/play/a0v1"},
-{"name":"Telehit","category":"Musica","url":"http://190.61.55.34:2401/play/a06t/index.m3u8"},
 {"name":"Discovery","category":"Documental","url":"http://38.41.8.1:8000/play/a0d1"},
 {"name":"Nat Geo","category":"Documental","url":"http://38.41.8.1:8000/play/a0ng"},
 {"name":"History","category":"Documental","url":"http://38.41.8.1:8000/play/a0hi"},
@@ -175,31 +163,42 @@ var chans=[
 {"name":"Fox Life","category":"Entretenimiento","url":"http://38.41.8.1:8000/play/a0f2"},
 {"name":"Warner","category":"Entretenimiento","url":"http://38.41.8.1:8000/play/a0wb"},
 {"name":"Universal","category":"Entretenimiento","url":"http://38.41.8.1:8000/play/a0un"},
-{"name":"Sony","category":"Entretenimiento","url":""},
-{"name":"Paramount","category":"Entretenimiento","url":""},
-{"name":"Comedy Central","category":"Entretenimiento","url":""},
 {"name":"AXN","category":"Entretenimiento","url":"http://38.41.8.1:8000/play/a0ax"},
 {"name":"TBS","category":"Entretenimiento","url":"http://38.41.8.1:8000/play/a0tb"},
-{"name":"A&E","category":"Documental","url":""},
-{"name":"E!","category":"Entretenimiento","url":""},
 {"name":"TVN","category":"Chile","url":"http://13.cntcdn.cl/live/13live/playlist.m3u8"},
 {"name":"Canal 13","category":"Chile","url":"https://vslive-ttv-lin.cdn.tv/13live/13live_live/playlist.m3u8"},
 {"name":"Caracol TV","category":"Colombia","url":"https://stream.caracoltv.com/live/caracol_live/playlist.m3u8"},
 {"name":"RCN","category":"Colombia","url":"https://mdstrm.com/live-stream-playlist-58a4e8ce294cd55468000000.m3u8"},
+{"name":"Azteca Uno","category":"Mexico","url":""},
+{"name":"Azteca 7","category":"Mexico","url":""},
+{"name":"FOROtv","category":"Mexico","url":""},
+{"name":"América TV","category":"Argentina","url":""},
+{"name":"Cuatro","category":"Espana","url":""},
+{"name":"laSexta","category":"Espana","url":""},
+{"name":"Telehit","category":"Musica","url":""},
+{"name":"C5N","category":"Noticias","url":""},
+{"name":"TN","category":"Noticias","url":""},
+{"name":"BBC","category":"Noticias","url":""},
+{"name":"Disney Channel","category":"Infantil","url":""},
+{"name":"Boing","category":"Infantil","url":""},
+{"name":"AMC","category":"Cine","url":""},
+{"name":"FX","category":"Cine","url":""},
+{"name":"Golden","category":"Cine","url":""},
+{"name":"Comedy Central","category":"Entretenimiento","url":""},
+{"name":"Sony","category":"Entretenimiento","url":""},
+{"name":"Paramount","category":"Entretenimiento","url":""},
+{"name":"E!","category":"Entretenimiento","url":""},
 {"name":"MTV Hits","category":"Musica","url":""},
 {"name":"VH1 Classic","category":"Musica","url":""},
+{"name":"MTV Live","category":"Musica","url":""},
 {"name":"Bandamax","category":"Musica","url":""},
 {"name":"Ritmoson","category":"Musica","url":""},
-{"name":"Golden","category":"Cine","url":""},
-{"name":"Studio Universal","category":"Cine","url":""},
-{"name":"Sundance","category":"Cine","url":""},
+{"name":"A&E","category":"Documental","url":""},
 {"name":"Nat Geo Wild","category":"Documental","url":""},
 {"name":"Discovery Turbo","category":"Documental","url":""},
-{"name":"Discovery Civilization","category":"Documental","url":""},
 {"name":"EuroNews","category":"Noticias","url":""},
 {"name":"DW","category":"Noticias","url":""},
 {"name":"Al Jazeera","category":"Noticias","url":""},
-{"name":"telesur","category":"Noticias","url":""},
 {"name":"Univision","category":"Mexico","url":""},
 {"name":"Telemundo","category":"Mexico","url":""},
 {"name":"Globo","category":"Argentina","url":""},
@@ -209,23 +208,21 @@ var chans=[
 {"name":"Atreseries","category":"Espana","url":""},
 {"name":"FDF","category":"Espana","url":""},
 {"name":"TyC Sports","category":"Deportes","url":""},
-{"name":"Gol TV","category":"Deportes","url":""},
-{"name":"Directv Sports","category":"Deportes","url":""},
+{"name":"beIN Sports","category":"Deportes","url":""},
 {"name":"UFC","category":"Deportes","url":""},
-{"name":"MTV Live","category":"Musica","url":""},
 {"name":"HTV","category":"Musica","url":""},
 {"name":"TruTV","category":"Entretenimiento","url":""},
 {"name":"Paramount Network","category":"Entretenimiento","url":""}
 ];
 
-var filt=[],sel=0,curT=0,isFS=false,isWatch=false,isErr=false;
+var filt=[],sel=0,curT=0,isFS=false,isWatch=false;
 
 function log(m){msg.textContent=m;}
 
 function mCat(n){
     n=n.toLowerCase();
     if(/espn|sports|tudn|futbol|fox sports|bein|tyc|gol|directv|ufc/i.test(n))return 1;
-    if(/hbo|cinemax|showtime|movie|cine|star|amc|fx|space|tbs|tnt|golden|sundance/i.test(n))return 2;
+    if(/hbo|cinemax|showtime|movie|cine|star|amc|fx|space|tbs|tnt|golden/i.test(n))return 2;
     if(/cnn|bbc|news|telesur|dw|aljazeera|tn|c5n|univision|telemundo/i.test(n))return 3;
     if(/azteca|estrellas|canal 5|televisa|mexico|univision|telemundo/i.test(n))return 4;
     if(/trece|telefe|argentina|globo|america/i.test(n))return 5;
@@ -249,9 +246,7 @@ function filterChans(){
             if(cc.indexOf(cat)>-1||mCat(cn)===curT)filt.push(c);
         }
     }
-    // Ensure sel is valid
-    sel=Math.min(sel,filt.length-1);
-    if(sel<0)sel=0;
+    sel=Math.min(sel,Math.max(0,filt.length-1));
 }
 
 function renderTabs(){
@@ -283,18 +278,10 @@ function setTab(i){
     log(filt.length+' canales');
 }
 
-function getVisibleIndex(){
-    var chs=gridInner.children;
-    for(var i=0;i<chs.length;i++){
-        if(chs[i].classList.contains('sel'))return i;
-    }
-    return -1;
-}
-
 function updateFocus(){
     var chs=gridInner.children;
     for(var i=0;i<chs.length;i++)chs[i].classList.remove('sel');
-    var idx=getVisibleIndex();
+    var idx=sel;
     if(idx>=0&&idx<chs.length){
         chs[idx].classList.add('sel');
         chs[idx].scrollIntoView({block:'nearest'});
@@ -314,18 +301,24 @@ function move(d){
 
 function watchChan(c){
     isWatch=true;
-    isErr=false;
+    
+    // Reset video completely
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+    video.style.display='none';
+    video.classList.remove('active');
     err.classList.remove('active');
     loaderGif.classList.add('active');
     
     // Hide menu, show video
-    menu.style.display='none';
-    video.style.display='block';
-    video.classList.add('active');
+    menu.classList.add('hidden');
     
-    // Try to play
     if(c.url){
         video.src=c.url;
+        video.style.display='block';
+        video.classList.add('active');
+        
         video.play().then(function(){
             loaderGif.classList.remove('active');
             log('Reproduciendo: '+c.name);
@@ -334,56 +327,58 @@ function watchChan(c){
             showErr();
         });
     }else{
-        // No URL, try alternative
         loaderGif.classList.remove('active');
         showErr();
     }
 }
 
 function showErr(){
-    isErr=true;
     loaderGif.classList.remove('active');
-    video.style.display='none';
-    video.classList.remove('active');
-    menu.style.display='flex';
-    err.classList.add('active');
-    errMsg.textContent='Sin senal';
-    isWatch=false;
-    // Force render and focus after error
-    setTimeout(function(){
-        renderGrid();
-        updateFocus();
-    },100);
-}
-
-function backMenu(){
-    // Stop video completely
+    
+    // Completely stop video
     video.pause();
-    video.src='';
     video.removeAttribute('src');
     video.load();
     video.style.display='none';
     video.classList.remove('active');
     
-    // Show menu
-    menu.style.display='flex';
+    // Show menu again
+    menu.classList.remove('hidden');
+    err.classList.add('active');
+    isWatch=false;
+    
+    // Force render
+    renderGrid();
+    updateFocus();
+    log('Sin senal - usa BACK para navegar');
+}
+
+function backMenu(){
+    // Completely stop video - CRITICAL
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+    video.style.display='none';
+    video.classList.remove('active');
+    
+    // Hide video, show menu
+    menu.classList.remove('hidden');
     err.classList.remove('active');
     loaderGif.classList.remove('active');
     
     // Reset state
     isWatch=false;
-    isErr=false;
     isFS=false;
     app.classList.remove('fs');
     
-    // Re-render grid and focus
+    // Force re-render
     renderGrid();
     updateFocus();
     log(filt[sel].name);
 }
 
 function toggleFS(){
-    if(!isWatch||isErr)return;
+    if(!isWatch)return;
     if(!isFS){
         var f=video.requestFullscreen||video.webkitRequestFullscreen;
         if(f)f.call(video);
@@ -397,12 +392,12 @@ function toggleFS(){
     }
 }
 
-// Keyboard handling
+// Keyboard
 document.onkeydown=function(e){
     var k=e.keyCode||e.which;
-    if([37,38,39,40,13,8,27].indexOf(k)>-1)e.preventDefault();
+    if([37,38,39,40,13,8,27,66,70].indexOf(k)>-1)e.preventDefault();
     
-    // BACK key - return to menu
+    // BACK
     if(k===8||k===27){
         if(isWatch){
             backMenu();
@@ -410,11 +405,10 @@ document.onkeydown=function(e){
         return;
     }
     
-    // WATCHING MODE
-    if(isWatch && !isErr){
-        if(k===13||k===66){ // OK button
+    // WATCHING
+    if(isWatch){
+        if(k===13||k===66){
             if(err.classList.contains('active')){
-                // Retry current channel
                 err.classList.remove('active');
                 if(filt[sel])watchChan(filt[sel]);
             }else{
@@ -422,30 +416,20 @@ document.onkeydown=function(e){
             }
             return;
         }
-        // Fullscreen toggle
         if(k===70){toggleFS();return;}
         return;
     }
     
-    // ERROR MODE - OK to go back
-    if(isErr){
-        if(k===13||k===66){
-            backMenu();
-            return;
-        }
-    }
-    
-    // MENU NAVIGATION
-    if(k===38){move('up');}
-    else if(k===40){move('down');}
-    else if(k===37){move('left');}
-    else if(k===39){move('right');}
-    else if(k===13||k===66){ // OK to play
+    // MENU
+    if(k===38)move('up');
+    else if(k===40)move('down');
+    else if(k===37)move('left');
+    else if(k===39)move('right');
+    else if(k===13||k===66){
         if(filt[sel])watchChan(filt[sel]);
     }
 };
 
-// Tab clicks
 tabsEl.onclick=function(e){
     var t=e.target;
     if(t.className.indexOf('tab')>-1){
@@ -453,7 +437,6 @@ tabsEl.onclick=function(e){
     }
 };
 
-// Fullscreen events
 document.addEventListener('fullscreenchange',function(){
     isFS=!!document.fullscreenElement;
     app.classList.toggle('fs',isFS);
@@ -463,20 +446,14 @@ document.addEventListener('webkitfullscreenchange',function(){
     app.classList.toggle('fs',isFS);
 });
 
-// Video error handler
-video.onerror=function(){
-    showErr();
-};
+video.onerror=showErr;
 
-// Button clicks
 document.getElementById('btn-exit').onclick=backMenu;
 document.getElementById('btn-fs').onclick=toggleFS;
 
-// Touch support
 var tx=0,ty=0;
 document.ontouchstart=function(e){
-    tx=e.touches[0].clientX;
-    ty=e.touches[0].clientY;
+    tx=e.touches[0].clientX;ty=e.touches[0].clientY;
 };
 document.ontouchend=function(e){
     var dx=tx-e.changedTouches[0].clientX;
@@ -490,9 +467,9 @@ chCount.textContent=chans.length+' canales';
 filterChans();
 renderTabs();
 renderGrid();
-log('Listo - usa flechas y OK');
+log('Listo');
 
-console.log('MoJiTo initialized');
+console.log('MoJiTo ready');
 })();
 </script>
 </body>
