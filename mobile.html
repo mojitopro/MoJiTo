@@ -88,15 +88,27 @@ fondoRandom();
 
 function msg(m){document.getElementById('msg').textContent=m;}
 
+function formatLatency(latency){
+    if(latency === null || latency === undefined || latency === '') return '';
+    var value = Number(latency);
+    if(!isFinite(value)) return '';
+    if(value >= 900) return '';
+    if(value < 10) value = value * 1000;
+    if(value < 1000) return Math.round(value) + 'ms';
+    return value.toFixed(2) + 's';
+}
+
 function showChannels(data){
     var el=document.getElementById('list');
     el.innerHTML='';
     if(!data||data.length===0){msg('Sin canales');return;}
     channels=data;
     data.forEach(function(ch,i){
+        var name = typeof ch === 'string' ? ch : (ch.name || ch.title || '');
+        var latency = typeof ch === 'object' ? formatLatency(ch.best_latency) : '';
         var li=document.createElement('li');
-        li.textContent=ch;
-        li.onclick=function(){playChannel(ch);};
+        li.textContent=name + (latency ? ' · ' + latency : '');
+        li.onclick=function(){playChannel(name);};
         el.appendChild(li);
     });
     msg(data.length+' canales');
@@ -105,13 +117,13 @@ function showChannels(data){
 function loadChannels(){
     msg('Cargando...');
     var x=new XMLHttpRequest();
-    x.open('GET',API_BASE+'/channels',true);
+    x.open('GET',API_BASE+'/channels?category=premium&sort=latency',true);
     x.onreadystatechange=function(){
         if(x.readyState===4){
             if(x.status===200){
                 try{
                     var d=JSON.parse(x.responseText);
-                    showChannels(d.channels||[]);
+                    showChannels(d.channels||d||[]);
                 }catch(e){
                     msg('Error');
                 }
@@ -128,7 +140,7 @@ function buscar(){
     if(!txt.trim()){loadChannels();return;}
     msg('Buscando...');
     var x=new XMLHttpRequest();
-    x.open('GET',API_BASE+'/channel/'+encodeURIComponent(txt),true);
+    x.open('GET',API_BASE+'/channel/'+encodeURIComponent(txt)+'?category=premium',true);
     x.onreadystatechange=function(){
         if(x.readyState===4){
             if(x.status===200){
@@ -160,7 +172,7 @@ function quick(q){
 function playChannel(name){
     msg('Cargando...');
     var x=new XMLHttpRequest();
-    x.open('GET',API_BASE+'/channel/'+encodeURIComponent(name),true);
+    x.open('GET',API_BASE+'/channel/'+encodeURIComponent(name)+'?category=premium',true);
     x.onreadystatechange=function(){
         if(x.readyState===4){
             if(x.status===200){

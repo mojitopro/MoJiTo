@@ -1,42 +1,25 @@
-import sqlite3
 import os
-import time
+import sqlite3
+from collections import defaultdict
+
+from channel_utils import (
+    is_premium_channel,
+    normalize_channel_name,
+    normalize_latency_ms,
+    stream_sort_key,
+)
 
 DB_PATH = os.environ.get('DB_PATH', 'streams.db')
 
-def get_all_channels():
+
+def _connect():
     conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("SELECT name, category, best_url FROM channels ORDER BY name")
-    
-    channels = []
-    for r in cursor.fetchall():
-        name = r[0] or ''
-        category = r[1] or auto_categorize(name)
-        best_url = r[2] or ''
-        
-        # Count streams from streams table
-        cursor.execute(
-            "SELECT COUNT(*) FROM streams WHERE LOWER(channel) = LOWER(?)",
-            (name,)
-        )
-        stream_cnt = cursor.fetchall()[0][0]
-        
-        # Count URLs in best_url if pipe-separated
-        url_cnt = len(best_url.split('|')) if best_url else 0
-        total = max(stream_cnt, url_cnt)
-        
-        channels.append({
-            'name': name,
-            'category': category,
-            'streams': total
-        })
-    
-    conn.close()
-    return channels
+    conn.row_factory = sqlite3.Row
+    return conn
+
 
 def auto_categorize(name):
-    name_lower = name.lower()
+    name_lower = (name or '').lower()
     if any(x in name_lower for x in ['espn', 'sports', 'tudn', 'futbol', 'fox sports', 'bein']):
         return 'Deportes'
     if any(x in name_lower for x in ['hbo', 'cinemax', 'showtime', 'movie', 'cine', 'star']):
@@ -59,183 +42,317 @@ def auto_categorize(name):
         return 'Entretenimiento'
     return 'General'
 
-def get_all_streams_for_channel(channel_name):
-    """Obtiene TODOS los streams disponibles para un canal desde cualquier fuente"""
-    all_urls = []
-    
-    conn = sqlite3.connect(DB_PATH)
+
+def _channel_label(name, category=None):
+    normalized = normalize_channel_name(name)
+    if is_premium_channel(normalized, category):
+        return 'premium'
+    return category or auto_categorize(normalized or name)
+
+
+def _load_all_streams(query=None, premium_only=False, include_unknown=False):
+    conn = _connect()
     cursor = conn.cursor()
-    
-    # 1. Streams desde tabla streams (prioridad por score)
-    cursor.execute("""
-        SELECT url, score, latency, status
-        FROM streams 
-        WHERE LOWER(channel) = LOWER(?)
-        ORDER BY 
-            CASE status WHEN 'online' THEN 1 WHEN 'unknown' THEN 2 ELSE 3 END,
+
+    clauses = [
+        "url IS NOT NULL",
+        "url != ''",
+        "channel IS NOT NULL",
+        "channel != ''",
+    ]
+    params = []
+
+    if not include_unknown:
+        clauses.append("LOWER(status) = 'online'")
+
+    if query:
+        clauses.append("LOWER(channel) LIKE LOWER(?)")
+        params.append(f"%{query}%")
+
+    sql = f"""
+        SELECT channel, url, status, latency, score
+        FROM streams
+        WHERE {' AND '.join(clauses)}
+        ORDER BY
+            CASE LOWER(status)
+                WHEN 'online' THEN 1
+                WHEN 'unknown' THEN 2
+                ELSE 3
+            END,
             score DESC,
             latency ASC
-    """, (channel_name,))
-    
-    for r in cursor.fetchall():
-        url = r[0]
-        if url and url not in all_urls:
-            all_urls.append({
-                'url': url,
-                'source': 'db',
-                'score': r[1] or 0,
-                'latency': r[2] or 999,
-                'status': r[3]
-            })
-    
-    # 2. URLs desde best_url en channels (puede tener pipes)
-    cursor.execute(
-        "SELECT best_url FROM channels WHERE LOWER(name) = LOWER(?)",
-        (channel_name,)
-    )
-    row = cursor.fetchone()
-    if row and row[0]:
-        for url in row[0].split('|'):
-            url = url.strip()
-            if url and url not in [u['url'] for u in all_urls]:
-                all_urls.append({
-                    'url': url,
-                    'source': 'best_url',
-                    'score': 0,
-                    'latency': 999,
-                    'status': 'unknown'
-                })
-    
-    # 3. Busqueda fuzzy si no hay resultados
-    if not all_urls:
-        cursor.execute("""
-            SELECT url, score, latency, status
-            FROM streams 
-            WHERE LOWER(channel) LIKE LOWER(?)
-            ORDER BY score DESC
-            LIMIT 20
-        """, (f'%{channel_name}%',))
-        
-        for r in cursor.fetchall():
-            url = r[0]
-            if url and url not in [u['url'] for u in all_urls]:
-                all_urls.append({
-                    'url': url,
-                    'source': 'search',
-                    'score': r[1] or 0,
-                    'latency': r[2] or 999,
-                    'status': r[3]
-                })
-    
-    conn.close()
-    return all_urls
+    """
+    cursor.execute(sql, params)
 
-def get_best_stream(channel_name, max_retries=3):
-    """
-    Obtiene el mejor stream con redundancia completa.
-    Retorna: {url, fallbacks[], source}
-    """
-    streams = get_all_streams_for_channel(channel_name)
-    
-    if not streams:
-        return None
-    
-    # Filtrar URLs invalidas
-    valid = []
-    skip = ['youtube.com', 'youtu.be', '.mp4', '.avi', '.mkv', '.zip']
-    for s in streams:
-        if not s['url'] or len(s['url']) < 10:
+    candidates = []
+    seen_urls = set()
+    for row in cursor.fetchall():
+        url = row['url'] or ''
+        if not url or url in seen_urls:
             continue
-        if any(x in s['url'].lower() for x in skip):
+
+        channel = row['channel'] or ''
+        normalized = normalize_channel_name(channel)
+        if not normalized or normalized in {'discovered', 'unknown'}:
             continue
-        valid.append(s)
-    
-    if not valid:
-        return None
-    
-    # Ordenar: online primero, luego por score
-    def sort_key(s):
-        status_order = {'online': 0, 'unknown': 1, 'offline': 2, 'error': 3, 'timeout': 4, 'not_found': 5}
-        so = status_order.get(s['status'], 1)
-        return (so, -s['score'], s['latency'])
-    
-    valid.sort(key=sort_key)
-    
-    # Mejor stream
-    best = valid[0]
-    
-    # Fallbacks (hasta 8)
-    fallbacks = [s['url'] for s in valid[1:9] if s['url'] != best['url']]
-    
+
+        premium = is_premium_channel(channel) or is_premium_channel(normalized)
+        if premium_only and not premium:
+            continue
+
+        seen_urls.add(url)
+        candidates.append({
+            'channel': channel,
+            'name': normalized,
+            'title': channel,
+            'url': url,
+            'status': row['status'] or 'unknown',
+            'latency': float(row['latency'] or 999),
+            'latency_ms': normalize_latency_ms(row['latency']),
+            'score': float(row['score'] or 0),
+            'category': 'premium' if premium else auto_categorize(normalized),
+            'premium': premium,
+        })
+
+    conn.close()
+    return candidates
+
+
+def _summarize_group(name, items):
+    items = sorted(items, key=stream_sort_key)
+    best = items[0]
+    fallbacks = [s['url'] for s in items[1:9] if s['url'] != best['url']]
     return {
-        'url': best['url'],
-        'channel': channel_name,
+        'name': name,
+        'category': 'premium',
+        'streams': len(items),
+        'best_url': best['url'],
+        'best_latency': best['latency'],
+        'best_latency_ms': best.get('latency_ms') or normalize_latency_ms(best['latency']),
+        'best_score': best['score'],
+        'best_status': best['status'],
         'fallbacks': fallbacks,
-        'total_available': len(valid),
-        'best_status': best['status']
+        'premium': True,
     }
 
-def search_channels(query):
-    conn = sqlite3.connect(DB_PATH)
+
+def get_premium_channels(limit=None, sort_by='latency'):
+    candidates = _load_all_streams(premium_only=True)
+    grouped = defaultdict(list)
+
+    for item in candidates:
+        key = item['name']
+        grouped[key].append(item)
+
+    channels = [_summarize_group(name, items) for name, items in grouped.items() if items]
+
+    measured = [c for c in channels if c.get('best_latency_ms') is not None]
+    if measured:
+        channels = measured
+
+    if sort_by == 'name':
+        channels.sort(key=lambda c: c['name'])
+    else:
+        channels.sort(key=lambda c: (c.get('best_latency_ms') or 999999, -c['best_score'], c['name']))
+
+    if limit:
+        channels = channels[:limit]
+    return channels
+
+
+def get_all_channels(limit=None, premium_only=False, sort_by='name'):
+    if premium_only:
+        return get_premium_channels(limit=limit, sort_by=sort_by)
+
+    conn = _connect()
     cursor = conn.cursor()
-    
-    cursor.execute("""
-        SELECT DISTINCT name, category
-        FROM channels 
-        WHERE LOWER(name) LIKE LOWER(?)
-        ORDER BY name
-        LIMIT 50
-    """, (f'%{query}%',))
-    
-    results = []
-    for r in cursor.fetchall():
-        name = r[0]
+    cursor.execute("SELECT name, category, best_url FROM channels ORDER BY name")
+
+    channels = []
+    for row in cursor.fetchall():
+        name = row['name'] or ''
+        if not name:
+            continue
+
+        category = row['category'] or auto_categorize(name)
+        best_url = row['best_url'] or ''
+
         cursor.execute(
             "SELECT COUNT(*) FROM streams WHERE LOWER(channel) = LOWER(?)",
             (name,)
         )
-        cnt = cursor.fetchone()[0]
-        results.append({
+        stream_cnt = cursor.fetchone()[0]
+
+        url_cnt = len([u for u in best_url.split('|') if u.strip()]) if best_url else 0
+        total = max(stream_cnt, url_cnt)
+
+        channels.append({
             'name': name,
-            'category': r[1] or auto_categorize(name),
-            'streams': cnt
+            'category': category,
+            'streams': total,
+            'best_url': best_url,
+            'premium': category == 'premium',
         })
-    
+
     conn.close()
+
+    if sort_by == 'latency':
+        channels.sort(key=lambda c: c['name'])
+    else:
+        channels.sort(key=lambda c: c['name'])
+
+    if limit:
+        channels = channels[:limit]
+    return channels
+
+
+def get_best_stream(channel_name, max_retries=3, premium_only=False):
+    """
+    Returns the best stream for a channel, with fallbacks.
+    """
+    query = normalize_channel_name(channel_name) or (channel_name or '').strip()
+    if not query:
+        return None
+
+    candidates = _load_all_streams(query=query, premium_only=premium_only, include_unknown=False)
+
+    if not candidates:
+        # Fallback to the channels table if we do not have direct stream matches.
+        conn = _connect()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT name, best_url, category FROM channels WHERE LOWER(name) LIKE LOWER(?) ORDER BY name LIMIT 20",
+            (f'%{query}%',)
+        )
+        rows = cursor.fetchall()
+        conn.close()
+
+        for row in rows:
+            best_url = row['best_url'] or ''
+            if not best_url:
+                continue
+            if premium_only and not is_premium_channel(row['name'], row['category']):
+                continue
+
+            for url in [u.strip() for u in best_url.split('|') if u.strip()]:
+                candidates.append({
+                    'channel': row['name'],
+                    'name': normalize_channel_name(row['name']) or row['name'],
+                    'title': row['name'],
+                    'url': url,
+                    'status': 'unknown',
+                    'latency': 999,
+                    'latency_ms': None,
+                    'score': 0,
+                    'category': 'premium' if is_premium_channel(row['name'], row['category']) else (row['category'] or auto_categorize(row['name'])),
+                    'premium': is_premium_channel(row['name'], row['category']),
+                })
+
+    if not candidates:
+        return None
+
+    measured = [c for c in candidates if c.get('latency_ms') is not None]
+    if measured:
+        candidates = measured
+
+    candidates = sorted(candidates, key=stream_sort_key)
+    best = candidates[0]
+    fallbacks = [s['url'] for s in candidates[1:9] if s['url'] != best['url']]
+
+    return {
+        'url': best['url'],
+        'channel': channel_name,
+        'fallbacks': fallbacks,
+        'total_available': len(candidates),
+        'best_status': best['status'],
+        'best_latency': best['latency'],
+        'best_latency_ms': best.get('latency_ms') or normalize_latency_ms(best['latency']),
+        'best_score': best['score'],
+        'category': best['category'],
+        'premium': best['premium'],
+    }
+
+
+def search_channels(query, premium_only=False, limit=50):
+    """
+    Returns stream candidates for the search UI.
+    """
+    q = (query or '').strip()
+    if not q:
+        return []
+
+    candidates = _load_all_streams(query=q, premium_only=premium_only, include_unknown=False)
+    if not candidates:
+        return []
+
+    measured = [item for item in candidates if item['latency'] < 999]
+    if measured:
+        candidates = measured
+
+    candidates = sorted(candidates, key=stream_sort_key)
+
+    results = []
+    seen_urls = set()
+    for item in candidates:
+        if item['url'] in seen_urls:
+            continue
+        seen_urls.add(item['url'])
+        results.append({
+            'title': item['title'],
+            'url': item['url'],
+            'channel': item['channel'],
+            'latency': item['latency'],
+            'latency_ms': item.get('latency_ms'),
+            'score': item['score'],
+            'status': item['status'],
+            'category': item['category'],
+            'premium': item['premium'],
+        })
+        if len(results) >= limit:
+            break
+
     return results
 
+
 def get_stats():
-    conn = sqlite3.connect(DB_PATH)
+    conn = _connect()
     cursor = conn.cursor()
-    
+
     cursor.execute("SELECT COUNT(*) FROM channels")
     total_channels = cursor.fetchone()[0]
-    
+
     cursor.execute("SELECT COUNT(*) FROM streams")
     total_streams = cursor.fetchone()[0]
-    
+
     cursor.execute("SELECT COUNT(*) FROM streams WHERE status = 'online'")
     online = cursor.fetchone()[0]
-    
+
     cursor.execute("SELECT COUNT(DISTINCT LOWER(channel)) FROM streams WHERE status = 'online'")
     channels_with_online = cursor.fetchone()[0] or 0
-    
+
     cursor.execute("""
-        SELECT COUNT(*) FROM channels 
+        SELECT COUNT(*) FROM channels
         WHERE best_url LIKE '%|%'
     """)
     multi_url = cursor.fetchone()[0]
-    
+
+    premium_channels = len(get_premium_channels(limit=None, sort_by='latency'))
+    premium_streams = len(_load_all_streams(premium_only=True))
+
     conn.close()
-    
+
     return {
         'total_channels': total_channels,
         'total_streams': total_streams,
         'online_streams': online,
         'channels_with_online': channels_with_online,
-        'channels_with_redundancy': multi_url
+        'channels_with_redundancy': multi_url,
+        'premium_channels': premium_channels,
+        'premium_streams': premium_streams,
     }
+
 
 if __name__ == '__main__':
     import json
+
     print(json.dumps(get_stats(), indent=2))

@@ -97,7 +97,7 @@ function buscar(){
     var txt=document.getElementById('in').value.trim();
     if(!txt)return;
     msg('Buscando...');
-    fetch(API+'?q='+encodeURIComponent(txt)).then(function(r){return r.json();}).then(function(d){
+    fetch(API+'?q='+encodeURIComponent(txt)+'&category=premium').then(function(r){return r.json();}).then(function(d){
         streams=d.streams||[];
         playingIdx=-1;
         render();

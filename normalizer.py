@@ -1,42 +1,13 @@
 import sqlite3
-import re
 import os
 from collections import defaultdict
+
+from channel_utils import is_premium_channel, normalize_channel_name as _normalize_channel_name, stream_sort_key
 
 DB_PATH = os.environ.get('DB_PATH', 'streams.db')
 
 def normalize_channel_name(name):
-    name = name.lower().strip()
-    
-    # Remove country codes like -CO, -MX, -US, etc.
-    name = re.sub(r'\s*-\s*[A-Z]{2}(\s+\([^)]+\))?$', '', name)
-    
-    # Remove numbers at the start like "010 ", "2.28 ", "117)"
-    name = re.sub(r'^\d+\.?\s*', '', name)
-    name = re.sub(r'^\d+\)\s+', '', name)
-    
-    # Remove hashed/encrypted names like "47dllnef", "945a2db..."
-    name = re.sub(r'\s+[0-9a-f]{6,}.*$', '', name)
-    
-    # Remove quality indicators
-    name = re.sub(r'\s*(hd|sd|4k|1080p|720p)$', '', name, flags=re.IGNORECASE)
-    
-    # Remove common suffixes
-    name = re.sub(r'\s+(clone|enviado|sps|sj|cp|ip|sd|hd)$', '', name, flags=re.IGNORECASE)
-    
-    # Clean up &T -> NT
-    name = name.replace('&t.', 'nt.')
-    
-    # Normalize similar names
-    name = name.replace('cartoon network', 'cartoon network')
-    name = name.replace('cartoonito', 'cartoonito')
-    name = name.replace('adult swim', 'adult swim')
-    name = name.replace('nt.', 'nt ')
-    
-    # Remove extra spaces
-    name = re.sub(r'\s+', ' ', name).strip()
-    
-    return name
+    return _normalize_channel_name(name)
 
 def build_unified_index():
     conn = sqlite3.connect(DB_PATH)
@@ -58,14 +29,19 @@ def build_unified_index():
     
     unified = {}
     for norm_ch, items in grouped.items():
-        items.sort(key=lambda x: x['latency'])
+        items.sort(key=stream_sort_key)
         unified[norm_ch] = items
     
     for ch, items in unified.items():
         cursor.execute("""
-            INSERT INTO channels (name, stream_count, best_url)
-            VALUES (?, ?, ?)
-        """, (ch, len(items), items[0]['url'] if items else None))
+            INSERT INTO channels (name, stream_count, best_url, category)
+            VALUES (?, ?, ?, ?)
+        """, (
+            ch,
+            len(items),
+            items[0]['url'] if items else None,
+            'premium' if is_premium_channel(ch) else 'general',
+        ))
     
     conn.commit()
     print(f"Unificados a {len(unified)} canales")

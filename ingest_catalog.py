@@ -10,6 +10,7 @@ import time
 import random
 import urllib.request
 from catalog import CATALOG, get_all_channel_names
+from channel_utils import is_premium_channel
 
 DB_PATH = os.environ.get('DB_PATH', 'streams.db')
 
@@ -88,6 +89,11 @@ def ingest_channel(conn, channel_data, do_validate=True):
     urls = channel_data.get('urls', [])
     category = channel_data.get('category', 'general')
     quality = channel_data.get('quality', 'SD')
+
+    if is_premium_channel(name, category):
+        category = 'premium'
+    else:
+        category = category or 'general'
     
     cursor = conn.cursor()
     
