@@ -4,186 +4,196 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>MoJiTo TV</title>
+<title>MoJiTo TV Premium</title>
 <style type="text/css">
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-box-sizing: border-box; }
-html, body { width: 100%; height: 100%; overflow: hidden; font-family: Arial, sans-serif; background: #0a0a12; color: #fff; }
+html, body { width: 100%; height: 100%; overflow: hidden; font-family: Arial, Helvetica, sans-serif; background: #0d0d1a; color: #fff; }
 
 #app { width: 100%; height: 100%; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; }
 
 /* Header */
-#header { height: 60px; min-height: 60px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: space-between; justify-content: space-between; padding: 0 20px; background: #12121a; border-bottom: 1px solid #2a2a3a; }
+#header { height: 55px; min-height: 55px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: space-between; justify-content: space-between; padding: 0 15px; background: linear-gradient(180deg, #1a1a2e, #0d0d1a); border-bottom: 1px solid #2a2a4a; }
 
-#logo { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; gap: 10px; }
-#logo-icon { width: 36px; height: 36px; background: #8b5cf6; border-radius: 8px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; font-size: 20px; font-weight: bold; }
-#logo-text { font-size: 22px; font-weight: bold; letter-spacing: 2px; color: #fff; }
+#logo { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; gap: 8px; }
+#logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #ff6b35, #f7931e); border-radius: 6px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; font-size: 18px; font-weight: bold; }
+#logo-text { font-size: 20px; font-weight: bold; letter-spacing: 2px; background: linear-gradient(90deg, #fff, #ff6b35); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+#logo-sub { font-size: 10px; color: #888; letter-spacing: 1px; }
 
-#header-nav { display: -webkit-box; display: -webkit-flex; display: flex; gap: 20px; }
-.nav-item { font-size: 13px; color: #888; cursor: pointer; padding: 8px 14px; border-radius: 16px; }
-.nav-item:hover, .nav-item.active { color: #fff; background: rgba(139, 92, 246, 0.2); }
+#header-nav { display: -webkit-box; display: -webkit-flex; display: flex; gap: 5px; }
+.nav-item { font-size: 11px; color: #888; cursor: pointer; padding: 6px 12px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; }
+.nav-item:hover, .nav-item.active { color: #fff; background: rgba(255, 107, 53, 0.2); }
+.nav-item.active { background: rgba(255, 107, 53, 0.3); border: 1px solid rgba(255, 107, 53, 0.5); }
 
-#header-search { position: relative; width: 200px; }
-#search-input { width: 100%; height: 34px; padding: 0 14px; background: #1a1a25; border: 1px solid #2a2a3a; border-radius: 17px; color: #fff; font-size: 13px; outline: none; }
-#search-input:focus { border-color: #8b5cf6; }
-
-/* Main content */
+/* Main */
 #main-content { -webkit-flex: 1; flex: 1; display: -webkit-box; display: -webkit-flex; display: flex; overflow: hidden; }
 
 /* Sidebar */
-#sidebar { width: 200px; min-width: 200px; background: #0e0e16; border-right: 1px solid #1a1a25; overflow-y: auto; }
-.sidebar-section { padding: 15px 0; border-bottom: 1px solid #1a1a25; }
-.sidebar-title { font-size: 10px; font-weight: bold; color: #666; text-transform: uppercase; letter-spacing: 1px; padding: 0 15px 10px; }
-.sidebar-item { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; gap: 10px; padding: 10px 15px; color: #999; cursor: pointer; }
-.sidebar-item:hover { background: rgba(139, 92, 246, 0.1); color: #fff; }
-.sidebar-item.active { background: rgba(139, 92, 246, 0.15); color: #fff; border-left: 3px solid #8b5cf6; }
-.sidebar-icon { width: 28px; height: 28px; background: rgba(139, 92, 246, 0.2); border-radius: 6px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; font-size: 14px; }
-.sidebar-item.active .sidebar-icon { background: #8b5cf6; }
-.sidebar-label { font-size: 13px; }
+#sidebar { width: 180px; min-width: 180px; background: #0a0a14; border-right: 1px solid #1a1a2e; overflow-y: auto; padding: 10px 0; }
+.sidebar-title { font-size: 9px; font-weight: bold; color: #666; text-transform: uppercase; letter-spacing: 1px; padding: 10px 12px 6px; }
+.sidebar-item { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; gap: 8px; padding: 8px 12px; color: #999; cursor: pointer; font-size: 12px; }
+.sidebar-item:hover { background: rgba(255, 107, 53, 0.1); color: #fff; }
+.sidebar-item.active { background: rgba(255, 107, 53, 0.15); color: #ff6b35; border-left: 3px solid #ff6b35; }
+.sidebar-icon { width: 24px; height: 24px; background: rgba(255, 107, 53, 0.2); border-radius: 4px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; font-size: 11px; }
+.sidebar-item.active .sidebar-icon { background: #ff6b35; color: #fff; }
 
-/* Content area */
-#content-area { -webkit-flex: 1; flex: 1; overflow-y: auto; padding: 20px; }
+/* Content */
+#content-area { -webkit-flex: 1; flex: 1; overflow-y: auto; padding: 15px; background: linear-gradient(135deg, #0d0d1a 0%, #1a1a2e 100%); }
 
-/* Category pills */
-.category-bar { display: -webkit-box; display: -webkit-flex; display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px; }
-.category-pill { padding: 8px 16px; background: #1a1a25; border: 1px solid #2a2a3a; border-radius: 20px; font-size: 12px; color: #999; cursor: pointer; white-space: nowrap; }
-.category-pill:hover { background: rgba(139, 92, 246, 0.15); color: #fff; }
-.category-pill.active { background: #8b5cf6; border-color: #8b5cf6; color: #fff; }
+/* Category bar */
+.category-bar { display: -webkit-box; display: -webkit-flex; display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 8px; }
+.category-pill { padding: 6px 14px; background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 15px; font-size: 11px; color: #999; cursor: pointer; white-space: nowrap; }
+.category-pill:hover { background: rgba(255, 107, 53, 0.1); border-color: rgba(255, 107, 53, 0.3); color: #fff; }
+.category-pill.active { background: rgba(255, 107, 53, 0.2); border-color: #ff6b35; color: #fff; }
 
-/* Featured section */
-#featured { position: relative; height: 280px; margin-bottom: 25px; border-radius: 12px; overflow: hidden; cursor: pointer; background: linear-gradient(135deg, #1a1a2e 0%, #2d1b4e 100%); }
-#featured-bg { position: absolute; inset: 0; background: radial-gradient(circle at 30% 40%, rgba(139, 92, 246, 0.3), transparent 50%); }
-#featured-content { position: relative; z-index: 2; height: 100%; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; -webkit-justify-content: center; justify-content: center; padding: 30px 40px; }
-#featured-badge { display: inline-block; padding: 5px 12px; background: #ef4444; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
-#featured-title { font-size: 36px; font-weight: bold; letter-spacing: 1px; margin-bottom: 10px; }
-#featured-desc { font-size: 14px; color: #aaa; margin-bottom: 20px; max-width: 400px; }
-#featured-buttons { display: -webkit-box; display: -webkit-flex; display: flex; gap: 12px; }
-.btn { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 24px; font-size: 13px; font-weight: bold; cursor: pointer; border: none; }
-.btn-primary { background: #8b5cf6; color: #fff; }
-.btn-primary:hover { background: #7c3aed; }
+/* Featured */
+#featured { position: relative; height: 200px; margin-bottom: 20px; border-radius: 10px; overflow: hidden; cursor: pointer; background: linear-gradient(135deg, #1a1a2e 0%, #2d1b4e 50%, #1a1a2e 100%); }
+#featured-bg { position: absolute; inset: 0; background: radial-gradient(circle at 30% 50%, rgba(255, 107, 53, 0.2), transparent 50%); }
+#featured-content { position: relative; z-index: 2; height: 100%; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column; -webkit-justify-content: center; justify-content: center; padding: 20px 30px; }
+#featured-badge { display: inline-block; padding: 4px 10px; background: #ff6b35; border-radius: 3px; font-size: 9px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; width: -webkit-fit-content; width: fit-content; }
+#featured-title { font-size: 28px; font-weight: bold; letter-spacing: 1px; margin-bottom: 5px; }
+#featured-desc { font-size: 12px; color: #aaa; margin-bottom: 15px; }
+#featured-buttons { display: -webkit-box; display: -webkit-flex; display: flex; gap: 10px; }
+.btn { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; gap: 6px; padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; border: none; }
+.btn-primary { background: linear-gradient(135deg, #ff6b35, #f7931e); color: #fff; }
 .btn-secondary { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); }
 
 /* Channel grid */
-.content-row { margin-bottom: 25px; }
-.row-header { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: space-between; justify-content: space-between; margin-bottom: 15px; }
-.row-title { font-size: 20px; font-weight: bold; letter-spacing: 1px; }
-.row-title span { color: #8b5cf6; }
-.row-more { font-size: 12px; color: #8b5cf6; cursor: pointer; }
+.content-row { margin-bottom: 20px; }
+.row-header { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: space-between; justify-content: space-between; margin-bottom: 12px; }
+.row-title { font-size: 16px; font-weight: bold; letter-spacing: 1px; }
+.row-title span { color: #ff6b35; }
 
-.channel-grid { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; gap: 15px; }
+.channel-grid { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; gap: 12px; }
 
-.channel-card { width: calc(20% - 12px); min-width: 160px; background: #12121a; border-radius: 10px; overflow: hidden; cursor: pointer; border: 1px solid #1a1a25; }
-.channel-card:hover { border-color: #8b5cf6; }
-.channel-card.selected { border-color: #06b6d4; }
+.channel-card { width: calc(16.666% - 10px); min-width: 140px; background: #12121f; border-radius: 8px; overflow: hidden; cursor: pointer; border: 1px solid #1a1a2e; }
+.channel-card:hover { border-color: #ff6b35; }
+.channel-card.selected { border-color: #06b6d4; box-shadow: 0 0 15px rgba(6, 182, 212, 0.3); }
 
-.channel-thumb { position: relative; height: 90px; background: linear-gradient(135deg, #1a1a2e, #2d1b4e); display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; }
-.channel-number { position: absolute; right: 10px; bottom: 5px; font-size: 32px; font-weight: bold; color: rgba(255, 255, 255, 0.1); }
-.channel-logo { font-size: 22px; font-weight: bold; }
-.channel-live { position: absolute; top: 8px; left: 8px; background: #ef4444; color: #fff; font-size: 9px; font-weight: bold; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; }
-.channel-quality { position: absolute; top: 8px; right: 8px; background: rgba(6, 182, 212, 0.8); color: #fff; font-size: 9px; font-weight: bold; padding: 2px 6px; border-radius: 3px; }
+.channel-thumb { position: relative; height: 70px; background: linear-gradient(135deg, #1a1a2e, #2d1b4e); display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; }
+.channel-number { position: absolute; right: 8px; bottom: 3px; font-size: 24px; font-weight: bold; color: rgba(255, 255, 255, 0.1); }
+.channel-logo { font-size: 18px; font-weight: bold; color: #fff; text-shadow: 0 0 10px rgba(255, 107, 53, 0.5); }
+.channel-live { position: absolute; top: 6px; left: 6px; background: #ef4444; color: #fff; font-size: 8px; font-weight: bold; padding: 2px 6px; border-radius: 2px; text-transform: uppercase; }
+.channel-hd { position: absolute; top: 6px; right: 6px; background: rgba(6, 182, 212, 0.8); color: #fff; font-size: 8px; font-weight: bold; padding: 2px 5px; border-radius: 2px; }
 
-.channel-info { padding: 10px; }
-.channel-name { font-weight: bold; font-size: 13px; color: #fff; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.channel-category { font-size: 11px; color: #8b5cf6; text-transform: uppercase; }
+.channel-info { padding: 8px; }
+.channel-name { font-weight: bold; font-size: 11px; color: #fff; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.channel-category { font-size: 9px; color: #ff6b35; text-transform: uppercase; }
 
-/* Video player overlay */
+/* Player */
 #player-overlay { position: fixed; inset: 0; background: #000; z-index: 1000; display: none; -webkit-flex-direction: column; flex-direction: column; }
 #player-overlay.active { display: -webkit-box; display: -webkit-flex; display: flex; }
 
-#player-header { height: 50px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: space-between; justify-content: space-between; padding: 0 20px; background: #12121a; }
-#player-channel-info { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; gap: 12px; }
-#player-channel-logo { width: 32px; height: 32px; background: #8b5cf6; border-radius: 6px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; font-size: 14px; font-weight: bold; }
-#player-channel-name { font-size: 16px; font-weight: bold; }
-#player-channel-category { font-size: 11px; color: #8b5cf6; text-transform: uppercase; }
-#player-close { width: 32px; height: 32px; background: rgba(255, 255, 255, 0.1); border: none; border-radius: 50%; color: #fff; font-size: 16px; cursor: pointer; }
+#player-header { height: 45px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: space-between; justify-content: space-between; padding: 0 15px; background: #0d0d1a; }
+#player-channel-info { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; gap: 10px; }
+#player-channel-logo { width: 28px; height: 28px; background: linear-gradient(135deg, #ff6b35, #f7931e); border-radius: 5px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; font-size: 12px; font-weight: bold; }
+#player-channel-name { font-size: 14px; font-weight: bold; }
+#player-channel-category { font-size: 10px; color: #ff6b35; text-transform: uppercase; }
+#player-close { width: 28px; height: 28px; background: rgba(255, 255, 255, 0.1); border: none; border-radius: 50%; color: #fff; font-size: 14px; cursor: pointer; }
 #player-close:hover { background: rgba(239, 68, 68, 0.3); }
 
 #player-container { -webkit-flex: 1; flex: 1; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; background: #000; position: relative; }
 #player-video { width: 100%; height: 100%; object-fit: contain; }
-#player-status { position: absolute; bottom: 15px; left: 15px; background: rgba(0, 0, 0, 0.8); padding: 8px 14px; border-radius: 6px; font-size: 12px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; gap: 8px; }
-.live-dot { width: 8px; height: 8px; background: #ef4444; border-radius: 50%; }
+#player-status { position: absolute; bottom: 12px; left: 12px; background: rgba(0, 0, 0, 0.8); padding: 6px 12px; border-radius: 5px; font-size: 11px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; gap: 6px; }
+.live-dot { width: 6px; height: 6px; background: #ef4444; border-radius: 50%; }
 
-/* Loading overlay */
-#loading-overlay { position: fixed; inset: 0; background: #0a0a12; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; z-index: 2000; -webkit-flex-direction: column; flex-direction: column; gap: 20px; }
-#loading-logo { width: 60px; height: 60px; background: #8b5cf6; border-radius: 12px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; font-size: 32px; font-weight: bold; }
-#loading-text { font-size: 18px; letter-spacing: 2px; }
+/* Loading */
+#loading-overlay { position: fixed; inset: 0; background: #0d0d1a; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; z-index: 2000; -webkit-flex-direction: column; flex-direction: column; gap: 15px; }
+#loading-logo { width: 50px; height: 50px; background: linear-gradient(135deg, #ff6b35, #f7931e); border-radius: 10px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center; font-size: 26px; font-weight: bold; }
+#loading-text { font-size: 14px; letter-spacing: 2px; color: #888; }
 
-/* Stats bar */
-#stats-bar { position: fixed; bottom: 0; left: 200px; right: 0; height: 35px; background: #12121a; border-top: 1px solid #1a1a25; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: space-between; justify-content: space-between; padding: 0 20px; font-size: 11px; color: #666; z-index: 50; }
-#stats-left { display: -webkit-box; display: -webkit-flex; display: flex; gap: 20px; }
-.stat-value { color: #8b5cf6; font-weight: bold; }
+/* Stats */
+#stats-bar { position: fixed; bottom: 0; left: 180px; right: 0; height: 30px; background: #0a0a14; border-top: 1px solid #1a1a2e; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: space-between; justify-content: space-between; padding: 0 15px; font-size: 10px; color: #666; z-index: 50; }
+.stat-value { color: #ff6b35; font-weight: bold; }
 
 .hidden { display: none !important; }
 
-@media screen and (max-width: 1200px) { .channel-card { width: calc(25% - 12px); } }
-@media screen and (max-width: 900px) { .channel-card { width: calc(33.333% - 10px); } #sidebar { display: none; } #stats-bar { left: 0; } }
-@media screen and (max-width: 600px) { .channel-card { width: calc(50% - 8px); } }
+@media screen and (max-width: 1400px) { .channel-card { width: calc(20% - 10px); } }
+@media screen and (max-width: 1100px) { .channel-card { width: calc(25% - 9px); } #sidebar { width: 160px; min-width: 160px; } }
+@media screen and (max-width: 900px) { .channel-card { width: calc(33.333% - 8px); } #sidebar { display: none; } #stats-bar { left: 0; } }
+@media screen and (max-width: 600px) { .channel-card { width: calc(50% - 6px); } }
 </style>
 </head>
 <body>
 
 <div id="loading-overlay">
     <div id="loading-logo">M</div>
-    <div id="loading-text">CARGANDO...</div>
+    <div id="loading-text">CARGANDO PREMIUM...</div>
 </div>
 
 <div id="app">
     <header id="header">
         <div id="logo">
             <div id="logo-icon">M</div>
-            <div id="logo-text">MOJITO</div>
+            <div>
+                <div id="logo-text">MOJITO</div>
+                <div id="logo-sub">PREMIUM DIRECTV</div>
+            </div>
         </div>
         <nav id="header-nav">
             <div class="nav-item active">En Vivo</div>
-            <div class="nav-item">On Demand</div>
-            <div class="nav-item">Canales</div>
+            <div class="nav-item">Deportes</div>
+            <div class="nav-item">Peliculas</div>
+            <div class="nav-item">Infantil</div>
         </nav>
-        <div id="header-search">
-            <input type="text" id="search-input" placeholder="Buscar...">
-        </div>
     </header>
 
     <main id="main-content">
         <aside id="sidebar">
-            <div class="sidebar-section">
-                <div class="sidebar-title">Canales</div>
-                <div class="sidebar-item active" data-category="all">
-                    <div class="sidebar-icon">&#128250;</div>
-                    <span class="sidebar-label">Todos</span>
-                </div>
-                <div class="sidebar-item" data-category="premium">
-                    <div class="sidebar-icon">&#9733;</div>
-                    <span class="sidebar-label">Premium</span>
-                </div>
-                <div class="sidebar-item" data-category="sports">
-                    <div class="sidebar-icon">&#9917;</div>
-                    <span class="sidebar-label">Deportes</span>
-                </div>
-                <div class="sidebar-item" data-category="movies">
-                    <div class="sidebar-icon">&#127916;</div>
-                    <span class="sidebar-label">Peliculas</span>
-                </div>
-                <div class="sidebar-item" data-category="news">
-                    <div class="sidebar-icon">&#128240;</div>
-                    <span class="sidebar-label">Noticias</span>
-                </div>
+            <div class="sidebar-title">CATEGORIAS</div>
+            <div class="sidebar-item active" data-category="all">
+                <div class="sidebar-icon">&#128250;</div>
+                <span class="sidebar-label">Todos</span>
+            </div>
+            <div class="sidebar-item" data-category="Deportes">
+                <div class="sidebar-icon">&#9917;</div>
+                <span class="sidebar-label">Deportes</span>
+            </div>
+            <div class="sidebar-item" data-category="Peliculas">
+                <div class="sidebar-icon">&#127916;</div>
+                <span class="sidebar-label">Peliculas</span>
+            </div>
+            <div class="sidebar-item" data-category="Premium">
+                <div class="sidebar-icon">&#9733;</div>
+                <span class="sidebar-label">Premium</span>
+            </div>
+            <div class="sidebar-item" data-category="Entretenimiento">
+                <div class="sidebar-icon">&#127916;</div>
+                <span class="sidebar-label">Entretenimiento</span>
+            </div>
+            <div class="sidebar-item" data-category="Infantil">
+                <div class="sidebar-icon">&#128118;</div>
+                <span class="sidebar-label">Infantil</span>
+            </div>
+            <div class="sidebar-item" data-category="Noticias">
+                <div class="sidebar-icon">&#128240;</div>
+                <span class="sidebar-label">Noticias</span>
+            </div>
+            <div class="sidebar-item" data-category="Documentales">
+                <div class="sidebar-icon">&#127758;</div>
+                <span class="sidebar-label">Documentales</span>
+            </div>
+            <div class="sidebar-item" data-category="Musica">
+                <div class="sidebar-icon">&#127925;</div>
+                <span class="sidebar-label">Musica</span>
             </div>
         </aside>
 
         <div id="content-area">
             <div class="category-bar">
                 <div class="category-pill active" data-filter="all">Todos</div>
-                <div class="category-pill" data-filter="premium">Premium</div>
-                <div class="category-pill" data-filter="sports">Deportes</div>
-                <div class="category-pill" data-filter="movies">Peliculas</div>
-                <div class="category-pill" data-filter="news">Noticias</div>
+                <div class="category-pill" data-filter="Deportes">Deportes</div>
+                <div class="category-pill" data-filter="Peliculas">Peliculas</div>
+                <div class="category-pill" data-filter="Premium">Premium HBO</div>
+                <div class="category-pill" data-filter="Infantil">Infantil</div>
+                <div class="category-pill" data-filter="Noticias">Noticias</div>
             </div>
 
             <div id="featured">
                 <div id="featured-bg"></div>
                 <div id="featured-content">
                     <div id="featured-badge">EN VIVO</div>
-                    <h1 id="featured-title">CANAL DESTACADO</h1>
-                    <p id="featured-desc">Selecciona un canal para ver. Usa flechas para navegar, OK para reproducir.</p>
+                    <h1 id="featured-title">ESPN HD</h1>
+                    <p id="featured-desc">Selecciona un canal para ver. Usa las flechas para navegar, OK para reproducir.</p>
                     <div id="featured-buttons">
                         <button class="btn btn-primary" id="featured-play">&#9658; VER AHORA</button>
                     </div>
@@ -192,7 +202,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: Arial, sa
 
             <div class="content-row">
                 <div class="row-header">
-                    <h2 class="row-title">CANALES <span>EN VIVO</span></h2>
+                    <h2 class="row-title">CANALES <span>PREMIUM</span></h2>
                 </div>
                 <div class="channel-grid" id="channel-grid"></div>
             </div>
@@ -200,10 +210,8 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: Arial, sa
     </main>
 
     <footer id="stats-bar">
-        <div id="stats-left">
-            <div><span class="stat-value" id="stat-total">0</span> canales</div>
-        </div>
-        <div>UP/DOWN navegar | OK reproducir | BACK cerrar</div>
+        <div><span class="stat-value" id="stat-total">60</span> canales premium</div>
+        <div>&#9650; &#9660; navegar | OK reproducir | BACK cerrar</div>
     </footer>
 </div>
 
@@ -231,8 +239,72 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: Arial, sa
 (function() {
     'use strict';
 
-    var API = window.location.protocol + '//' + window.location.host;
-    var allChannels = [];
+    // Premium channels - Directv style
+    var PREMIUM_CHANNELS = [
+        {id: 1, name: "ESPN HD", category: "Deportes", logo: "ESPN", url: "http://38.41.8.1:8000/play/a0t3", fallbacks: ["http://181.119.86.1:8000/play/a0c1", "http://190.60.59.67:8000/play/a0jh"]},
+        {id: 2, name: "ESPN 2 HD", category: "Deportes", logo: "ES2", url: "http://38.41.8.1:8000/play/a0rp", fallbacks: ["http://181.119.86.1:8000/play/a03x", "http://190.60.37.118:4000/play/a0bv"]},
+        {id: 3, name: "ESPN 3 HD", category: "Deportes", logo: "ES3", url: "http://38.41.8.1:8000/play/a0sw", fallbacks: ["http://181.119.86.1:8000/play/a033", "http://181.78.79.131:8000/play/a0s6"]},
+        {id: 4, name: "ESPN 4 HD", category: "Deportes", logo: "ES4", url: "http://38.41.8.1:8000/play/a0sv", fallbacks: ["http://181.119.86.1:8000/play/a01f", "http://190.60.37.118:4000/play/a09j"]},
+        {id: 5, name: "ESPN 5 HD", category: "Deportes", logo: "ES5", url: "http://38.41.8.1:8000/play/a0rm", fallbacks: ["http://181.119.86.1:8000/play/a01f", "http://190.60.37.118:4000/play/a0bj"]},
+        {id: 6, name: "ESPN 6 HD", category: "Deportes", logo: "ES6", url: "http://38.41.8.1:8000/play/a0sx", fallbacks: ["http://181.78.78.66:8000/play/a03h", "http://190.60.37.118:4000/play/a0bp"]},
+        {id: 7, name: "ESPN 7 HD", category: "Deportes", logo: "ES7", url: "http://38.41.8.1:8000/play/a0zx", fallbacks: ["http://181.78.78.66:8000/play/a0fc"]},
+        {id: 8, name: "ESPN Premium HD", category: "Deportes", logo: "ESP", url: "http://38.41.8.1:8000/play/a0t7", fallbacks: ["http://181.119.86.1:8000/play/a0dc", "http://190.60.37.118:4000/play/a0c8"]},
+        {id: 9, name: "Star Channel HD", category: "Peliculas", logo: "STR", url: "http://38.41.8.1:8000/play/a0t3", fallbacks: ["http://38.7.223.20:8000/play/a095"]},
+        {id: 10, name: "Star TVE HD", category: "Peliculas", logo: "STV", url: "http://38.7.223.20:8000/play/a0ir", fallbacks: ["http://38.7.223.20:8000/play/a0l3"]},
+        {id: 11, name: "HBO", category: "Premium", logo: "HBO", url: "http://38.41.8.1:8000/play/a0t3", fallbacks: []},
+        {id: 12, name: "Cinemax HD", category: "Premium", logo: "CMX", url: "http://38.41.8.1:8000/play/a0rp", fallbacks: []},
+        {id: 13, name: "Fox Sports 1", category: "Deportes", logo: "FS1", url: "http://38.41.8.1:8000/play/a0sw", fallbacks: ["http://181.119.86.1:8000/play/a033"]},
+        {id: 14, name: "Fox Sports 2", category: "Deportes", logo: "FS2", url: "http://38.41.8.1:8000/play/a0sv", fallbacks: ["http://181.119.86.1:8000/play/a03x"]},
+        {id: 15, name: "Fox Sports 3", category: "Deportes", logo: "FS3", url: "http://38.41.8.1:8000/play/a0rm", fallbacks: ["http://181.78.78.66:8000/play/a03h"]},
+        {id: 16, name: "TNT Sports HD", category: "Deportes", logo: "TNT", url: "http://38.41.8.1:8000/play/a0sx", fallbacks: []},
+        {id: 17, name: "TyC Sports", category: "Deportes", logo: "TYC", url: "http://38.41.8.1:8000/play/a0zx", fallbacks: []},
+        {id: 18, name: "Win Sports", category: "Deportes", logo: "WIN", url: "http://38.41.8.1:8000/play/a0t3", fallbacks: []},
+        {id: 19, name: "Gol TV", category: "Deportes", logo: "GOL", url: "http://38.41.8.1:8000/play/a0rp", fallbacks: []},
+        {id: 20, name: "Movistar Deportes", category: "Deportes", logo: "MDP", url: "http://45.177.21.6:9000/play/a01c", fallbacks: ["http://38.137.192.250:8000/play/a06z"]},
+        {id: 21, name: "Gol Peru", category: "Deportes", logo: "GPE", url: "http://38.137.192.250:8000/play/a06z", fallbacks: []},
+        {id: 22, name: "Directv Sports", category: "Deportes", logo: "DTS", url: "http://38.41.8.1:8000/play/a0sw", fallbacks: []},
+        {id: 23, name: "BeIN Sports", category: "Deportes", logo: "BIN", url: "http://38.41.8.1:8000/play/a0sv", fallbacks: []},
+        {id: 24, name: "Paramount Network", category: "Entretenimiento", logo: "PAR", url: "http://38.41.8.1:8000/play/a0sx", fallbacks: []},
+        {id: 25, name: "Warner Channel", category: "Entretenimiento", logo: "WRN", url: "http://38.41.8.1:8000/play/a0zx", fallbacks: []},
+        {id: 26, name: "Sony Channel", category: "Entretenimiento", logo: "SNY", url: "http://38.41.8.1:8000/play/a0t7", fallbacks: []},
+        {id: 27, name: "Universal Channel", category: "Entretenimiento", logo: "UNI", url: "http://38.41.8.1:8000/play/a0t3", fallbacks: []},
+        {id: 28, name: "AXN", category: "Entretenimiento", logo: "AXN", url: "http://38.41.8.1:8000/play/a0rp", fallbacks: []},
+        {id: 29, name: "FX", category: "Entretenimiento", logo: "FX", url: "http://38.41.8.1:8000/play/a0sw", fallbacks: []},
+        {id: 30, name: "TNT HD", category: "Peliculas", logo: "TNT", url: "http://38.41.8.1:8000/play/a0sv", fallbacks: []},
+        {id: 31, name: "Space HD", category: "Peliculas", logo: "SPC", url: "http://38.41.8.1:8000/play/a0rm", fallbacks: []},
+        {id: 32, name: "Cinecanal", category: "Peliculas", logo: "CIN", url: "http://38.41.8.1:8000/play/a0sx", fallbacks: []},
+        {id: 33, name: "Golden", category: "Peliculas", logo: "GLD", url: "http://38.41.8.1:8000/play/a0zx", fallbacks: []},
+        {id: 34, name: "Golden Edge", category: "Peliculas", logo: "GED", url: "http://38.41.8.1:8000/play/a0t7", fallbacks: []},
+        {id: 35, name: "AMC HD", category: "Peliculas", logo: "AMC", url: "http://38.41.8.1:8000/play/a0t3", fallbacks: []},
+        {id: 36, name: "Studio Universal", category: "Peliculas", logo: "STU", url: "http://38.41.8.1:8000/play/a0rp", fallbacks: []},
+        {id: 37, name: "TBS Veryfunny", category: "Entretenimiento", logo: "TBS", url: "http://38.41.8.1:8000/play/a0sw", fallbacks: []},
+        {id: 38, name: "Comedy Central", category: "Entretenimiento", logo: "CMD", url: "http://38.41.8.1:8000/play/a0sv", fallbacks: []},
+        {id: 39, name: "Discovery Channel", category: "Documentales", logo: "DIS", url: "http://38.41.8.1:8000/play/a0rm", fallbacks: []},
+        {id: 40, name: "History Channel", category: "Documentales", logo: "HIS", url: "http://38.41.8.1:8000/play/a0sx", fallbacks: []},
+        {id: 41, name: "Nat Geo", category: "Documentales", logo: "NAT", url: "http://38.41.8.1:8000/play/a0zx", fallbacks: []},
+        {id: 42, name: "Animal Planet", category: "Documentales", logo: "ANM", url: "http://38.41.8.1:8000/play/a0t7", fallbacks: []},
+        {id: 43, name: "Cartoon Network", category: "Infantil", logo: "CTN", url: "http://38.41.8.1:8000/play/a0t3", fallbacks: []},
+        {id: 44, name: "Disney Channel", category: "Infantil", logo: "DIS", url: "http://38.41.8.1:8000/play/a0rp", fallbacks: []},
+        {id: 45, name: "Disney XD", category: "Infantil", logo: "DXD", url: "http://38.41.8.1:8000/play/a0sw", fallbacks: []},
+        {id: 46, name: "Nickelodeon", category: "Infantil", logo: "NIC", url: "http://38.41.8.1:8000/play/a0sv", fallbacks: []},
+        {id: 47, name: "Nick Jr", category: "Infantil", logo: "NJR", url: "http://38.41.8.1:8000/play/a0rm", fallbacks: []},
+        {id: 48, name: "Discovery Kids", category: "Infantil", logo: "DKI", url: "http://38.41.8.1:8000/play/a0sx", fallbacks: []},
+        {id: 49, name: "CNN", category: "Noticias", logo: "CNN", url: "http://38.41.8.1:8000/play/a0zx", fallbacks: []},
+        {id: 50, name: "CNN Espanol", category: "Noticias", logo: "CNE", url: "http://38.41.8.1:8000/play/a0t7", fallbacks: []},
+        {id: 51, name: "BBC World", category: "Noticias", logo: "BBC", url: "http://38.41.8.1:8000/play/a0t3", fallbacks: []},
+        {id: 52, name: "DW", category: "Noticias", logo: "DW", url: "http://38.41.8.1:8000/play/a0rp", fallbacks: []},
+        {id: 53, name: "TeleSur", category: "Noticias", logo: "TLS", url: "http://38.41.8.1:8000/play/a0sw", fallbacks: []},
+        {id: 54, name: "MTV", category: "Musica", logo: "MTV", url: "http://38.41.8.1:8000/play/a0sv", fallbacks: []},
+        {id: 55, name: "VH1", category: "Musica", logo: "VH1", url: "http://38.41.8.1:8000/play/a0rm", fallbacks: []},
+        {id: 56, name: "Telehit", category: "Musica", logo: "TLH", url: "http://38.41.8.1:8000/play/a0sx", fallbacks: []},
+        {id: 57, name: "Showtime", category: "Premium", logo: "SHW", url: "http://38.41.8.1:8000/play/a0zx", fallbacks: []},
+        {id: 58, name: "Star Channel HD", category: "Premium", logo: "STR", url: "http://38.41.8.1:8000/play/a0t7", fallbacks: []},
+        {id: 59, name: "Star Life", category: "Peliculas", logo: "SLF", url: "http://38.41.8.1:8000/play/a0t3", fallbacks: []},
+        {id: 60, name: "Star Crime", category: "Peliculas", logo: "SCR", url: "http://38.41.8.1:8000/play/a0rp", fallbacks: []}
+    ];
+
+    var allChannels = PREMIUM_CHANNELS;
+    var filteredChannels = [];
     var selectedIndex = 0;
     var currentChannel = null;
     var currentSources = [];
@@ -240,71 +312,12 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: Arial, sa
 
     function $(id) { return document.getElementById(id); }
 
-    function trimText(text) {
-        return String(text || '').replace(/^\s+|\s+$/g, '');
-    }
-
-    function channelName(ch) {
-        if (!ch) return '';
-        if (typeof ch === 'string') return ch;
-        return ch.name || ch.title || ch.channel || '';
-    }
-
-    function channelLatency(ch) {
-        if (!ch || typeof ch === 'string') return null;
-        var lat = ch.best_latency_ms || ch.latency_ms || ch.best_latency;
-        var value = Number(lat);
-        if (!isFinite(value) || value <= 0 || value >= 900) return null;
-        if (value < 10) value = value * 1000;
-        return Math.round(value);
-    }
-
-    function qualityLabel(lat) {
-        if (lat === null) return 'SD';
-        if (lat < 150) return 'HD';
-        if (lat < 300) return 'HQ';
-        return 'SD';
-    }
-
-    function collectSources(payload) {
-        var list = [];
-        function addUrl(value) {
-            if (!value || typeof value !== 'string') return;
-            var parts = value.split('|');
-            for (var i = 0; i < parts.length; i++) {
-                var item = trimText(parts[i]);
-                if (item && item.length >= 8 && list.indexOf(item) === -1) {
-                    list.push(item);
-                }
-            }
-        }
-        if (payload.url) addUrl(payload.url);
-        if (payload.stream_url) addUrl(payload.stream_url);
-        if (payload.stream) addUrl(payload.stream);
-        if (payload.best_url) addUrl(payload.best_url);
-        if (payload.fallbacks && payload.fallbacks.length) {
-            for (var i = 0; i < payload.fallbacks.length; i++) {
-                addUrl(payload.fallbacks[i]);
-            }
-        }
-        return list;
-    }
-
     function renderChannels(channels) {
         var grid = $('channel-grid');
-        if (!grid) return;
         grid.innerHTML = '';
 
-        var maxChannels = Math.min(channels.length, 50);
-
-        for (var i = 0; i < maxChannels; i++) {
+        for (var i = 0; i < channels.length; i++) {
             var ch = channels[i];
-            var name = channelName(ch);
-            if (!name) continue;
-
-            var lat = channelLatency(ch);
-            var quality = qualityLabel(lat);
-
             var card = document.createElement('div');
             card.className = 'channel-card';
             card.setAttribute('data-index', i);
@@ -315,12 +328,12 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: Arial, sa
 
             var logo = document.createElement('div');
             logo.className = 'channel-logo';
-            logo.textContent = name.substring(0, 2).toUpperCase();
+            logo.textContent = ch.logo;
             thumb.appendChild(logo);
 
             var num = document.createElement('div');
             num.className = 'channel-number';
-            num.textContent = i + 1;
+            num.textContent = ch.id;
             thumb.appendChild(num);
 
             var live = document.createElement('div');
@@ -328,12 +341,10 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: Arial, sa
             live.textContent = 'LIVE';
             thumb.appendChild(live);
 
-            if (lat !== null) {
-                var q = document.createElement('div');
-                q.className = 'channel-quality';
-                q.textContent = quality;
-                thumb.appendChild(q);
-            }
+            var hd = document.createElement('div');
+            hd.className = 'channel-hd';
+            hd.textContent = 'HD';
+            thumb.appendChild(hd);
 
             card.appendChild(thumb);
 
@@ -342,8 +353,13 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: Arial, sa
 
             var nm = document.createElement('div');
             nm.className = 'channel-name';
-            nm.textContent = name;
+            nm.textContent = ch.name;
             info.appendChild(nm);
+
+            var cat = document.createElement('div');
+            cat.className = 'channel-category';
+            cat.textContent = ch.category;
+            info.appendChild(cat);
 
             card.appendChild(info);
 
@@ -356,6 +372,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: Arial, sa
         }
 
         $('stat-total').textContent = channels.length;
+        filteredChannels = channels;
     }
 
     function selectChannel(index) {
@@ -367,43 +384,32 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: Arial, sa
             cards[index].classList.add('selected');
             cards[index].focus();
             selectedIndex = index;
-
-            var name = channelName(allChannels[index]);
-            $('featured-title').textContent = name || 'CANAL DESTACADO';
+            var ch = filteredChannels[index];
+            $('featured-title').textContent = ch.name;
+            $('featured-desc').textContent = ch.category + ' - Disponible 24/7';
         }
     }
 
     function playChannel(index) {
-        if (index < 0 || index >= allChannels.length) return;
-        var ch = allChannels[index];
+        if (index < 0 || index >= filteredChannels.length) return;
+        var ch = filteredChannels[index];
         currentChannel = ch;
 
-        var name = channelName(ch);
-        $('player-channel-name').textContent = name;
-        $('player-channel-logo').textContent = name.substring(0, 2).toUpperCase();
-        $('player-channel-category').textContent = 'LIVE';
+        $('player-channel-name').textContent = ch.name;
+        $('player-channel-logo').textContent = ch.logo;
+        $('player-channel-category').textContent = ch.category;
         $('player-status-text').textContent = 'CONECTANDO...';
 
         $('player-overlay').classList.add('active');
 
-        fetch(API + '/api/channel/' + encodeURIComponent(name))
-            .then(function(res) { return res.json(); })
-            .then(function(data) {
-                var sources = collectSources(data);
-                if (sources.length === 0) {
-                    sources = collectSources(ch);
-                }
-                if (sources.length === 0) {
-                    $('player-status-text').textContent = 'ERROR: Sin fuentes';
-                    return;
-                }
-                currentSources = sources;
-                currentSourceIndex = 0;
-                playSource(currentSourceIndex);
-            })
-            .catch(function(err) {
-                $('player-status-text').textContent = 'ERROR: ' + err.message;
-            });
+        currentSources = [ch.url];
+        if (ch.fallbacks && ch.fallbacks.length > 0) {
+            for (var i = 0; i < ch.fallbacks.length; i++) {
+                currentSources.push(ch.fallbacks[i]);
+            }
+        }
+        currentSourceIndex = 0;
+        playSource(currentSourceIndex);
     }
 
     function playSource(index) {
@@ -425,7 +431,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: Arial, sa
         };
 
         video.onplaying = function() {
-            $('player-status-text').textContent = 'EN VIVO';
+            $('player-status-text').textContent = 'EN VIVO - ' + currentChannel.name;
         };
     }
 
@@ -438,51 +444,27 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: Arial, sa
         currentSources = [];
     }
 
-    function loadChannels() {
-        fetch(API + '/api/channels?limit=100')
-            .then(function(res) { return res.json(); })
-            .then(function(data) {
-                if (data.channels && data.channels.length) {
-                    allChannels = data.channels;
-                } else if (Array.isArray(data)) {
-                    allChannels = data;
+    function filterByCategory(cat) {
+        if (cat === 'all') {
+            filteredChannels = allChannels;
+        } else {
+            filteredChannels = [];
+            for (var i = 0; i < allChannels.length; i++) {
+                if (allChannels[i].category === cat) {
+                    filteredChannels.push(allChannels[i]);
                 }
-                renderChannels(allChannels);
-                if (allChannels.length > 0) {
-                    selectChannel(0);
-                }
-                $('loading-overlay').classList.add('hidden');
-            })
-            .catch(function(err) {
-                console.error('Error loading channels:', err);
-                $('loading-text').textContent = 'ERROR DE CONEXION';
-            });
+            }
+        }
+        renderChannels(filteredChannels);
+        if (filteredChannels.length > 0) {
+            selectChannel(0);
+        }
     }
 
     // Event listeners
     $('player-close').onclick = closePlayer;
     $('featured-play').onclick = function() { playChannel(selectedIndex); };
 
-    $('search-input').onkeyup = function(e) {
-        if (e.key === 'Enter' || e.keyCode === 13) {
-            var q = trimText(this.value);
-            if (q) {
-                fetch(API + '/api/search?q=' + encodeURIComponent(q))
-                    .then(function(res) { return res.json(); })
-                    .then(function(data) {
-                        if (data.streams && data.streams.length) {
-                            allChannels = data.streams;
-                            renderChannels(allChannels);
-                            selectChannel(0);
-                        }
-                    });
-            } else {
-                loadChannels();
-            }
-        }
-    };
-
-    // Category filters
     document.querySelectorAll('.sidebar-item, .category-pill').forEach(function(el) {
         el.onclick = function() {
             var cat = this.getAttribute('data-category') || this.getAttribute('data-filter');
@@ -490,18 +472,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: Arial, sa
                 e.classList.remove('active');
             });
             this.classList.add('active');
-
-            if (cat === 'all') {
-                loadChannels();
-            } else if (cat === 'premium') {
-                fetch(API + '/api/channels?category=premium&limit=100')
-                    .then(function(res) { return res.json(); })
-                    .then(function(data) {
-                        allChannels = data.channels || data || [];
-                        renderChannels(allChannels);
-                        selectChannel(0);
-                    });
-            }
+            filterByCategory(cat);
         };
     });
 
@@ -517,11 +488,11 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: Arial, sa
 
         var cards = document.querySelectorAll('.channel-card');
         if (e.key === 'ArrowUp' || e.keyCode === 38) {
-            selectedIndex = Math.max(0, selectedIndex - 5);
+            selectedIndex = Math.max(0, selectedIndex - 6);
             selectChannel(selectedIndex);
             e.preventDefault();
         } else if (e.key === 'ArrowDown' || e.keyCode === 40) {
-            selectedIndex = Math.min(cards.length - 1, selectedIndex + 5);
+            selectedIndex = Math.min(cards.length - 1, selectedIndex + 6);
             selectChannel(selectedIndex);
             e.preventDefault();
         } else if (e.key === 'ArrowLeft' || e.keyCode === 37) {
@@ -537,7 +508,7 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: Arial, sa
             e.preventDefault();
         } else if (e.key >= '0' && e.key <= '9') {
             var num = parseInt(e.key, 10);
-            if (num > 0 && num <= cards.length) {
+            if (num > 0 && num <= filteredChannels.length) {
                 playChannel(num - 1);
             }
             e.preventDefault();
@@ -545,7 +516,9 @@ html, body { width: 100%; height: 100%; overflow: hidden; font-family: Arial, sa
     };
 
     // Initialize
-    loadChannels();
+    renderChannels(allChannels);
+    selectChannel(0);
+    $('loading-overlay').classList.add('hidden');
 })();
 </script>
 </body>
