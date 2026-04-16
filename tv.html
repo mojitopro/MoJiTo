@@ -426,8 +426,7 @@ body:before{
     overflow:hidden;
 }
 #video{
-    position:absolute;
-    inset:0;
+    display:block;
     width:100%;
     height:100%;
     background:#000;
@@ -435,7 +434,7 @@ body:before{
     z-index:1;
 }
 body.playing #video{
-    z-index:1;
+    display:block;
 }
 #fullscreenBtn{
     position:absolute;
@@ -725,6 +724,14 @@ body.playing #screenFrame{
 }
 body.playing #screenWrap{
     flex:1;
+    position:relative;
+}
+body.playing #video{
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
 }
 @media (max-width: 1200px){
     body.playing #screenWrap{
