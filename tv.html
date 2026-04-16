@@ -1,204 +1,1178 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<meta charset="utf-8">
-<title>SŌF MOJITO TV</title>
-<style>
-*{margin:0;padding:0}
-html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial}
-#video{width:100%;height:100%;position:fixed;top:0;left:0;display:none;background:#000}
-#menu{padding:50px 10px 0 10px;height:100%;display:flex;flex-direction:column;align-items:center}
-.logo{font-size:72px;font-weight:bold;text-align:center;line-height:1}
-.logo .sof{color:#8b0000;text-shadow:0 0 10px #ff0000,0 0 20px #8b0000}
-.logo .mojito{color:#dc143c;text-shadow:0 0 10px #ff0000,0 0 20px #dc143c}
-.logo .tv{color:#ff0000;font-size:32px;vertical-align:top;margin-left:5px;text-shadow:0 0 10px #ff0000}
-#in{font-size:32px;padding:20px;background:transparent;border:none;color:#666;text-align:center;margin-bottom:20px;outline:none;text-shadow:0 0 5px rgba(255,0,0,0.3)}
-#in.focused{color:#aaa;text-shadow:0 0 10px rgba(255,0,0,0.5)}
-#msg{font-size:20px;padding:15px;color:#8b0000;min-height:30px}
-.error{color:#ff0000}
-.info{color:#dc143c}
-.hidden{display:none}
-#qm{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:200;flex-direction:column;justify-content:center;align-items:center}
-#qm.show{display:flex}
-#qm h2{color:#ff0000;font-size:48px;margin-bottom:40px;text-shadow:0 0 20px #ff0000,0 0 40px #8b0000}
-#qm p{color:#8b0000;font-size:24px;padding:15px}
-select{font-size:20px;width:100%;padding:15px;background:#1a1a1a;color:#fff;border:1px solid #333;border-radius:8px;margin-top:20px;height:300px}
-option{background:#1a1a1a;color:#aaa;padding:12px}
-option:checked,option:focus,option:selected{background:#0066cc;color:#fff}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoJiTo TV - Dreamcore Streaming</title>
+    <style>
+        /* ============================================
+           RESET Y BASE - Compatible con navegadores 50-
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+            background: #000000;
+        }
+
+        /* ============================================
+           EFECTOS CRT / TV ANTIGUA
+           ============================================ */
+        .crt-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+        }
+
+        .flicker {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            animation: flicker 0.15s infinite;
+            pointer-events: none;
+        }
+
+        .vignette {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                ellipse at center,
+                transparent 0%,
+                transparent 50%,
+                rgba(0, 0, 0, 0.4) 100%
+            );
+            pointer-events: none;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.02; }
+            50% { opacity: 0.05; }
+            100% { opacity: 0.02; }
+        }
+
+        /* ============================================
+           LAYOUT PRINCIPAL
+           ============================================ */
+        .tv-interface {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: #0a0a0a;
+            color: #00ff41;
+        }
+
+        /* ============================================
+           HEADER / BARRA SUPERIOR
+           ============================================ */
+        .tv-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
+            border-bottom: 2px solid #00ff41;
+            text-shadow: 0 0 10px #00ff41;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            color: #00ff41;
+        }
+
+        .logo-ascii {
+            font-size: 10px;
+            line-height: 1;
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff;
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 12px;
+        }
+
+        .channel-display {
+            background: #000;
+            border: 1px solid #00ff41;
+            padding: 5px 15px;
+            font-size: 14px;
+        }
+
+        .clock {
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        /* ============================================
+           AREA DE CONTENIDO PRINCIPAL
+           ============================================ */
+        .tv-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* ============================================
+           BARRA LATERAL / NAVEGACION
+           ============================================ */
+        .sidebar {
+            width: 200px;
+            background: #0f0f0f;
+            border-right: 2px solid #00ff41;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            font-size: 14px;
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #ff00ff;
+        }
+
+        .nav-item {
+            padding: 10px 15px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+            font-size: 12px;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: #1a1a1a;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            text-shadow: 0 0 10px #00ff41;
+        }
+
+        .nav-item::before {
+            content: '► ';
+            color: #ff00ff;
+        }
+
+        /* ============================================
+           AREA DE VIDEO / REPRODUCTOR
+           ============================================ */
+        .video-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #000;
+            position: relative;
+        }
+
+        .video-player {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-player iframe,
+        .video-player video {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-placeholder {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .video-placeholder-ascii {
+            font-size: 10px;
+            line-height: 1.2;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+            white-space: pre;
+            margin-bottom: 20px;
+        }
+
+        .video-placeholder-text {
+            font-size: 16px;
+            color: #00ff41;
+            text-shadow: 0 0 10px #00ff41;
+        }
+
+        /* Controles de video personalizados */
+        .video-controls {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #1a1a1a;
+            border-top: 2px solid #00ff41;
+            gap: 15px;
+        }
+
+        .control-btn {
+            background: #000;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            text-shadow: 0 0 5px #00ff41;
+            transition: all 0.3s;
+        }
+
+        .control-btn:hover {
+            background: #00ff41;
+            color: #000;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: #000;
+            border: 1px solid #00ff41;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #00ff41;
+            width: 0%;
+            box-shadow: 0 0 10px #00ff41;
+        }
+
+        .time-display {
+            font-size: 12px;
+            color: #00ffff;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        /* ============================================
+           GRID DE CONTENIDO / CATALOGO
+           ============================================ */
+        .content-grid {
+            width: 350px;
+            background: #0f0f0f;
+            border-left: 2px solid #ff00ff;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .grid-title {
+            font-size: 14px;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #00ffff;
+        }
+
+        .content-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        .content-card:hover,
+        .content-card.selected {
+            border: 1px solid #ff00ff;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+        }
+
+        .content-card-ascii {
+            font-size: 6px;
+            line-height: 1;
+            color: #00ff41;
+            padding: 10px;
+            background: #000;
+            white-space: pre;
+            overflow: hidden;
+            height: 80px;
+            text-shadow: 0 0 5px #00ff41;
+        }
+
+        .content-card-info {
+            padding: 10px;
+        }
+
+        .content-card-title {
+            font-size: 12px;
+            color: #00ffff;
+            margin-bottom: 5px;
+            text-shadow: 0 0 5px #00ffff;
+        }
+
+        .content-card-meta {
+            font-size: 10px;
+            color: #888;
+        }
+
+        .content-card-channel {
+            color: #ff00ff;
+            text-shadow: 0 0 5px #ff00ff;
+        }
+
+        /* ============================================
+           MODAL / POPUP DE INFORMACION
+           ============================================ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #0a0a0a;
+            border: 2px solid #00ff41;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff;
+            margin-bottom: 15px;
+        }
+
+        .modal-ascii {
+            font-size: 8px;
+            line-height: 1;
+            color: #00ffff;
+            white-space: pre;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #00ffff;
+        }
+
+        .modal-description {
+            font-size: 12px;
+            color: #00ff41;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            background: #000;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 10px 25px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            text-shadow: 0 0 5px #00ff41;
+            transition: all 0.3s;
+        }
+
+        .modal-btn:hover {
+            background: #00ff41;
+            color: #000;
+        }
+
+        .modal-btn.secondary {
+            border-color: #ff00ff;
+            color: #ff00ff;
+            text-shadow: 0 0 5px #ff00ff;
+        }
+
+        .modal-btn.secondary:hover {
+            background: #ff00ff;
+            color: #000;
+        }
+
+        /* ============================================
+           ANIMACIONES GLITCH
+           ============================================ */
+        .glitch {
+            animation: glitch-anim 0.3s infinite;
+        }
+
+        @keyframes glitch-anim {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        .glitch-text {
+            animation: glitch-text 0.5s infinite;
+        }
+
+        @keyframes glitch-text {
+            0% { text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff; }
+            25% { text-shadow: -2px 0 #ff00ff, 2px 0 #00ffff; }
+            50% { text-shadow: 2px 0 #00ffff, -2px 0 #ff00ff; }
+            75% { text-shadow: -2px 0 #00ffff, 2px 0 #ff00ff; }
+            100% { text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff; }
+        }
+
+        /* ============================================
+           SCROLLBAR PERSONALIZADA
+           ============================================ */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+            border: 1px solid #333;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #00ff41;
+            border: 1px solid #00ff41;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00ffff;
+        }
+
+        /* ============================================
+           ESTADO DE CARGA
+           ============================================ */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-ascii {
+            font-size: 10px;
+            line-height: 1.2;
+            color: #00ff41;
+            white-space: pre;
+            text-shadow: 0 0 10px #00ff41;
+        }
+
+        /* ============================================
+           BARRA INFERIOR / STATUS
+           ============================================ */
+        .tv-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 20px;
+            background: #1a1a1a;
+            border-top: 2px solid #ff00ff;
+            font-size: 11px;
+        }
+
+        .footer-left {
+            color: #888;
+        }
+
+        .footer-right {
+            display: flex;
+            gap: 20px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #00ff41;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ff41;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ============================================
+           RESPONSIVE BASICO
+           ============================================ */
+        @media (max-width: 900px) {
+            .content-grid {
+                display: none;
+            }
+            .sidebar {
+                width: 150px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar {
+                display: none;
+            }
+            .tv-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- EFECTOS CRT -->
+    <div class="crt-container">
+        <div class="scanlines"></div>
+        <div class="flicker"></div>
+        <div class="vignette"></div>
+    </div>
 
-<video id="video" controls></video>
+    <!-- INTERFAZ PRINCIPAL -->
+    <div class="tv-interface">
+        <!-- HEADER -->
+        <header class="tv-header">
+            <div>
+                <div class="logo">MoJiTo TV</div>
+                <div class="logo-ascii">╔═══════════════════════╗
+║  DREAMCORE STREAM   ║
+╚═══════════════════════╝</div>
+            </div>
+            <div class="header-info">
+                <div class="channel-display">CH <span id="currentChannel">01</span></div>
+                <div class="clock" id="clock">00:00:00</div>
+            </div>
+        </header>
 
-<div id="qm">
-<h2>SŌF CONTROL</h2>
-<p>▶ ENTER: siguiente</p>
-<p>◀ FLECHA ARRIBA: anterior</p>
-<p>⏯ ESPACIO: play/pause</p>
-<p>❌ ESC: cerrar</p>
-</div>
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="tv-content">
+            <!-- BARRA LATERAL -->
+            <nav class="sidebar">
+                <div class="sidebar-title">✦ CANALES ✦</div>
+                <div class="nav-item active" data-channel="0">01 - DREAM PORTAL</div>
+                <div class="nav-item" data-channel="1">02 - LIMINAL POOL</div>
+                <div class="nav-item" data-channel="2">03 - STATIC DREAMS</div>
+                <div class="nav-item" data-channel="3">04 - NEON FOREST</div>
+                <div class="nav-item" data-channel="4">05 - MEMORY LANE</div>
+                
+                <div class="sidebar-title" style="margin-top: 20px;">✦ CATEGORIAS ✦</div>
+                <div class="nav-item" data-category="all">▸ Todo</div>
+                <div class="nav-item" data-category="ambient">▸ Ambient</div>
+                <div class="nav-item" data-category="lofi">▸ Lofi</div>
+                <div class="nav-item" data-category="nature">▸ Nature</div>
+                <div class="nav-item" data-category="retro">▸ Retro</div>
+            </nav>
 
-<div id="menu">
-<div class="logo"><span class="sof">SōF</span><span class="mojito"> MoJiTo</span><span class="tv"> TV</span></div>
-<div id="in">Escribe el canal...</div>
-<button id="more" style="display:none;margin-top:10px;padding:10px 20px;background:#8b0000;border:none;color:#fff;cursor:pointer;">MAS STREAMS (+20)</button>
-<div id="msg" class="info">↑↓ navegar | ENTER reproducir</div>
-<select id="results" size="10" class="hidden"></select>
-</div>
+            <!-- AREA DE VIDEO -->
+            <div class="video-area">
+                <div class="video-player" id="videoPlayer">
+                    <div class="video-placeholder">
+                        <div class="video-placeholder-ascii" id="placeholderAscii">
+    ╭────────────────────────────╮
+    │   ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓   │
+    │   ▓  MOJITO TV  ▓   │
+    │   ▓  DREAMCORE  ▓   │
+    │   ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓   │
+    │                            │
+    │    ✦ SELECIONA UN ✦      │
+    │    ✦   CONTENIDO   ✦      │
+    │                            │
+    │   ┌──────────────────┐    │
+    │   │  [ENTER] PLAY    │    │
+    │   └──────────────────┘    │
+    ╰────────────────────────────╯
+                        </div>
+                        <div class="video-placeholder-text">Selecciona contenido para reproducir</div>
+                    </div>
+                    <div class="loading-overlay" id="loadingOverlay">
+                        <div class="loading-ascii">
+    ╔══════════════════════╗
+    ║   CARGANDO STREAM    ║
+    ║                      ║
+    ║   ▓▓▓▓▒▒▒▒░░░░ 50%   ║
+    ║                      ║
+    ║   ████▓▓▓▓▒▒▒▒░░     ║
+    ╚══════════════════════╝
+                        </div>
+                    </div>
+                </div>
 
-<script>
-var BASE=window.location.protocol+'//'+window.location.host;
-var API=BASE+'/api/search';
-var streams=[], favorites=[], idx=0, txt='', mode='search', page=1, hasMore=false, loading=false;
-var elIn=document.getElementById('in'), elSel=document.getElementById('results'), elMsg=document.getElementById('msg'), elMenu=document.getElementById('menu'), elVideo=document.getElementById('video');
+                <!-- CONTROLES DE VIDEO -->
+                <div class="video-controls">
+                    <button class="control-btn" id="playPauseBtn">▶ PLAY</button>
+                    <button class="control-btn" id="stopBtn">■ STOP</button>
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="time-display">
+                        <span id="currentTime">00:00</span> / <span id="duration">00:00</span>
+                    </div>
+                    <button class="control-btn" id="fullscreenBtn">⛶ FULL</button>
+                </div>
+            </div>
 
-function log(m,t){elMsg.textContent=m;elMsg.className=t||'info'}
+            <!-- GRID DE CONTENIDO -->
+            <div class="content-grid">
+                <div class="grid-title">◈ CATALOGO ON-DEMAND ◈</div>
+                <div id="contentGrid">
+                    <!-- El contenido se genera dinamicamente -->
+                </div>
+            </div>
+        </div>
 
-function ql(t){
-    if(/1080|4k|uhd/i.test(t))return' [1080p]';
-    if(/720|hd/i.test(t))return' [HD]';
-    if(/480|sd/i.test(t))return' [SD]';
-    return'';
-}
+        <!-- FOOTER -->
+        <footer class="tv-footer">
+            <div class="footer-left">
+                MoJiTo TV v1.0 | Dreamcore Terminal Interface
+            </div>
+            <div class="footer-right">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>ONLINE</span>
+                </div>
+                <div>
+                    <span style="color: #00ffff;">CONTROLES:</span>
+                    ↑↓ Navegar | ENTER Play | G Glitch
+                </div>
+            </div>
+        </footer>
+    </div>
 
-function renderIn(){elIn.textContent=txt||'Escribe el canal...';}
+    <!-- MODAL DE INFORMACION -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <div class="modal-title" id="modalTitle">TITULO</div>
+            <div class="modal-ascii" id="modalAscii"></div>
+            <div class="modal-description" id="modalDescription"></div>
+            <div class="modal-buttons">
+                <button class="modal-btn" id="modalPlayBtn">▶ REPRODUCIR</button>
+                <button class="modal-btn secondary" id="modalCloseBtn">✕ CERRAR</button>
+            </div>
+        </div>
+    </div>
 
-function setMode(m){
-    mode=m;
-    elIn.classList.toggle('focused',m==='search');
-    elSel.classList.toggle('hidden',m==='search');
-}
+    <script>
+        // ============================================
+        // DATOS DE CONTENIDO - SIMULACION DE STREAMS
+        // ============================================
+        var contentData = [
+            {
+                id: 1,
+                title: "Liminal Pool Ambience",
+                channel: "01 - DREAM PORTAL",
+                category: "ambient",
+                duration: "∞ LIVE",
+                url: "https://www.youtube.com/embed/4xDzrJKXOOY?autoplay=1&loop=1&playlist=4xDzrJKXOOY",
+                ascii: "    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n    ▓  ░░░░░░░░░░░░  ▓\n    ▓  ░  POOL   ░  ▓\n    ▓  ░  ROOMS  ░  ▓\n    ▓  ░░░░░░░░░░░░  ▓\n    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n    ████        ████\n    █  █        █  █\n    █  █        █  █",
+                description: "Ambiente liminal de piscina infinita. Espacios oniricos que existen entre los suenos."
+            },
+            {
+                id: 2,
+                title: "Retro Computer Terminal",
+                channel: "02 - LIMINAL POOL",
+                category: "retro",
+                duration: "∞ LIVE",
+                url: "https://www.youtube.com/embed/5qap5aO4i9A?autoplay=1&loop=1&playlist=5qap5aO4i9A",
+                ascii: "    ╔════════════════════╗\n    ║ C:\\>_SYSTEM READY  ║\n    ║                    ║\n    ║ [OK] BOOT COMPLETE ║\n    ║ [OK] MEMORY CHECK  ║\n    ║ [OK] DISK READY    ║\n    ║                    ║\n    ║ C:\\>_               ║\n    ╚════════════════════╝",
+                description: "Terminal de computadora retro de los 80s. Sonidos de modem y boot sequence."
+            },
+            {
+                id: 3,
+                title: "Neon City Rain",
+                channel: "03 - STATIC DREAMS",
+                category: "ambient",
+                duration: "∞ LIVE",
+                url: "https://www.youtube.com/embed/4xDzrJKXOOY?autoplay=1&loop=1&playlist=4xDzrJKXOOY",
+                ascii: "    ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄\n    █  ▓▓  ▓▓  ▓▓  █\n    █  ▓▓  ▓▓  ▓▓  █\n    █  ▓▓  ▓▓  ▓▓  █\n    █  ▓▓  ▓▓  ▓▓  █\n    ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀\n    ✦ NEON CITY ✦\n    ✦   RAIN    ✦",
+                description: "Ciudad de neón bajo la lluvia. Estética cyberpunk dreamcore."
+            },
+            {
+                id: 4,
+                title: "Forest Cabin Lofi",
+                channel: "04 - NEON FOREST",
+                category: "lofi",
+                duration: "∞ LIVE",
+                url: "https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&loop=1&playlist=jfKfPfyJRdk",
+                ascii: "         /\\    \n        /  \\   \n       /    \\  \n      /______\\ \n      |      | \n      |  []  | \n      |______| \n    ✦ FOREST ✦\n    ✦  CABIN ✦",
+                description: "Cabina en el bosque con musica lofi. Ambiente relajante para estudiar."
+            },
+            {
+                id: 5,
+                title: "Old TV Static",
+                channel: "05 - MEMORY LANE",
+                category: "retro",
+                duration: "∞ LIVE",
+                url: "https://www.youtube.com/embed/aqz-KE-bpKQ?autoplay=1&loop=1&playlist=aqz-KE-bpKQ",
+                ascii: "    ▓▒░▓▒░▓▒░▓▒░▓▒░\n    ░▓▒░▓▒░▓▒░▓▒░▓▒\n    ▒░▓▒░▓▒░▓▒░▓▒░\n    ▓▒░▓▒░▓▒░▓▒░▓▒\n    ░▓▒░▓▒░▓▒░▓▒░▓\n    ▒░▓▒░▓▒░▓▒░▓▒░\n    ✦ NO SIGNAL ✦",
+                description: "Estática de televisión antigua. Mensajes subliminales del subconsciente."
+            },
+            {
+                id: 6,
+                title: "Underwater Dreams",
+                channel: "01 - DREAM PORTAL",
+                category: "nature",
+                duration: "∞ LIVE",
+                url: "https://www.youtube.com/embed/2Vv-BfVoq4g?autoplay=1&loop=1&playlist=2Vv-BfVoq4g",
+                ascii: "    ~~~~ ~~~~ ~~~~\n    ~  ▓▓▓▓  ~  ▓▓  ~\n    ~ ▓▓▓▓▓▓ ~ ▓▓▓  ~\n    ~  ▓▓▓▓  ~  ▓▓  ~\n    ~~~~ ~~~~ ~~~~\n    ✦ UNDER ✦\n    ✦ WATER ✦",
+                description: "Suenos bajo el agua. Profundidades oceanicas misteriosas."
+            },
+            {
+                id: 7,
+                title: "Midnight Train",
+                channel: "02 - LIMINAL POOL",
+                category: "ambient",
+                duration: "∞ LIVE",
+                url: "https://www.youtube.com/embed/4xDzrJKXOOY?autoplay=1&loop=1&playlist=4xDzrJKXOOY",
+                ascii: "    ╭────────────╮\n    │  TRAIN     │\n    │  →→→→→→→   │\n    │  [__]      │\n    ╰────────────╯\n    ~~~ ~~~ ~~~ ~~~\n    ✦ MIDNIGHT ✦\n    ✦  EXPRESS ✦",
+                description: "Viaje en tren de medianoche. Destino desconocido, solo el viaje importa."
+            },
+            {
+                id: 8,
+                title: "Abandoned Mall",
+                channel: "03 - STATIC DREAMS",
+                category: "ambient",
+                duration: "∞ LIVE",
+                url: "https://www.youtube.com/embed/5qap5aO4i9A?autoplay=1&loop=1&playlist=5qap5aO4i9A",
+                ascii: "    ╔══════════════╗\n    ║  MALL      ║\n    ║  CLOSED    ║\n    ║  SINCE     ║\n    ║  199█      ║\n    ╚══════════════╝\n    ▓▓    ▓▓    ▓▓\n    ✦ LIMINAL ✦\n    ✦  SPACE  ✦",
+                description: "Centro comercial abandonado. Espacios liminales que evocan nostalgia."
+            }
+        ];
 
-function addFavorite(){
-    var s=streams[idx];
-    if(!s||favorites.some(function(f){return f.url===s.url}))return;
-    favorites.push({title:s.title,url:s.url});
-    log('★ Guardado: '+s.title.substring(0,20));
-}
+        // ============================================
+        // ESTADO DE LA APLICACION
+        // ============================================
+        var currentChannel = 1;
+        var totalChannels = 5;
+        var isPlaying = false;
+        var currentContent = null;
+        var selectedCardIndex = 0;
+        var glitchMode = false;
 
-function showFavorites(){
-    mode='favorites';
-    elSel.innerHTML='';elSel.classList.remove('hidden');
-    if(!favorites.length){log('Sin favoritos');return;}
-    favorites.forEach(function(f,i){
-        elSel.add(new Option('★ '+f.title.substring(0,60),i));
-    });
-    idx=0;elSel.selectedIndex=0;
-    log(favorites.length+' favoritos');
-}
+        // ============================================
+        // ELEMENTOS DOM
+        // ============================================
+        var videoPlayer = document.getElementById('videoPlayer');
+        var placeholderAscii = document.getElementById('placeholderAscii');
+        var loadingOverlay = document.getElementById('loadingOverlay');
+        var currentChannelDisplay = document.getElementById('currentChannel');
+        var clockDisplay = document.getElementById('clock');
+        var playPauseBtn = document.getElementById('playPauseBtn');
+        var stopBtn = document.getElementById('stopBtn');
+        var fullscreenBtn = document.getElementById('fullscreenBtn');
+        var progressBar = document.getElementById('progressBar');
+        var progressFill = document.getElementById('progressFill');
+        var currentTimeDisplay = document.getElementById('currentTime');
+        var durationDisplay = document.getElementById('duration');
+        var contentGrid = document.getElementById('contentGrid');
+        var modalOverlay = document.getElementById('modalOverlay');
+        var modalTitle = document.getElementById('modalTitle');
+        var modalAscii = document.getElementById('modalAscii');
+        var modalDescription = document.getElementById('modalDescription');
+        var modalPlayBtn = document.getElementById('modalPlayBtn');
+        var modalCloseBtn = document.getElementById('modalCloseBtn');
+        var navItems = document.querySelectorAll('.nav-item');
 
-function playStream(startIdx){
-    var trial=0, max=5, s;
-    function tryNext(){
-        if(trial>=max||!(s=streams[startIdx+trial])){
-            log('Sin stream válido');
-            elVideo.style.display='none';
-            elMenu.style.display='flex';
-            return;
+        // ============================================
+        // RELOJ DIGITAL
+        // ============================================
+        function updateClock() {
+            var now = new Date();
+            var hours = String(now.getHours()).padStart(2, '0');
+            var minutes = String(now.getMinutes()).padStart(2, '0');
+            var seconds = String(now.getSeconds()).padStart(2, '0');
+            clockDisplay.textContent = hours + ':' + minutes + ':' + seconds;
         }
-        log('Probando '+(trial+1)+': '+s.title.substring(0,25));
-        elVideo.dataset.idx=startIdx+trial;
-        elVideo.src=s.url;
-        elVideo.play().then(function(){log('✓ '+s.title.substring(0,30));}).catch(function(){trial++;setTimeout(tryNext,800);});
-    }
-    elVideo.style.display='block';
-    elMenu.style.display='none';
-    elVideo.onerror=function(){trial++;setTimeout(tryNext,500);};
-    tryNext();
-}
+        setInterval(updateClock, 1000);
+        updateClock();
 
-function playFav(favIdx){
-    var f=favorites[favIdx];
-    if(!f)return;
-    elVideo.dataset.idx=favIdx;
-    elVideo.src=f.url;
-    elVideo.style.display='block';
-    elMenu.style.display='none';
-    elVideo.onerror=function(){
-        var n=parseInt(elVideo.dataset.idx)+1;
-        if(n<favorites.length){log('Error, siguiente...');setTimeout(function(){playFav(n)},1500);}else{log('Sin opciones');}
-    };
-    elVideo.play().catch(function(){log('Toca para reproducir');});
-}
+        // ============================================
+        // RENDERIZAR GRID DE CONTENIDO
+        // ============================================
+        function renderContentGrid(filter) {
+            contentGrid.innerHTML = '';
+            var filteredData = contentData;
+            
+            if (filter && filter !== 'all') {
+                filteredData = contentData.filter(function(item) {
+                    return item.category === filter;
+                });
+            }
 
-function buscar(){
-    if(!txt.trim())return;
-    log('Buscando...');
-    elSel.innerHTML='';streams=[];page=1;
-    loadPage(1);
-}
-
-function loadPage(p){
-    if(loading)return;
-    loading=true;
-    log('Cargando...');
-    var x=new XMLHttpRequest();
-    x.open('GET',API+'?q='+encodeURIComponent(txt)+'&page='+p,true);
-    x.onload=function(){
-        loading=false;
-        if(x.status===200){
-            try{
-                var d=JSON.parse(x.responseText);
-                showStreams(d.streams||[],d.hasMore,p===1);
-                if(p>1){idx=streams.length-d.streams.length;elSel.selectedIndex=idx;elSel.focus();}
-            }catch(e){log('Error');}
+            filteredData.forEach(function(item, index) {
+                var card = document.createElement('div');
+                card.className = 'content-card';
+                card.setAttribute('data-id', item.id);
+                card.innerHTML = 
+                    '<div class="content-card-ascii">' + item.ascii + '</div>' +
+                    '<div class="content-card-info">' +
+                        '<div class="content-card-title">' + item.title + '</div>' +
+                        '<div class="content-card-meta">' +
+                            '<span class="content-card-channel">' + item.channel + '</span> | ' +
+                            item.duration +
+                        '</div>' +
+                    '</div>';
+                
+                card.addEventListener('click', function() {
+                    selectContent(index);
+                });
+                
+                card.addEventListener('dblclick', function() {
+                    playContent(item);
+                });
+                
+                contentGrid.appendChild(card);
+            });
         }
-    };
-    x.onerror=function(){loading=false;log('Sin conexion');};
-    x.send();
-}
 
-function showStreams(data,more,isFirst){
-    if(!data||!data.length){log('Sin resultados');return;}
-    hasMore=more;
-    data.sort(function(a,b){
-        var ga=/1080|4k|uhd/i.test(a.title)?3:(/720|hd/i.test(a.title)?2:1);
-        var gb=/1080|4k|uhd/i.test(b.title)?3:(/720|hd/i.test(b.title)?2:1);
-        return gb-ga;
-    });
-    if(isFirst){streams=data;idx=-1;elSel.innerHTML='';elSel.classList.remove('hidden');}
-    data.forEach(function(s,i){
-        var pos=isFirst?i:streams.length;
-        elSel.add(new Option((pos+1)+'. '+s.title.substring(0,50)+ql(s.title),pos));
-        streams.push(s);
-    });
-    log(streams.length+' streams'+(hasMore?' - MAS':' - FIN'));
-}
+        // ============================================
+        // SELECCIONAR CONTENIDO
+        // ============================================
+        function selectContent(index) {
+            var cards = contentGrid.querySelectorAll('.content-card');
+            cards.forEach(function(card) {
+                card.classList.remove('selected');
+            });
+            
+            if (cards[index]) {
+                cards[index].classList.add('selected');
+                selectedCardIndex = index;
+                showContentModal(contentData[index]);
+            }
+        }
 
-document.addEventListener('keydown',function(e){
-    var k=e.key;
-    if(elVideo.style.display==='block'){
-        if(k==='Escape'){elVideo.pause();elVideo.style.display='none';elMenu.style.display='flex';log('Cerrado');}
-        else if(k===' '){e.preventDefault();elVideo.paused?elVideo.play():elVideo.pause();}
-        else if(k==='ArrowRight'){e.preventDefault();var n=parseInt(elVideo.dataset.idx)+1;n<streams.length?playStream(n):log('Fin lista');}
-        else if(k==='ArrowLeft'){e.preventDefault();var p=parseInt(elVideo.dataset.idx)-1;p>=0?playStream(p):log('Inicio lista');}
-        return;
-    }
-    if(k==='ArrowDown'){
-        e.preventDefault();
-        var lim=mode==='search'&&txt.length>0?streams.length-1:favorites.length-1;
-        if(idx<lim){idx++;elSel.value=idx;elSel.selectedIndex=idx;elSel.focus();log((mode==='search'?streams[idx]:favorites[idx]).title.substring(0,40));}
-        else if(mode==='search'&&txt.length>0&&hasMore){page++;loadPage(page);log('Cargando más...');}
-    }else if(k==='ArrowUp'){
-        e.preventDefault();
-        if(idx>0){idx--;elSel.value=idx;elSel.selectedIndex=idx;elSel.focus();log((mode==='search'?streams[idx]:favorites[idx]).title.substring(0,40));}
-    }else if(k==='Enter'){
-        e.preventDefault();
-        if(mode==='favorites'&&favorites[idx])playFav(idx);
-        else if(mode==='search'&&txt.length>0&&idx>=0&&streams[idx])playStream(idx);
-        else if(mode==='search'){setMode('search');buscar();}
-    }else if(k==='Backspace'){txt=txt.slice(0,-1);renderIn();idx=-1;elSel.innerHTML='';}
-    else if(k.length===1){txt+=k;renderIn();}
-    else if(k==='F1'){e.preventDefault();document.getElementById('qm').classList.toggle('show');}
-    else if(k==='f'||k==='F'){if(mode==='search'&&streams[idx])addFavorite();}
-    else if(k==='s'||k==='S'){showFavorites();}
-    else if(k==='Home'){txt='';renderIn();setMode('search');elSel.innerHTML='';idx=-1;}
-    else if(k==='PageDown'){if(hasMore){page++;loadPage(page);}}
-    else if(k==='PageUp'){if(page>1){page--;loadPage(page);}}
-});
+        // ============================================
+        // MOSTRAR MODAL DE INFORMACION
+        // ============================================
+        function showContentModal(content) {
+            currentContent = content;
+            modalTitle.textContent = content.title;
+            modalAscii.textContent = content.ascii;
+            modalDescription.textContent = content.description;
+            modalOverlay.classList.add('active');
+        }
 
-renderIn();
-</script>
+        // ============================================
+        // REPRODUCIR CONTENIDO
+        // ============================================
+        function playContent(content) {
+            if (!content) return;
+            
+            modalOverlay.classList.remove('active');
+            loadingOverlay.classList.add('active');
+            
+            // Simular carga
+            setTimeout(function() {
+                loadingOverlay.classList.remove('active');
+                
+                // Limpiar reproductor
+                videoPlayer.innerHTML = '';
+                
+                // Crear iframe para el stream
+                var iframe = document.createElement('iframe');
+                iframe.src = content.url;
+                iframe.setAttribute('allow', 'autoplay; encrypted-media');
+                iframe.setAttribute('allowfullscreen', 'true');
+                
+                videoPlayer.appendChild(iframe);
+                videoPlayer.appendChild(loadingOverlay);
+                
+                isPlaying = true;
+                playPauseBtn.textContent = '⏸ PAUSE';
+                currentChannelDisplay.textContent = 'STR';
+                
+                // Actualizar placeholder ASCII
+                placeholderAscii.textContent = content.ascii;
+                
+                // Simular progreso
+                simulateProgress();
+            }, 1500);
+        }
+
+        // ============================================
+        // SIMULAR PROGRESO DE VIDEO
+        // ============================================
+        function simulateProgress() {
+            var progress = 0;
+            var interval = setInterval(function() {
+                if (!isPlaying) {
+                    clearInterval(interval);
+                    return;
+                }
+                progress += 0.1;
+                if (progress > 100) progress = 0;
+                progressFill.style.width = progress + '%';
+                
+                // Actualizar tiempo
+                var totalSeconds = Math.floor(progress * 240); // 4 minutos simulados
+                var mins = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+                var secs = String(totalSeconds % 60).padStart(2, '0');
+                currentTimeDisplay.textContent = mins + ':' + secs;
+                durationDisplay.textContent = '04:00';
+            }, 100);
+        }
+
+        // ============================================
+        // CAMBIAR CANAL
+        // ============================================
+        function changeChannel(direction) {
+            currentChannel += direction;
+            if (currentChannel < 1) currentChannel = totalChannels;
+            if (currentChannel > totalChannels) currentChannel = 1;
+            
+            currentChannelDisplay.textContent = String(currentChannel).padStart(2, '0');
+            
+            // Efecto de estatica al cambiar canal
+            videoPlayer.classList.add('glitch');
+            setTimeout(function() {
+                videoPlayer.classList.remove('glitch');
+            }, 300);
+            
+            // Actualizar nav items
+            navItems.forEach(function(item) {
+                item.classList.remove('active');
+                if (item.getAttribute('data-channel') === String(currentChannel - 1)) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        // ============================================
+        // ACTIVAR MODO GLITCH
+        // ============================================
+        function toggleGlitch() {
+            glitchMode = !glitchMode;
+            
+            if (glitchMode) {
+                document.body.classList.add('glitch');
+                document.querySelectorAll('.tv-header, .tv-footer').forEach(function(el) {
+                    el.classList.add('glitch-text');
+                });
+            } else {
+                document.body.classList.remove('glitch');
+                document.querySelectorAll('.tv-header, .tv-footer').forEach(function(el) {
+                    el.classList.remove('glitch-text');
+                });
+            }
+        }
+
+        // ============================================
+        // CONTROLES DE VIDEO
+        // ============================================
+        playPauseBtn.addEventListener('click', function() {
+            isPlaying = !isPlaying;
+            playPauseBtn.textContent = isPlaying ? '⏸ PAUSE' : '▶ PLAY';
+        });
+
+        stopBtn.addEventListener('click', function() {
+            isPlaying = false;
+            playPauseBtn.textContent = '▶ PLAY';
+            videoPlayer.innerHTML = '';
+            videoPlayer.appendChild(createPlaceholder());
+            videoPlayer.appendChild(loadingOverlay);
+            currentChannelDisplay.textContent = String(currentChannel).padStart(2, '0');
+            progressFill.style.width = '0%';
+            currentTimeDisplay.textContent = '00:00';
+        });
+
+        fullscreenBtn.addEventListener('click', function() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) {
+                document.documentElement.msRequestFullscreen();
+            }
+        });
+
+        progressBar.addEventListener('click', function(e) {
+            var rect = progressBar.getBoundingClientRect();
+            var pos = (e.clientX - rect.left) / rect.width * 100;
+            progressFill.style.width = pos + '%';
+        });
+
+        // ============================================
+        // CREAR PLACEHOLDER
+        // ============================================
+        function createPlaceholder() {
+            var placeholder = document.createElement('div');
+            placeholder.className = 'video-placeholder';
+            placeholder.innerHTML = 
+                '<div class="video-placeholder-ascii" id="placeholderAscii">' + placeholderAscii.innerHTML + '</div>' +
+                '<div class="video-placeholder-text">Selecciona contenido para reproducir</div>';
+            return placeholder;
+        }
+
+        // ============================================
+        // NAVEGACION POR TECLADO
+        // ============================================
+        document.addEventListener('keydown', function(e) {
+            switch(e.keyCode) {
+                case 38: // Arrow Up
+                    e.preventDefault();
+                    if (selectedCardIndex > 0) {
+                        selectedCardIndex--;
+                        selectContent(selectedCardIndex);
+                    }
+                    break;
+                case 40: // Arrow Down
+                    e.preventDefault();
+                    if (selectedCardIndex < contentData.length - 1) {
+                        selectedCardIndex++;
+                        selectContent(selectedCardIndex);
+                    }
+                    break;
+                case 37: // Arrow Left
+                    changeChannel(-1);
+                    break;
+                case 39: // Arrow Right
+                    changeChannel(1);
+                    break;
+                case 13: // Enter
+                    if (currentContent) {
+                        playContent(currentContent);
+                    } else if (contentData[selectedCardIndex]) {
+                        playContent(contentData[selectedCardIndex]);
+                    }
+                    break;
+                case 32: // Space
+                    e.preventDefault();
+                    if (currentContent) {
+                        isPlaying = !isPlaying;
+                        playPauseBtn.textContent = isPlaying ? '⏸ PAUSE' : '▶ PLAY';
+                    }
+                    break;
+                case 71: // G
+                    toggleGlitch();
+                    break;
+                case 27: // Escape
+                    modalOverlay.classList.remove('active');
+                    break;
+            }
+        });
+
+        // ============================================
+        // NAVEGACION POR CATEGORIAS
+        // ============================================
+        navItems.forEach(function(item) {
+            item.addEventListener('click', function() {
+                var category = this.getAttribute('data-category');
+                if (category) {
+                    navItems.forEach(function(nav) {
+                        nav.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    renderContentGrid(category);
+                }
+                
+                var channel = this.getAttribute('data-channel');
+                if (channel !== null) {
+                    currentChannel = parseInt(channel) + 1;
+                    currentChannelDisplay.textContent = String(currentChannel).padStart(2, '0');
+                    navItems.forEach(function(nav) {
+                        nav.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // ============================================
+        // MODAL CONTROLES
+        // ============================================
+        modalPlayBtn.addEventListener('click', function() {
+            if (currentContent) {
+                playContent(currentContent);
+            }
+        });
+
+        modalCloseBtn.addEventListener('click', function() {
+            modalOverlay.classList.remove('active');
+        });
+
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('active');
+            }
+        });
+
+        // ============================================
+        // INICIALIZAR
+        // ============================================
+        renderContentGrid('all');
+        
+        // Seleccionar primer elemento
+        setTimeout(function() {
+            selectContent(0);
+        }, 500);
+
+        // Mensaje de bienvenida en consola
+        console.log('%c MoJiTo TV - Dreamcore Terminal Interface ', 
+            'background: #000; color: #00ff41; font-size: 16px; padding: 10px;');
+        console.log('%c Controles: ↑↓ Navegar | ENTER Play | G Glitch ', 
+            'background: #000; color: #ff00ff; font-size: 12px; padding: 5px;');
+    </script>
 </body>
 </html>
