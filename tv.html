@@ -432,12 +432,16 @@ body:before{
     height:100%;
     background:#000;
     object-fit:contain;
+    z-index:1;
+}
+body.playing #video{
+    z-index:1;
 }
 #fullscreenBtn{
     position:absolute;
     top:10px;
     right:10px;
-    z-index:100;
+    z-index:200;
     width:48px;
     height:48px;
     background:rgba(0,0,0,0.7);
@@ -461,10 +465,11 @@ body.playing #fullscreenBtn{
 #playOverlay{
     position:absolute;
     inset:0;
+    z-index:50;
     display:flex;
     align-items:center;
     justify-content:center;
-    background:rgba(0,0,0,0.6);
+    background:rgba(0,0,0,0.8);
     opacity:0;
     transition:opacity 0.3s;
     pointer-events:none;
@@ -480,12 +485,10 @@ body.playing #fullscreenBtn{
     fill:#fff;
     filter:drop-shadow(0 4px 20px rgba(0,255,255,0.5));
 }
-body.playing #playOverlay{
-    display:none;
-}
 #screenOverlay{
     position:absolute;
     inset:0;
+    z-index:10;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -535,6 +538,7 @@ body.playing #playOverlay{
     top:10px;
     left:10px;
     right:10px;
+    z-index:60;
     display:flex;
     justify-content:space-between;
     gap:10px;
@@ -594,6 +598,7 @@ body.playing #playOverlay{
     position:absolute;
     left:10px;
     bottom:10px;
+    z-index:60;
     padding:7px 9px;
     max-width:80%;
     background:rgba(0,0,0,.72);
@@ -732,6 +737,7 @@ body.playing #screenWrap{
         inset:0;
         z-index:9999;
         border:none;
+        background:#000;
     }
     body.playing #content{
         height:100%;
@@ -739,7 +745,12 @@ body.playing #screenWrap{
     body.playing #screenFrame{
         height:100%;
     }
+    body.playing #screenFrame .panel-title,
+    body.playing .screen-topbar{
+        display:none;
+    }
 }
+@media (max-width: 1200px){
     #workspace{
         flex-direction:column;
     }
@@ -1385,13 +1396,12 @@ function startSource(index){
     $('screenLabel').textContent = 'PLAYBACK';
     $('playerStatus').textContent = 'CONNECTING | SOURCE ' + (index + 1) + '/' + currentSources.length;
     setStatus('CONNECTING | ' + prettyName(channelName(currentChannel)) + ' | SOURCE ' + (index + 1) + '/' + currentSources.length, 'Premium on demand');
+    $('video').style.display = 'block';
+    $('video').style.visibility = 'visible';
+    $('video').style.opacity = '1';
     $('video').src = url;
     $('video').load();
     showPlayOverlay();
-    setTimeout(function(){
-        $('video').focus();
-        $('video').click();
-    }, 100);
 
     sourceWatchdog = setTimeout(function(){
         if(playing && currentSourceIndex === index){
