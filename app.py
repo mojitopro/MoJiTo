@@ -117,34 +117,30 @@ def get_device_type():
 def get_html_version():
     """
     Determina que version HTML servir basado en el User-Agent.
-    Retorna: 'legacy' o 'modern'
+    Retorna: 'pluto', 'legacy' o 'modern'
     """
     ua = request.headers.get('User-Agent', '')
     
-    # Siempre usar legacy para TVs detectadas
-    if is_legacy_browser(ua):
-        return 'legacy'
-    
-    # Usar legacy si el dispositivo es TV
-    if get_device_type() == 'tv':
-        return 'legacy'
-    
     # Parametro explicito para forzar version
     version = request.args.get('version', '').strip().lower()
+    if version in {'pluto', 'tv'}:
+        return 'pluto'
     if version in {'legacy', 'old', 'es5'}:
         return 'legacy'
     if version in {'modern', 'new', 'es6'}:
         return 'modern'
     
-    # Por defecto, usar legacy para maxima compatibilidad
-    return 'legacy'
+    # Por defecto, usar pluto (estilo Pluto TV) para maxima compatibilidad
+    return 'pluto'
 
 @app.route('/')
 def index():
     device = get_device_type()
     html_version = get_html_version()
     
-    # Servir version legacy por defecto para TV
+    # Servir version pluto por defecto
+    if html_version == 'pluto':
+        return send_file(str(BASE_DIR / 'tv-pluto.html'))
     if html_version == 'legacy':
         return send_file(str(BASE_DIR / 'tv-legacy.html'))
     
@@ -156,9 +152,16 @@ def index():
 @app.route('/tv')
 def tv():
     html_version = get_html_version()
+    if html_version == 'pluto':
+        return send_file(str(BASE_DIR / 'tv-pluto.html'))
     if html_version == 'legacy':
         return send_file(str(BASE_DIR / 'tv-legacy.html'))
     return send_file(str(BASE_DIR / 'tv.html'))
+
+@app.route('/pluto')
+@app.route('/tv-pluto.html')
+def tv_pluto():
+    return send_file(str(BASE_DIR / 'tv-pluto.html'))
 
 @app.route('/tv-legacy.html')
 @app.route('/legacy')
