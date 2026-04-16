@@ -146,14 +146,15 @@ def get_premium_channels(limit=None, sort_by='latency'):
 
     channels = [_summarize_group(name, items) for name, items in grouped.items() if items]
 
-    measured = [c for c in channels if c.get('best_latency_ms') is not None]
-    if measured:
-        channels = measured
-
     if sort_by == 'name':
         channels.sort(key=lambda c: c['name'])
     else:
-        channels.sort(key=lambda c: (c.get('best_latency_ms') or 999999, -c['best_score'], c['name']))
+        channels.sort(key=lambda c: (
+            c.get('best_latency_ms') is None,
+            c.get('best_latency_ms') or 999999,
+            -c['best_score'],
+            c['name']
+        ))
 
     if limit:
         channels = channels[:limit]
@@ -251,10 +252,6 @@ def get_best_stream(channel_name, max_retries=3, premium_only=False):
     if not candidates:
         return None
 
-    measured = [c for c in candidates if c.get('latency_ms') is not None]
-    if measured:
-        candidates = measured
-
     candidates = sorted(candidates, key=stream_sort_key)
     best = candidates[0]
     fallbacks = [s['url'] for s in candidates[1:9] if s['url'] != best['url']]
@@ -284,10 +281,6 @@ def search_channels(query, premium_only=False, limit=50):
     candidates = _load_all_streams(query=q, premium_only=premium_only, include_unknown=False)
     if not candidates:
         return []
-
-    measured = [item for item in candidates if item['latency'] < 999]
-    if measured:
-        candidates = measured
 
     candidates = sorted(candidates, key=stream_sort_key)
 
