@@ -463,27 +463,22 @@ body.playing #fullscreenBtn{
     display:flex;
 }
 #playOverlay{
-    position:absolute;
-    inset:0;
-    z-index:50;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:rgba(0,0,0,0.8);
-    opacity:0;
-    transition:opacity 0.3s;
-    pointer-events:none;
-    cursor:pointer;
+    display:none;
 }
 #playOverlay.visible{
-    opacity:1;
-    pointer-events:auto;
+    display:flex;
+    position:absolute;
+    inset:0;
+    z-index:100;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,0.85);
+    cursor:pointer;
 }
-#playOverlay svg{
+#playOverlay.visible svg{
     width:120px;
     height:120px;
     fill:#fff;
-    filter:drop-shadow(0 4px 20px rgba(0,255,255,0.5));
 }
 #screenOverlay{
     position:absolute;
@@ -838,7 +833,7 @@ body.playing #screenWrap{
                     <div id="screenWrap">
                         <video id="video" playsinline webkit-playsinline preload="auto"></video>
                         <button id="fullscreenBtn" title="Pantalla Completa">⛶</button>
-                        <div id="playOverlay" class="visible">
+                        <div id="playOverlay">
                             <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                         </div>
                         <div id="screenOverlay">
