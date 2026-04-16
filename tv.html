@@ -433,6 +433,56 @@ body:before{
     background:#000;
     object-fit:contain;
 }
+#fullscreenBtn{
+    position:absolute;
+    top:10px;
+    right:10px;
+    z-index:100;
+    width:48px;
+    height:48px;
+    background:rgba(0,0,0,0.7);
+    border:2px solid rgba(255,255,255,0.4);
+    border-radius:8px;
+    color:#fff;
+    font-size:24px;
+    cursor:pointer;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    transition:all 0.2s;
+}
+#fullscreenBtn:hover{
+    background:rgba(0,200,200,0.8);
+    border-color:#00ffff;
+}
+body.playing #fullscreenBtn{
+    display:flex;
+}
+#playOverlay{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,0.6);
+    opacity:0;
+    transition:opacity 0.3s;
+    pointer-events:none;
+    cursor:pointer;
+}
+#playOverlay.visible{
+    opacity:1;
+    pointer-events:auto;
+}
+#playOverlay svg{
+    width:120px;
+    height:120px;
+    fill:#fff;
+    filter:drop-shadow(0 4px 20px rgba(0,255,255,0.5));
+}
+body.playing #playOverlay{
+    display:none;
+}
 #screenOverlay{
     position:absolute;
     inset:0;
@@ -673,7 +723,23 @@ body.playing #content{
 body.playing #screenFrame{
     flex:1;
 }
+body.playing #screenWrap{
+    flex:1;
+}
 @media (max-width: 1200px){
+    body.playing #screenWrap{
+        position:fixed;
+        inset:0;
+        z-index:9999;
+        border:none;
+    }
+    body.playing #content{
+        height:100%;
+    }
+    body.playing #screenFrame{
+        height:100%;
+    }
+}
     #workspace{
         flex-direction:column;
     }
@@ -759,7 +825,11 @@ body.playing #screenFrame{
                         <div id="screenState">0 / 0</div>
                     </div>
                     <div id="screenWrap">
-                        <video id="video" controls playsinline webkit-playsinline preload="auto"></video>
+                        <video id="video" playsinline webkit-playsinline preload="auto"></video>
+                        <button id="fullscreenBtn" title="Pantalla Completa">⛶</button>
+                        <div id="playOverlay" class="visible">
+                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
                         <div id="screenOverlay">
                             <div class="overlay-box">
                                 <div class="overlay-kicker">Premium on demand</div>
@@ -1280,6 +1350,10 @@ function startSource(index){
         $('screenLabel').textContent = 'PLAYING';
         $('playerStatus').textContent = 'PLAYING | SOURCE ' + (currentSourceIndex + 1) + '/' + currentSources.length;
         setStatus('PLAYING | ' + prettyName(channelName(currentChannel)) + ' | ' + (currentSourceIndex + 1) + '/' + currentSources.length, 'Premium on demand');
+        hidePlayOverlay();
+        if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && !document.fullscreenElement){
+            setTimeout(function(){ toggleFullscreen(); }, 500);
+        }
         if(mutedRetryPending){
             setTimeout(function(){
                 try{
@@ -1313,6 +1387,11 @@ function startSource(index){
     setStatus('CONNECTING | ' + prettyName(channelName(currentChannel)) + ' | SOURCE ' + (index + 1) + '/' + currentSources.length, 'Premium on demand');
     $('video').src = url;
     $('video').load();
+    showPlayOverlay();
+    setTimeout(function(){
+        $('video').focus();
+        $('video').click();
+    }, 100);
 
     sourceWatchdog = setTimeout(function(){
         if(playing && currentSourceIndex === index){
@@ -1454,14 +1533,55 @@ function togglePause(){
         video.play();
         $('playerStatus').textContent = 'RESUMING';
         setStatus('RESUMING | ' + prettyName(channelName(currentChannel)), 'Premium on demand');
+        hidePlayOverlay();
     }else{
         video.pause();
         $('playerStatus').textContent = 'PAUSED';
         setStatus('PAUSED | ' + prettyName(channelName(currentChannel)), 'Premium on demand');
+        showPlayOverlay();
     }
 }
 
+function showPlayOverlay(){
+    $('playOverlay').classList.add('visible');
+}
+
+function hidePlayOverlay(){
+    $('playOverlay').classList.remove('visible');
+}
+
+function toggleFullscreen(){
+    var elem = document.documentElement;
+    if(!document.fullscreenElement && !document.webkitFullscreenElement){
+        if(elem.requestFullscreen){
+            elem.requestFullscreen();
+        }else if(elem.webkitRequestFullscreen){
+            elem.webkitRequestFullscreen();
+        }else if(elem.webkitEnterFullscreen){
+            elem.webkitEnterFullscreen();
+        }
+        $('fullscreenBtn').textContent = '⛶';
+    }else{
+        if(document.exitFullscreen){
+            document.exitFullscreen();
+        }else if(document.webkitExitFullscreen){
+            document.webkitExitFullscreen();
+        }
+    }
+}
+
+document.addEventListener('fullscreenchange', function(){
+    $('fullscreenBtn').textContent = document.fullscreenElement ? '✕' : '⛶';
+});
+document.addEventListener('webkitfullscreenchange', function(){
+    $('fullscreenBtn').textContent = document.webkitFullscreenElement ? '✕' : '⛶';
+});
+
 function closePlayback(){
+    if(document.fullscreenElement){
+        if(document.exitFullscreen) document.exitFullscreen();
+        else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
     setPlayingMode(false);
     updateDetails(currentItem());
     setStatus('READY | ' + filteredChannels.length + ' visible | ' + allChannels.length + ' premium', 'Premium on demand');
@@ -1626,6 +1746,11 @@ function handleKeydown(e){
             togglePause();
             return;
         }
+        if(key === 'f' || key === 'F'){
+            e.preventDefault();
+            toggleFullscreen();
+            return;
+        }
         if(key === 'ArrowDown' || key === 'ArrowRight' || key === 'PageDown' || key === 'ChannelDown'){
             e.preventDefault();
             moveSelection(1);
@@ -1728,6 +1853,22 @@ function bindUI(){
                 return;
             }
             node = node.parentNode;
+        }
+    });
+
+    $('fullscreenBtn').addEventListener('click', function(e){
+        e.stopPropagation();
+        toggleFullscreen();
+    });
+
+    $('playOverlay').addEventListener('click', function(){
+        hidePlayOverlay();
+        $('video').play();
+    });
+
+    $('video').addEventListener('click', function(){
+        if(playing && !document.fullscreenElement){
+            toggleFullscreen();
         }
     });
 
