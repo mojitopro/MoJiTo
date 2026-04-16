@@ -433,9 +433,6 @@ body:before{
     object-fit:contain;
     z-index:1;
 }
-body.playing #video{
-    display:block;
-}
 #fullscreenBtn{
     position:absolute;
     top:10px;
@@ -704,53 +701,43 @@ body.playing #fullscreenBtn{
     margin-bottom:6px;
     color:var(--accent2);
 }
-body.playing #sidebar{
-    display:none;
-}
-body.playing #detailsRow{
-    display:none;
-}
+body.playing #sidebar,
+body.playing #detailsRow,
 body.playing #screenOverlay{
-    display:none;
-}
-body.playing #window{
-    background:var(--face);
+    display:none !important;
 }
 body.playing #content{
     width:100%;
+    height:100%;
 }
 body.playing #screenFrame{
-    flex:1;
+    width:100%;
+    height:100%;
 }
 body.playing #screenWrap{
-    flex:1;
-    position:relative;
+    width:100%;
+    height:100%;
+    position:fixed !important;
+    top:0 !important;
+    left:0 !important;
+    right:0 !important;
+    bottom:0 !important;
+    z-index:9998 !important;
+    border:none !important;
+    background:#000;
 }
 body.playing #video{
-    position:absolute;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
+    width:100% !important;
+    height:100% !important;
+    display:block !important;
+    position:fixed !important;
+    top:0 !important;
+    left:0 !important;
+    z-index:9999 !important;
+    background:#000 !important;
 }
-@media (max-width: 1200px){
-    body.playing #screenWrap{
-        position:fixed;
-        inset:0;
-        z-index:9999;
-        border:none;
-        background:#000;
-    }
-    body.playing #content{
-        height:100%;
-    }
-    body.playing #screenFrame{
-        height:100%;
-    }
-    body.playing #screenFrame .panel-title,
-    body.playing .screen-topbar{
-        display:none;
-    }
+body.playing #fullscreenBtn{
+    z-index:10000 !important;
 }
 @media (max-width: 1200px){
     #workspace{
@@ -1108,8 +1095,9 @@ function setPlayingMode(isPlaying){
     $('screenOverlay').style.display = playing ? 'none' : 'flex';
     if(!playing){
         $('video').pause();
+        $('video').src = '';
         $('video').removeAttribute('src');
-        $('video').load();
+        $('video').style.cssText = '';
         currentSources = [];
         currentSourceIndex = 0;
         currentChannel = null;
@@ -1398,12 +1386,10 @@ function startSource(index){
     $('screenLabel').textContent = 'PLAYBACK';
     $('playerStatus').textContent = 'CONNECTING | SOURCE ' + (index + 1) + '/' + currentSources.length;
     setStatus('CONNECTING | ' + prettyName(channelName(currentChannel)) + ' | SOURCE ' + (index + 1) + '/' + currentSources.length, 'Premium on demand');
-    $('video').style.display = 'block';
-    $('video').style.visibility = 'visible';
-    $('video').style.opacity = '1';
-    $('video').src = url;
-    $('video').load();
-    showPlayOverlay();
+    var v = $('video');
+    v.style.cssText = 'position:fixed !important; top:0 !important; left:0 !important; width:100vw !important; height:100vh !important; z-index:9999 !important; display:block !important; background:#000 !important;';
+    v.src = url;
+    v.load();
 
     sourceWatchdog = setTimeout(function(){
         if(playing && currentSourceIndex === index){
