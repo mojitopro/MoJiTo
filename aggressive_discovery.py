@@ -2,6 +2,7 @@ import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import sqlite3
 import os
+from db_utils import get_db_path
 
 def generate_paths():
     paths = []
@@ -40,7 +41,7 @@ def scan_ip_paths(ip, port, paths):
     return ip, port, found
 
 def aggressive_discovery():
-    DB_PATH = os.environ.get('DB_PATH', 'streams.db')
+    DB_PATH = get_db_path()
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     

@@ -8,8 +8,9 @@ from channel_utils import (
     normalize_latency_ms,
     stream_sort_key,
 )
+from db_utils import get_db_path
 
-DB_PATH = os.environ.get('DB_PATH', 'streams.db')
+DB_PATH = get_db_path()
 
 
 def _connect():

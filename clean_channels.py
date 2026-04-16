@@ -2,8 +2,9 @@
 """Limpiar y reorganizar canales en la DB"""
 import sqlite3
 import os
+from db_utils import get_db_path
 
-DB_PATH = os.environ.get('DB_PATH', 'streams.db')
+DB_PATH = get_db_path()
 
 def clean_channels():
     conn = sqlite3.connect(DB_PATH)

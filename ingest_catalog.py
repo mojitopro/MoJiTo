@@ -11,8 +11,9 @@ import random
 import urllib.request
 from catalog import CATALOG, get_all_channel_names
 from channel_utils import is_premium_channel
+from db_utils import get_db_path
 
-DB_PATH = os.environ.get('DB_PATH', 'streams.db')
+DB_PATH = get_db_path()
 
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)

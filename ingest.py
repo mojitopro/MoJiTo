@@ -1,6 +1,7 @@
 import json
 import sqlite3
 import os
+from db_utils import get_db_path
 
 def normalize_channel(name):
     name = name.lower().strip()
@@ -9,7 +10,7 @@ def normalize_channel(name):
     return name
 
 def ingest_playlist(json_path='../pirate/playlist.json'):
-    db_path = os.environ.get('DB_PATH', 'streams.db')
+    db_path = get_db_path()
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     

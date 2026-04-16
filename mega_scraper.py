@@ -11,8 +11,9 @@ import re
 import time
 import os
 from datetime import datetime
+from db_utils import get_db_path
 
-DB_PATH = os.environ.get('DB_PATH', 'streams.db')
+DB_PATH = get_db_path()
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
     'Accept': '*/*',

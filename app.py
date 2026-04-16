@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 import os
+from pathlib import Path
 from flask import Flask, request, jsonify, redirect, send_file
 
 app = Flask(__name__)
+BASE_DIR = Path(__file__).resolve().parent
 
 def wants_premium_only():
     category = request.args.get('category', '').strip().lower()
@@ -31,13 +33,13 @@ def get_device_type():
 def index():
     device = get_device_type()
     if device == 'mobile':
-        return send_file('mobile.html')
-    return send_file('tv.html')
+        return send_file(str(BASE_DIR / 'mobile.html'))
+    return send_file(str(BASE_DIR / 'tv.html'))
 
 @app.route('/tv.html')
 @app.route('/tv')
 def tv():
-    return send_file('tv.html')
+    return send_file(str(BASE_DIR / 'tv.html'))
 
 @app.route('/tv-addictive.html')
 @app.route('/tv-addictive')

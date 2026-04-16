@@ -3,8 +3,9 @@ import os
 from collections import defaultdict
 
 from channel_utils import is_premium_channel, normalize_channel_name as _normalize_channel_name, stream_sort_key
+from db_utils import get_db_path
 
-DB_PATH = os.environ.get('DB_PATH', 'streams.db')
+DB_PATH = get_db_path()
 
 def normalize_channel_name(name):
     return _normalize_channel_name(name)
