@@ -8,219 +8,132 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; background: #000; color: #fff; font-family: Arial, sans-serif; }
         #video { width: 100%; height: 100%; display: none; object-fit: contain; }
-        #videoExternal { display: none; width: 100%; height: 100%; background: #111; align-items: center; justify-content: center; flex-direction: column; }
         .menu { padding: 15px; }
-        .logo { font-size: 32px; font-weight: bold; text-align: center; margin: 10px 0; }
+        .logo { font-size: 28px; text-align: center; margin: 10px 0; }
         .logo span { color: #dc143c; text-shadow: 0 0 10px #dc143c; }
         .msg { text-align: center; color: #dc143c; min-height: 20px; margin: 10px 0; font-size: 14px; }
         .list { height: 60vh; overflow-y: auto; }
-        .ch { padding: 14px; border-bottom: 1px solid #222; color: #aaa; font-size: 14px; cursor: pointer; }
-        .ch:hover, .ch:active { background: #111; }
-        .ch.active { background: #dc143c; color: #fff; }
-        .ch.error { color: #f44; }
-        .ch.ok { color: #4f4; }
+        .ch { padding: 14px; border-bottom: 1px solid #222; color: #aaa; font-size: 14px; }
+        .ch.focused { background: #222; border-left: 4px solid #dc143c; }
         .btn { padding: 12px 20px; background: #8b0000; border: none; color: #fff; font-size: 14px; margin: 5px; cursor: pointer; border-radius: 5px; }
-        .btn:active { background: #dc143c; }
-        .btns { display: flex; gap: 5px; flex-wrap: wrap; }
     </style>
 </head>
 <body>
 
-<video id="video" controls playsinline></video>
-
-<div id="videoExternal">
-    <div style="font-size: 48px; color: #666;">📺</div>
-    <div style="color: #dc143c; margin: 20px 0;">Abriendo en VLC...</div>
-    <div style="color: #666; font-size: 14px;">Si no abre, usa la app VLC en tu TV</div>
-    <button class="btn" onclick="openVLC()" style="margin-top: 20px;">ABRIR EN VLC</button>
-    <button class="btn" onclick="back()">VOLVER</button>
-</div>
+<video id="video" controls playsinline style="width:100%;height:100%;"></video>
 
 <div id="menu" class="menu">
     <div class="logo"><span>MoJiTo</span> TV</div>
-    
-    <div class="btns">
-        <button class="btn" onclick="filter('all')">TODOS</button>
-        <button class="btn" onclick="filter('deportes')">DEPORTES</button>
-        <button class="btn" onclick="filter('premium')">PREMIUM</button>
-        <button class="btn" onclick="filter('infantil')">INFANTIL</button>
-    </div>
-    
-    <div class="msg" id="msg">Cargando canales...</div>
+    <div class="msg" id="msg">↑↓ navegar | ENTER reproducir</div>
     <div class="list" id="list"></div>
-    
-    <div class="btns">
-        <button class="btn" onclick="prev()">◀</button>
+    <div style="margin-top:10px;">
+        <button class="btn" onclick="prev()">◀ ANTERIOR</button>
         <button class="btn" onclick="play()">▶ PLAY</button>
-        <button class="btn" onclick="next()">▶</button>
+        <button class="btn" onclick="next()">SIGUIENTE ▶</button>
         <button class="btn" onclick="stop()">■ STOP</button>
     </div>
 </div>
 
 <script>
-var streams = [], idx = 0, mode = 'all', currentUrl = '';
+var allStreams = [], hlsStreams = [], idx = 0;
 var video = document.getElementById('video');
 var menu = document.getElementById('menu');
-var videoExternal = document.getElementById('videoExternal');
-var elList = document.getElementById('list');
 var elMsg = document.getElementById('msg');
+var elList = document.getElementById('list');
+var focusedIdx = 0;
 
-// Cargar canales
 fetch('/api/premium').then(r=>r.json()).then(d=>{
-    streams = d.channels || [];
-    elMsg.textContent = streams.length + ' canales - Toca para ver';
+    allStreams = d.channels || [];
+    // Separar HLS de Astra
+    hlsStreams = allStreams.filter(s => s.url && s.url.indexOf('.m3u8') > 0);
+    elMsg.textContent = hlsStreams.length + ' canales HLS - ↑↓ navegar';
     render();
 });
 
 function render() {
-    var show = mode === 'all' ? streams : streams.filter(s => s.category === mode);
     var html = '';
-    for(var i=0; i<show.length; i++) {
-        html += '<div class="ch" onclick="select('+i+')">' + show[i].name + '</div>';
+    for(var i=0; i<hlsStreams.length; i++) {
+        var active = (i === focusedIdx) ? 'focused' : '';
+        html += '<div class="ch ' + active + '" id="ch' + i + '">' + hlsStreams[i].name + '</div>';
     }
     elList.innerHTML = html;
-}
-
-function filter(cat) {
-    mode = cat;
-    idx = 0;
-    render();
-    elMsg.textContent = cat;
-}
-
-function select(i) {
-    idx = i;
-    var ch = streams[i];
-    if(!ch) return;
-    
-    var url = ch.url || (ch.fallbacks && ch.fallbacks[0]) || '';
-    currentUrl = url;
-    
-    if(!url) {
-        elMsg.textContent = 'Sin URL';
-        return;
-    }
-    
-    elMsg.textContent = 'Probando: ' + ch.name;
-    playStream(url, ch.name);
-}
-
-function playStream(url, name) {
-    // Si es Astra (puerto 8000), usar proxy
-    if(url.indexOf(':8000') > 0 || url.indexOf(':8001') > 0 || url.indexOf(':18000') > 0) {
-        // Usar proxy del servidor
-        url = '/proxy/' + encodeURIComponent(url);
-    }
-    
-    elMsg.textContent = 'Cargando: ' + name + '...';
-    
-    // Intentar en navegador
-    video.src = url;
-    video.style.display = 'block';
-    menu.style.display = 'none';
-    
-    var playAttempt = video.play();
-    
-    if(playAttempt) {
-        playAttempt.then(function() {
-            elMsg.textContent = '▶ Reproduciendo: ' + name;
-        }).catch(function(e) {
-            elMsg.textContent = 'Error: ' + e.message;
-            setTimeout(function() {
-                showVLC(name);
-            }, 2000);
-        });
-    }
-    
-    // Timeout - si no reproduce en 5 segundos, intentar VLC
-    setTimeout(function() {
-        if(video.paused || video.currentTime === 0) {
-            showVLC(name);
-        }
-    }, 5000);
-}
-
-function showVLC(name) {
-    video.style.display = 'none';
-    videoExternal.style.display = 'flex';
-    menu.style.display = 'none';
-    elMsg.textContent = 'Abriendo: ' + name;
-    
-    // Intentar varios methods
-    var url = currentUrl;
-    
-    // Method 1: VLC protocol (Android TV con VLC)
-    try { window.location.href = 'vlc://' + url; } catch(e) {}
-    
-    // Method 2: External player intent (Android)
-    setTimeout(function() {
-        try {
-            // MX Player, VLC, etc
-            window.location.href = 'intent://' + url + '#Intent;package=com.mxtech.videoplayer.ad;end';
-        } catch(e) {}
-    }, 1000);
-    
-    // Method 3: JS directo
-    setTimeout(function() {
-        try {
-            window.open(url, '_blank');
-        } catch(e) {}
-    }, 2000);
-    
-    setTimeout(function() {
-        elMsg.textContent = 'Si no abrió, usa el botón';
-    }, 4000);
-}
-
-function openVLC() {
-    // Forzar apertura en VLC
-    window.location.href = 'vlc://' + currentUrl;
-}
-
-function back() {
-    video.style.display = 'none';
-    videoExternal.style.display = 'none';
-    menu.style.display = 'block';
-    video.pause();
-    elMsg.textContent = 'Detenido';
+    // Scroll into view
+    var el = document.getElementById('ch' + focusedIdx);
+    if(el) el.scrollIntoView({block: 'center'});
 }
 
 function play() {
-    select(idx);
+    var ch = hlsStreams[focusedIdx];
+    if(!ch || !ch.url) return;
+    
+    video.src = ch.url;
+    video.style.display = 'block';
+    menu.style.display = 'none';
+    
+    video.play().then(function() {
+        elMsg.textContent = '▶ ' + ch.name;
+    }).catch(function() {
+        elMsg.textContent = 'Error: ' + ch.name;
+    });
 }
 
 function stop() {
     video.pause();
     video.src = '';
-    back();
+    video.style.display = 'none';
+    menu.style.display = 'block';
+    elMsg.textContent = 'Detenido';
 }
 
 function prev() {
-    idx = Math.max(0, idx-1);
-    select(idx);
+    focusedIdx = Math.max(0, focusedIdx - 1);
+    idx = focusedIdx;
+    render();
+    elMsg.textContent = hlsStreams[focusedIdx] ? hlsStreams[focusedIdx].name : '';
 }
 
 function next() {
-    idx = Math.min(streams.length-1, idx+1);
-    select(idx);
+    focusedIdx = Math.min(hlsStreams.length - 1, focusedIdx + 1);
+    idx = focusedIdx;
+    render();
+    elMsg.textContent = hlsStreams[focusedIdx] ? hlsStreams[focusedIdx].name : '';
 }
 
-// Teclado
+// Keyboard - soporte para control remoto
 document.addEventListener('keydown', function(e) {
-    if(video.style.display === 'block' || videoExternal.style.display === 'flex') {
-        if(e.key === 'Escape') stop();
+    var k = e.keyCode;
+    
+    // Si video playing
+    if(video.style.display === 'block') {
+        if(k === 27) stop();  // ESC
         return;
     }
     
-    if(e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-        e.preventDefault();
-        next();
-    } else if(e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+    // Navegar
+    if(k === 38 || k === 33) {  // Up/PageUp
         e.preventDefault();
         prev();
-    } else if(e.key === 'Enter') {
+    } else if(k === 40 || k === 34) {  // Down/PageDown
+        e.preventDefault();
+        next();
+    } else if(k === 13) {  // Enter
         e.preventDefault();
         play();
+    } else if(k === 27) {  // ESC
+        e.preventDefault();
+        stop();
+    }
+});
+
+// Click en items
+elList.addEventListener('click', function(e) {
+    if(e.target.classList.contains('ch')) {
+        var id = e.target.id;
+        if(id.startsWith('ch')) {
+            focusedIdx = parseInt(id.substring(2));
+            render();
+            play();
+        }
     }
 });
 </script>
