@@ -6,105 +6,78 @@
     <title>MoJiTo TV</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root { --magenta: #ff00ff; --cyan: #00ffff; }
-        html, body { height: 100%; font-family: monospace; background: #0a0a0a; color: #fff; overflow: hidden; }
-        .container { display: flex; height: 100vh; padding: 15px; gap: 15px; }
-        .sidebar { width: 220px; border: 2px solid var(--magenta); padding: 10px; background: #111; }
-        .logo { color: var(--cyan); text-align: center; margin-bottom: 15px; font-size: 18px; }
-        .cat-title { color: var(--magenta); border-bottom: 1px solid var(--magenta); margin: 10px 0 8px 0; font-size: 12px; }
-        .nav-item { padding: 6px 10px; margin: 3px 0; color: #666; border: 1px solid #222; font-size: 13px; }
-        .nav-item.active { background: var(--magenta); color: #000; }
-        .main { flex: 1; display: flex; flex-direction: column; gap: 10px; }
-        .channels { flex: 1; border: 2px solid var(--magenta); padding: 10px; overflow-y: auto; background: #111; }
-        .channel { padding: 8px 12px; margin: 4px 0; color: #666; border: 1px solid #222; font-size: 13px; }
-        .channel.active { background: var(--cyan); color: #000; }
-        .player { height: 50%; border: 2px solid var(--cyan); background: #000; }
-        .player iframe { width: 100%; height: 100%; border: none; }
-        .player-empty { display: flex; align-items: center; justify-content: center; height: 100%; color: #333; font-size: 18px; }
-        .controls { display: flex; gap: 10px; padding: 8px; border: 2px solid var(--cyan); background: #111; }
-        .btn { padding: 8px 20px; border: 1px solid var(--cyan); background: transparent; color: var(--cyan); font-family: inherit; font-size: 12px; cursor: pointer; }
-        .btn:hover { background: var(--cyan); color: #000; }
-        .status { margin-left: auto; color: var(--cyan); font-size: 12px; }
+        :root { --magenta: #f0f; --cyan: #0ff; }
+        html, body { height: 100%; font-family: monospace; background: #000; color: #fff; overflow: hidden; }
+        body { padding: 10px; }
+        h1 { color: var(--cyan); text-align: center; margin: 10px 0; }
+        #msg { color: var(--magenta); text-align: center; margin: 10px 0; min-height: 24px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; padding: 10px; }
+        .ch { background: #111; border: 1px solid #333; padding: 15px; text-align: center; cursor: pointer; font-size: 14px; }
+        .ch:hover, .ch:active { background: #222; }
+        .ch.selected { background: var(--magenta); color: #000; border-color: var(--magenta); }
+        #player { width: 100%; height: 400px; background: #111; margin-top: 10px; border: 2px solid var(--cyan); }
+        iframe { width: 100%; height: 100%; border: none; }
+        .empty { display: flex; align-items: center; justify-content: center; height: 100%; color: #444; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="sidebar">
-            <div class="logo">MoJiTo TV</div>
-            <div class="cat-title">CATEGORÍAS</div>
-            <div class="nav-item active" data-cat="all">▸ Todos</div>
-            <div class="nav-item" data-cat="deportes">▸ Deportes</div>
-            <div class="nav-item" data-cat="premium">▸ Premium</div>
-            <div class="nav-item" data-cat="infantil">▸ Infantil</div>
-            <div class="nav-item" data-cat="peliculas">▸ Películas</div>
-        </div>
-        <div class="main">
-            <div class="channels" id="chList"></div>
-            <div class="player" id="player"><div class="player-empty">Presiona ↑↓ para navegar, ENTER para reproducir</div></div>
-            <div class="controls">
-                <button class="btn" onclick="play()">▶ PLAY</button>
-                <button class="btn" onclick="stop()">■ STOP</button>
-                <span class="status" id="status">63 canales cargados</span>
-            </div>
-        </div>
-    </div>
+    <h1>MoJiTo TV</h1>
+    <div id="msg">Cargando canales...</div>
+    <div class="grid" id="grid"></div>
+    <div id="player"><div class="empty">Selecciona un canal</div></div>
+    <p style="color:#666;font-size:12px;text-align:center;margin-top:10px">Usa ↑↓ o haz clic en los canales</p>
+
     <script>
-        var chs = [], cat = 'all', idx = 0, playing = false;
-        
-        fetch('/api/premium').then(r=>r.json()).then(d=>{
-            chs = d.channels || [];
+    var chs = [], idx = 0;
+    
+    fetch('/api/premium').then(r=>r.json()).then(d=>{
+        chs = d.channels || [];
+        document.getElementById('msg').textContent = chs.length + ' canales - Usa ↑↓ o clic';
+        render();
+    });
+    
+    function render() {
+        var g = document.getElementById('grid');
+        g.innerHTML = chs.map((c,i)=>
+            '<div class="ch'+(i===idx?' selected':'')+'" data-i="'+i+'" onclick="play('+i+')">'+c.name+'</div>'
+        ).join('');
+        var sel = g.querySelector('.selected');
+        if(sel) sel.scrollIntoView({block:'center'});
+    }
+    
+    function play(i) {
+        idx = i;
+        var c = chs[i];
+        if(!c) return;
+        var url = c.url || (c.fallbacks && c.fallbacks[0]);
+        document.getElementById('player').innerHTML = url 
+            ? '<iframe src="'+url+'" allow="autoplay"></iframe>'
+            : '<div class="empty">Sin stream</div>';
+        document.getElementById('msg').textContent = '▶ ' + c.name;
+    }
+    
+    // Click en grid
+    document.getElementById('grid').addEventListener('click', function(e) {
+        if(e.target.classList.contains('ch')) {
+            var i = parseInt(e.target.dataset.i);
+            play(i);
             render();
-        });
-        
-        function render() {
-            var filt = cat === 'all' ? chs : chs.filter(c=>c.category === cat);
-            document.getElementById('chList').innerHTML = filt.map((c,i)=>
-                '<div class="channel'+(i===idx?' active':'')+'">'+c.name+'</div>'
-            ).join('');
-            var items = document.querySelectorAll('.channel');
-            if(items[idx]) items[idx].scrollIntoView({block:'center'});
         }
+    });
+    
+    // Teclado
+    document.onkeydown = function(e) {
+        e.preventDefault();
+        var code = e.keyCode;
+        document.getElementById('msg').textContent = 'Key: ' + code;
         
-        function play() {
-            var filt = cat === 'all' ? chs : chs.filter(c=>c.category === cat);
-            var c = filt[idx];
-            if(!c) return;
-            var url = c.url || (c.fallbacks?.[0] '');
-            if(url) {
-                document.getElementById('player').innerHTML = '<iframe src="'+url+'" allow="autoplay"></iframe>';
-                document.getElementById('status').textContent = '▶ ' + c.name;
-                playing = true;
-            }
+        if(code === 38 || code === 40) {
+            idx = code === 38 ? Math.max(0, idx-1) : Math.min(chs.length-1, idx+1);
+            render();
+        } else if(code === 13) {
+            play(idx);
         }
-        
-        function stop() {
-            document.getElementById('player').innerHTML = '<div class="player-empty">Presiona ↑↓ para navegar, ENTER para reproducir</div>';
-            document.getElementById('status').textContent = 'Detenido';
-            playing = false;
-        }
-        
-        document.addEventListener('keydown', function(e) {
-            e.preventDefault();
-            var code = e.keyCode;
-            var filt = cat === 'all' ? chs : chs.filter(c=>c.category === cat);
-            var tot = filt.length;
-            
-            // Mostrar la tecla en status
-            var keyNames = {38:'↑',40:'↓',37:'←',39:'→',13:'ENTER',27:'ESC'};
-            document.getElementById('status').textContent = 'Key: ' + (keyNames[code] || code);
-            
-            if(code === 40 || code === 39) {  // ↓→
-                idx = Math.min(tot-1, idx+1);
-                render();
-            } else if(code === 38 || code === 37) {  // ↑←
-                idx = Math.max(0, idx-1);
-                render();
-            } else if(code === 13) {  // ENTER
-                play();
-            } else if(code === 27) {  // ESC
-                stop();
-            }
-        });
+    };
     </script>
 </body>
 </html>
