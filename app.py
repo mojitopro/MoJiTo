@@ -83,6 +83,17 @@ def api_stats():
     from selector import get_stats
     return jsonify(get_stats())
 
+@app.route('/api/premium')
+def api_premium():
+    import json
+    from pathlib import Path
+    path = BASE_DIR / 'premium_consolidated.json'
+    if path.exists():
+        with open(path) as f:
+            data = json.load(f)
+            return jsonify({'status': 'ok', 'channels': data.get('channels', [])})
+    return jsonify({'status': 'error', 'channels': []})
+
 @app.route('/api/debug')
 def api_debug():
     ua = request.headers.get('User-Agent', '')

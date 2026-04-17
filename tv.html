@@ -731,23 +731,21 @@
             loadingChannels = true;
             
             try {
-                var response = await fetch('/api/channels?limit=500');
+                var response = await fetch('/api/premium');
                 var data = await response.json();
                 
                 if (data.channels && data.channels.length > 0) {
                     contentData = data.channels.map(function(ch, index) {
                         var category = ch.category || 'General';
-                        var asciiArt = generateAsciiArt(ch.name);
                         
                         return {
                             id: index + 1,
                             title: ch.name,
                             channel: ch.name,
                             category: category.toLowerCase(),
-                            duration: ch.streams ? ch.streams + ' streams' : 'LIVE',
-                            url: ch.best_url,
-                            ascii: asciiArt,
-                            description: 'Canal: ' + ch.name + ' | Categoría: ' + category + ' | Streams disponibles: ' + (ch.streams || 0),
+                            duration: 'LIVE',
+                            url: ch.url || '',
+                            description: 'Canal: ' + ch.name + ' | Categoría: ' + category,
                             fallbacks: ch.fallbacks || [],
                             premium: ch.premium || false
                         };
