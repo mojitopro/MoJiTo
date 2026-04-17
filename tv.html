@@ -152,15 +152,15 @@
 ╚══════════════╝
 </div>
             <div class="cat-title">CATEGORÍAS</div>
-            <div class="nav-item active" data-cat="all" tabindex="0">▸ Todos</div>
-            <div class="nav-item" data-cat="deportes" tabindex="0">▸ Deportes</div>
-            <div class="nav-item" data-cat="premium" tabindex="0">▸ Premium</div>
-            <div class="nav-item" data-cat="infantil" tabindex="0">▸ Infantil</div>
-            <div class="nav-item" data-cat="entretenimiento" tabindex="0">▸ Entretenimiento</div>
-            <div class="nav-item" data-cat="peliculas" tabindex="0">▸ Películas</div>
-            <div class="nav-item" data-cat="documentales" tabindex="0">▸ Documentales</div>
-            <div class="nav-item" data-cat="noticias" tabindex="0">▸ Noticias</div>
-            <div class="nav-item" data-cat="musica" tabindex="0">▸ Música</div>
+            <div class="nav-item active" data-cat="all" tabindex="0" onfocus="inSidebar=true">▸ Todos</div>
+            <div class="nav-item" data-cat="deportes" tabindex="0" onfocus="inSidebar=true">▸ Deportes</div>
+            <div class="nav-item" data-cat="premium" tabindex="0" onfocus="inSidebar=true">▸ Premium</div>
+            <div class="nav-item" data-cat="infantil" tabindex="0" onfocus="inSidebar=true">▸ Infantil</div>
+            <div class="nav-item" data-cat="entretenimiento" tabindex="0" onfocus="inSidebar=true">▸ Entretenimiento</div>
+            <div class="nav-item" data-cat="peliculas" tabindex="0" onfocus="inSidebar=true">▸ Películas</div>
+            <div class="nav-item" data-cat="documentales" tabindex="0" onfocus="inSidebar=true">▸ Documentales</div>
+            <div class="nav-item" data-cat="noticias" tabindex="0" onfocus="inSidebar=true">▸ Noticias</div>
+            <div class="nav-item" data-cat="musica" tabindex="0" onfocus="inSidebar=true">▸ Música</div>
             <div class="cat-title">FAVORITOS</div>
             <div id="favorites"></div>
         </div>
@@ -189,7 +189,8 @@
         fetch('/api/premium').then(r=>r.json()).then(d=>{
             channels = d.channels || [];
             renderChannels();
-            document.querySelector('.nav-item').focus();
+            inSidebar = true;
+            setTimeout(() => document.querySelector('.nav-item')?.focus(), 100);
         });
         
         function filter(cat) {
@@ -210,7 +211,7 @@
             var list = document.getElementById('channelList');
             var filtered = currentCat === 'all' ? channels : channels.filter(c=>c.category === currentCat);
             list.innerHTML = filtered.map((c,i)=>'
-                <div class="channel'+(i===selectedIndex?' active':'')+'" tabindex="0" ondblclick="play('+i+')">
+                <div class="channel'+(i===selectedIndex?' active':'')+'" tabindex="0" onfocus="inSidebar=false" data-index="'+i+'">
                     <span class="channel-name">'+c.name+'</span>
                     <span class="channel-cat">'+c.category+'</span>
                 </div>
@@ -218,7 +219,10 @@
             
             // Scroll to selected
             var active = list.querySelector('.active');
-            if(active) active.scrollIntoView({block: 'center'});
+            if(active) {
+                active.focus();
+                active.scrollIntoView({block: 'center'});
+            }
         }
         
         function play(idx) {
@@ -226,12 +230,16 @@
             var ch = filtered[idx];
             if(!ch) return;
             
-            var url = ch.url;
+            var url = ch.url || '';
             if(!url && ch.fallbacks && ch.fallbacks.length > 0) url = ch.fallbacks[0];
             
-            document.getElementById('player').innerHTML = '<iframe src="'+url+'" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
-            document.getElementById('status').textContent = 'Reproduciendo: ' + ch.name;
-            isPlaying = true;
+            if(url) {
+                document.getElementById('player').innerHTML = '<iframe src="'+url+'" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+                document.getElementById('status').textContent = 'Reproduciendo: ' + ch.name;
+                isPlaying = true;
+            } else {
+                document.getElementById('status').textContent = 'Sin stream disponible';
+            }
         }
         
         function playChannel() {
@@ -256,52 +264,50 @@
         document.addEventListener('keydown', function(e) {
             var filtered = currentCat === 'all' ? channels : channels.filter(c=>c.category === currentCat);
             var total = filtered.length;
+            var keyCode = e.keyCode;
             
-            // Left/Right to switch between sidebar and channels
-            if(e.key === 'ArrowRight') {
+            // Philco remote mapping
+            // 38=Up, 40=Down, 37=Left, 39=Right, 13=Enter, 33=PageUp, 34=PageDown
+            if(keyCode === 39 || keyCode === 40) {  // Right/Down
                 e.preventDefault();
-                inSidebar = false;
-                document.getElementById('channelList').querySelector('.channel')?.focus();
-            } else if(e.key === 'ArrowLeft') {
-                e.preventDefault();
-                inSidebar = true;
-                document.querySelector('.nav-item.active, .nav-item')?.focus();
-            } else if(e.key === 'ArrowUp') {
-                e.preventDefault();
-                if(inSidebar || document.activeElement.classList.contains('nav-item')) {
-                    var navs = document.querySelectorAll('.nav-item');
-                    var idx = Array.from(navs).findIndex(n => n === document.activeElement);
-                    if(idx > 0) navs[idx-1].focus();
-                } else {
-                    selectedIndex = Math.max(0, selectedIndex - 1);
-                    renderChannels();
-                    document.getElementById('channelList').querySelector('.active')?.focus();
-                }
-            } else if(e.key === 'ArrowDown') {
-                e.preventDefault();
-                if(inSidebar || document.activeElement.classList.contains('nav-item')) {
+                if(inSidebar) {
                     var navs = document.querySelectorAll('.nav-item');
                     var idx = Array.from(navs).findIndex(n => n === document.activeElement);
                     if(idx < navs.length-1) navs[idx+1].focus();
                 } else {
                     selectedIndex = Math.min(total - 1, selectedIndex + 1);
                     renderChannels();
-                    document.getElementById('channelList').querySelector('.active')?.focus();
                 }
-            } else if(e.key === 'Enter') {
+            } else if(keyCode === 37 || keyCode === 38) {  // Left/Up
+                e.preventDefault();
+                if(inSidebar) {
+                    var navs = document.querySelectorAll('.nav-item');
+                    var idx = Array.from(navs).findIndex(n => n === document.activeElement);
+                    if(idx > 0) navs[idx-1].focus();
+                } else {
+                    selectedIndex = Math.max(0, selectedIndex - 1);
+                    renderChannels();
+                }
+            } else if(keyCode === 13) {  // Enter/OK
                 e.preventDefault();
                 if(document.activeElement.classList.contains('nav-item')) {
                     filter(document.activeElement.dataset.cat);
                 } else {
                     play(selectedIndex);
                 }
-            } else if(e.key === 'Escape') {
+            } else if(keyCode === 33) {  // PageUp - previous category
                 e.preventDefault();
-                if(isPlaying) {
-                    stopChannel();
-                } else {
-                    document.querySelector('.nav-item')?.focus();
-                }
+                var cats = ['all','deportes','premium','infantil','entretenimiento','peliculas','documentales','noticias','musica'];
+                var idx = cats.indexOf(currentCat);
+                if(idx > 0) filter(cats[idx-1]); else filter(cats[cats.length-1]);
+            } else if(keyCode === 34) {  // PageDown - next category
+                e.preventDefault();
+                var cats = ['all','deportes','premium','infantil','entretenimiento','peliculas','documentales','noticias','musica'];
+                var idx = cats.indexOf(currentCat);
+                if(idx < cats.length-1) filter(cats[idx+1]); else filter(cats[0]);
+            } else if(e.key === 'Escape' || keyCode === 26) {  // Escape/Back
+                e.preventDefault();
+                if(isPlaying) stopChannel();
             }
         });
     </script>
