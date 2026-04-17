@@ -1,0 +1,2969 @@
+[
+  {
+    "channel": "Adult Swim",
+    "streams": [
+      {
+        "url": "http://181.119.86.1:8000/play/a019",
+        "ok": false,
+        "connect_ms": 493,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://181.119.86.1:8000/play/a019",
+          "connect_time": 0.434342622756958,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://181.78.78.66:8000/play/a0fn",
+        "ok": false,
+        "connect_ms": 444,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://181.78.78.66:8000/play/a0fn",
+          "connect_time": 0.4393198490142822,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://190.61.42.218:9000/play/a06r",
+        "ok": false,
+        "connect_ms": 439,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://190.61.42.218:9000/play/a06r",
+          "connect_time": 0.4349672794342041,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://190.60.59.67:8000/play/a0io",
+        "ok": false,
+        "connect_ms": 432,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://190.60.59.67:8000/play/a0io",
+          "connect_time": 0.4335629940032959,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://181.78.79.131:8000/play/a0pk",
+        "ok": false,
+        "connect_ms": 429,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://181.78.79.131:8000/play/a0pk",
+          "connect_time": 0.47057557106018066,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://200.59.188.3:8000/play/a0qp",
+        "ok": false,
+        "connect_ms": 344,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://200.59.188.3:8000/play/a0qp",
+          "connect_time": 0.32174038887023926,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://181.119.86.1:8000/play/a019",
+      "ok": false,
+      "connect_ms": 493,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://181.119.86.1:8000/play/a019",
+        "connect_time": 0.434342622756958,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Cartoon Network",
+    "streams": [
+      {
+        "url": "http://181.78.78.66:8000/play/a0fb",
+        "ok": false,
+        "connect_ms": 440,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://181.78.78.66:8000/play/a0fb",
+          "connect_time": 0.43633556365966797,
+          "server": "unknown",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "HTTP 404"
+          ]
+        }
+      },
+      {
+        "url": "http://181.119.86.1:8000/play/a01g",
+        "ok": false,
+        "connect_ms": 433,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://181.119.86.1:8000/play/a01g",
+          "connect_time": 0.4275186061859131,
+          "server": "unknown",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "HTTP 404"
+          ]
+        }
+      },
+      {
+        "url": "http://181.78.79.131:8000/play/a0p1",
+        "ok": false,
+        "connect_ms": 413,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://181.78.79.131:8000/play/a0p1",
+          "connect_time": 0.4121115207672119,
+          "server": "unknown",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "HTTP 404"
+          ]
+        }
+      },
+      {
+        "url": "http://45.169.163.237:4000/play/a01c",
+        "ok": false,
+        "connect_ms": 143,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://45.169.163.237:4000/play/a01c",
+          "connect_time": 0.1304011344909668,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://181.78.78.66:8000/play/a0fb",
+      "ok": false,
+      "connect_ms": 440,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://181.78.78.66:8000/play/a0fb",
+        "connect_time": 0.43633556365966797,
+        "server": "unknown",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "HTTP 404"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "ESPN",
+    "streams": [
+      {
+        "url": "http://181.119.86.1:8000/play/a0c1",
+        "ok": false,
+        "connect_ms": 437,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://181.119.86.1:8000/play/a0c1",
+          "connect_time": 0.42923974990844727,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://190.60.59.67:8000/play/a0jh",
+        "ok": false,
+        "connect_ms": 434,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://190.60.59.67:8000/play/a0jh",
+          "connect_time": 0.44564080238342285,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://38.41.8.1:8000/play/a0t3",
+        "ok": false,
+        "connect_ms": 306,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0t3",
+          "connect_time": 0.30640244483947754,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://181.119.86.1:8000/play/a0c1",
+      "ok": false,
+      "connect_ms": 437,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://181.119.86.1:8000/play/a0c1",
+        "connect_time": 0.42923974990844727,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "ESPN 2",
+    "streams": [
+      {
+        "url": "http://181.119.86.1:8000/play/a03x",
+        "ok": false,
+        "connect_ms": 427,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://181.119.86.1:8000/play/a03x",
+          "connect_time": 0.42600488662719727,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://190.60.37.118:4000/play/a0bv",
+        "ok": false,
+        "connect_ms": 413,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://190.60.37.118:4000/play/a0bv",
+          "connect_time": 0.4283723831176758,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://38.41.8.1:8000/play/a0rp",
+        "ok": false,
+        "connect_ms": 297,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0rp",
+          "connect_time": 0.30001282691955566,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://181.119.86.1:8000/play/a03x",
+      "ok": false,
+      "connect_ms": 427,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://181.119.86.1:8000/play/a03x",
+        "connect_time": 0.42600488662719727,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "ESPN 3",
+    "streams": [
+      {
+        "url": "http://181.119.86.1:8000/play/a033",
+        "ok": false,
+        "connect_ms": 428,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://181.119.86.1:8000/play/a033",
+          "connect_time": 0.43227458000183105,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://181.78.79.131:8000/play/a0s6",
+        "ok": false,
+        "connect_ms": 416,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://181.78.79.131:8000/play/a0s6",
+          "connect_time": 0.41755032539367676,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://38.41.8.1:8000/play/a0sw",
+        "ok": false,
+        "connect_ms": 295,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sw",
+          "connect_time": 0.32108020782470703,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://181.119.86.1:8000/play/a033",
+      "ok": false,
+      "connect_ms": 428,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://181.119.86.1:8000/play/a033",
+        "connect_time": 0.43227458000183105,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "ESPN 4",
+    "streams": [
+      {
+        "url": "http://181.119.86.1:8000/play/a01f",
+        "ok": false,
+        "connect_ms": 435,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://181.119.86.1:8000/play/a01f",
+          "connect_time": 0.4304845333099365,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://190.60.37.118:4000/play/a09j",
+        "ok": false,
+        "connect_ms": 426,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://190.60.37.118:4000/play/a09j",
+          "connect_time": 0.4222583770751953,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://38.41.8.1:8000/play/a0sv",
+        "ok": false,
+        "connect_ms": 312,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sv",
+          "connect_time": 0.3323042392730713,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://181.119.86.1:8000/play/a01f",
+      "ok": false,
+      "connect_ms": 435,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://181.119.86.1:8000/play/a01f",
+        "connect_time": 0.4304845333099365,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "ESPN 5",
+    "streams": [
+      {
+        "url": "http://190.60.37.118:4000/play/a0bj",
+        "ok": false,
+        "connect_ms": 424,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://190.60.37.118:4000/play/a0bj",
+          "connect_time": 0.4155411720275879,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://38.41.8.1:8000/play/a0rm",
+        "ok": false,
+        "connect_ms": 316,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0rm",
+          "connect_time": 0.29868316650390625,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://190.60.37.118:4000/play/a0bj",
+      "ok": false,
+      "connect_ms": 424,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://190.60.37.118:4000/play/a0bj",
+        "connect_time": 0.4155411720275879,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "ESPN 6",
+    "streams": [
+      {
+        "url": "http://181.78.78.66:8000/play/a03h",
+        "ok": false,
+        "connect_ms": 439,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://181.78.78.66:8000/play/a03h",
+          "connect_time": 0.43802499771118164,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://190.60.37.118:4000/play/a0bp",
+        "ok": false,
+        "connect_ms": 418,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://190.60.37.118:4000/play/a0bp",
+          "connect_time": 0.41991162300109863,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://38.41.8.1:8000/play/a0sx",
+        "ok": false,
+        "connect_ms": 299,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sx",
+          "connect_time": 0.3012526035308838,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://181.78.78.66:8000/play/a03h",
+      "ok": false,
+      "connect_ms": 439,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://181.78.78.66:8000/play/a03h",
+        "connect_time": 0.43802499771118164,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "ESPN 7",
+    "streams": [
+      {
+        "url": "http://181.78.78.66:8000/play/a0fc",
+        "ok": false,
+        "connect_ms": 448,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://181.78.78.66:8000/play/a0fc",
+          "connect_time": 0.5457825660705566,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://190.60.37.118:4000/play/a09j",
+        "ok": false,
+        "connect_ms": 418,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://190.60.37.118:4000/play/a09j",
+          "connect_time": 0.44357872009277344,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://38.41.8.1:8000/play/a0zx",
+        "ok": false,
+        "connect_ms": 305,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0zx",
+          "connect_time": 0.32502293586730957,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://181.78.78.66:8000/play/a0fc",
+      "ok": false,
+      "connect_ms": 448,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://181.78.78.66:8000/play/a0fc",
+        "connect_time": 0.5457825660705566,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "ESPN Premium",
+    "streams": [
+      {
+        "url": "http://181.119.86.1:8000/play/a0dc",
+        "ok": false,
+        "connect_ms": 430,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://181.119.86.1:8000/play/a0dc",
+          "connect_time": 0.43317151069641113,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://190.60.37.118:4000/play/a0c8",
+        "ok": false,
+        "connect_ms": 418,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://190.60.37.118:4000/play/a0c8",
+          "connect_time": 0.42102694511413574,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://38.41.8.1:8000/play/a0t7",
+        "ok": false,
+        "connect_ms": 303,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0t7",
+          "connect_time": 0.29695749282836914,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://181.119.86.1:8000/play/a0dc",
+      "ok": false,
+      "connect_ms": 430,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://181.119.86.1:8000/play/a0dc",
+        "connect_time": 0.43317151069641113,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Fox Sports 1",
+    "streams": [
+      {
+        "url": "http://181.119.86.1:8000/play/a033",
+        "ok": false,
+        "connect_ms": 432,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://181.119.86.1:8000/play/a033",
+          "connect_time": 0.4267406463623047,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://38.41.8.1:8000/play/a0sw",
+        "ok": false,
+        "connect_ms": 319,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sw",
+          "connect_time": 0.30026912689208984,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://181.119.86.1:8000/play/a033",
+      "ok": false,
+      "connect_ms": 432,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://181.119.86.1:8000/play/a033",
+        "connect_time": 0.4267406463623047,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Fox Sports 2",
+    "streams": [
+      {
+        "url": "http://181.119.86.1:8000/play/a03x",
+        "ok": false,
+        "connect_ms": 439,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://181.119.86.1:8000/play/a03x",
+          "connect_time": 0.4323387145996094,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://38.41.8.1:8000/play/a0sv",
+        "ok": false,
+        "connect_ms": 299,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sv",
+          "connect_time": 0.3156867027282715,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://181.119.86.1:8000/play/a03x",
+      "ok": false,
+      "connect_ms": 439,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://181.119.86.1:8000/play/a03x",
+        "connect_time": 0.4323387145996094,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Fox Sports 3",
+    "streams": [
+      {
+        "url": "http://181.78.78.66:8000/play/a03h",
+        "ok": false,
+        "connect_ms": 439,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://181.78.78.66:8000/play/a03h",
+          "connect_time": 0.5249192714691162,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://38.41.8.1:8000/play/a0rm",
+        "ok": false,
+        "connect_ms": 307,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0rm",
+          "connect_time": 0.3202328681945801,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://181.78.78.66:8000/play/a03h",
+      "ok": false,
+      "connect_ms": 439,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://181.78.78.66:8000/play/a03h",
+        "connect_time": 0.5249192714691162,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "TNT Sports",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0sx",
+        "ok": false,
+        "connect_ms": 296,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sx",
+          "connect_time": 0.29592466354370117,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0sx",
+      "ok": false,
+      "connect_ms": 296,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0sx",
+        "connect_time": 0.29592466354370117,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "TyC Sports",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0zx",
+        "ok": false,
+        "connect_ms": 307,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0zx",
+          "connect_time": 0.30349040031433105,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0zx",
+      "ok": false,
+      "connect_ms": 307,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0zx",
+        "connect_time": 0.30349040031433105,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "TyC Sports 2",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0t7",
+        "ok": false,
+        "connect_ms": 308,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0t7",
+          "connect_time": 0.2982451915740967,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0t7",
+      "ok": false,
+      "connect_ms": 308,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0t7",
+        "connect_time": 0.2982451915740967,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Win Sports",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0t3",
+        "ok": false,
+        "connect_ms": 298,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0t3",
+          "connect_time": 0.2990849018096924,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0t3",
+      "ok": false,
+      "connect_ms": 298,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0t3",
+        "connect_time": 0.2990849018096924,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Gol TV",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0rp",
+        "ok": false,
+        "connect_ms": 300,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0rp",
+          "connect_time": 0.3042726516723633,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0rp",
+      "ok": false,
+      "connect_ms": 300,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0rp",
+        "connect_time": 0.3042726516723633,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Directv Sports",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0sv",
+        "ok": false,
+        "connect_ms": 309,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sv",
+          "connect_time": 0.3028891086578369,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0sv",
+      "ok": false,
+      "connect_ms": 309,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0sv",
+        "connect_time": 0.3028891086578369,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "BeIN Sports",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0rm",
+        "ok": false,
+        "connect_ms": 313,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0rm",
+          "connect_time": 0.31998276710510254,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0rm",
+      "ok": false,
+      "connect_ms": 313,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0rm",
+        "connect_time": 0.31998276710510254,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "HBO",
+    "streams": [
+      {
+        "url": "http://38.187.3.110:8000/play/a07z/index.m3u8",
+        "ok": false,
+        "connect_ms": 202,
+        "server": "astra",
+        "type": "hls",
+        "quality": {
+          "url": "http://38.187.3.110:8000/play/a07z/index.m3u8",
+          "connect_time": 0.19853901863098145,
+          "server": "Astra",
+          "type": "hls",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://45.181.120.65:9087/play/128/index.m3u8",
+        "ok": false,
+        "connect_ms": 147,
+        "server": "astra",
+        "type": "hls",
+        "quality": {
+          "url": "http://45.181.120.65:9087/play/128/index.m3u8",
+          "connect_time": 0.15749382972717285,
+          "server": "Astra",
+          "type": "hls",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.187.3.110:8000/play/a07z/index.m3u8",
+      "ok": false,
+      "connect_ms": 202,
+      "server": "astra",
+      "type": "hls",
+      "quality": {
+        "url": "http://38.187.3.110:8000/play/a07z/index.m3u8",
+        "connect_time": 0.19853901863098145,
+        "server": "Astra",
+        "type": "hls",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "HBO 2",
+    "streams": [
+      {
+        "url": "http://45.181.120.65:9087/play/130/index.m3u8",
+        "ok": false,
+        "connect_ms": 146,
+        "server": "astra",
+        "type": "hls",
+        "quality": {
+          "url": "http://45.181.120.65:9087/play/130/index.m3u8",
+          "connect_time": 0.15095782279968262,
+          "server": "Astra",
+          "type": "hls",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://45.181.120.65:9087/play/130/index.m3u8",
+      "ok": false,
+      "connect_ms": 146,
+      "server": "astra",
+      "type": "hls",
+      "quality": {
+        "url": "http://45.181.120.65:9087/play/130/index.m3u8",
+        "connect_time": 0.15095782279968262,
+        "server": "Astra",
+        "type": "hls",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "HBO Family",
+    "streams": [
+      {
+        "url": "http://45.181.120.65:9087/play/a0gt/index.m3u8",
+        "ok": false,
+        "connect_ms": 142,
+        "server": "astra",
+        "type": "hls",
+        "quality": {
+          "url": "http://45.181.120.65:9087/play/a0gt/index.m3u8",
+          "connect_time": 0.16870331764221191,
+          "server": "Astra",
+          "type": "hls",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://45.181.120.65:9087/play/a0gt/index.m3u8",
+      "ok": false,
+      "connect_ms": 142,
+      "server": "astra",
+      "type": "hls",
+      "quality": {
+        "url": "http://45.181.120.65:9087/play/a0gt/index.m3u8",
+        "connect_time": 0.16870331764221191,
+        "server": "Astra",
+        "type": "hls",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "HBO Plus",
+    "streams": [
+      {
+        "url": "http://38.250.125.162:9800/play/093/index.m3u8",
+        "ok": false,
+        "connect_ms": 143,
+        "server": "astra",
+        "type": "hls",
+        "quality": {
+          "url": "http://38.250.125.162:9800/play/093/index.m3u8",
+          "connect_time": 0.14494013786315918,
+          "server": "Astra",
+          "type": "hls",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.250.125.162:9800/play/093/index.m3u8",
+      "ok": false,
+      "connect_ms": 143,
+      "server": "astra",
+      "type": "hls",
+      "quality": {
+        "url": "http://38.250.125.162:9800/play/093/index.m3u8",
+        "connect_time": 0.14494013786315918,
+        "server": "Astra",
+        "type": "hls",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "HBO Xtreme",
+    "streams": [
+      {
+        "url": "http://45.181.120.65:9087/play/128/index.m3u8",
+        "ok": false,
+        "connect_ms": 142,
+        "server": "astra",
+        "type": "hls",
+        "quality": {
+          "url": "http://45.181.120.65:9087/play/128/index.m3u8",
+          "connect_time": 0.14335203170776367,
+          "server": "Astra",
+          "type": "hls",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://45.181.120.65:9087/play/128/index.m3u8",
+      "ok": false,
+      "connect_ms": 142,
+      "server": "astra",
+      "type": "hls",
+      "quality": {
+        "url": "http://45.181.120.65:9087/play/128/index.m3u8",
+        "connect_time": 0.14335203170776367,
+        "server": "Astra",
+        "type": "hls",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Cinemax",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0rp",
+        "ok": false,
+        "connect_ms": 314,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0rp",
+          "connect_time": 0.30573606491088867,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0rp",
+      "ok": false,
+      "connect_ms": 314,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0rp",
+        "connect_time": 0.30573606491088867,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Star Channel",
+    "streams": [
+      {
+        "url": "http://181.209.169.226:1900/play/a06m/index.m3u8",
+        "ok": false,
+        "connect_ms": 279,
+        "server": "astra",
+        "type": "hls",
+        "quality": {
+          "url": "http://181.209.169.226:1900/play/a06m/index.m3u8",
+          "connect_time": 0.2840111255645752,
+          "server": "Astra",
+          "type": "hls",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://38.250.125.162:9800/play/062/index.m3u8",
+        "ok": false,
+        "connect_ms": 145,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.250.125.162:9800/play/062/index.m3u8",
+          "connect_time": 0.14902234077453613,
+          "server": "unknown",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "HTTP 404"
+          ]
+        }
+      },
+      {
+        "url": "http://45.181.120.65:9087/play/109/index.m3u8",
+        "ok": false,
+        "connect_ms": 143,
+        "server": "astra",
+        "type": "hls",
+        "quality": {
+          "url": "http://45.181.120.65:9087/play/109/index.m3u8",
+          "connect_time": 0.1431441307067871,
+          "server": "Astra",
+          "type": "hls",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://181.209.169.226:1900/play/a06m/index.m3u8",
+      "ok": false,
+      "connect_ms": 279,
+      "server": "astra",
+      "type": "hls",
+      "quality": {
+        "url": "http://181.209.169.226:1900/play/a06m/index.m3u8",
+        "connect_time": 0.2840111255645752,
+        "server": "Astra",
+        "type": "hls",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Star TVE",
+    "streams": [
+      {
+        "url": "http://38.7.223.20:8000/play/a0ir",
+        "ok": false,
+        "connect_ms": 134,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.7.223.20:8000/play/a0ir",
+          "connect_time": 0.13637948036193848,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.7.223.20:8000/play/a0ir",
+      "ok": false,
+      "connect_ms": 134,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.7.223.20:8000/play/a0ir",
+        "connect_time": 0.13637948036193848,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Paramount",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0sx",
+        "ok": false,
+        "connect_ms": 320,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sx",
+          "connect_time": 0.30083274841308594,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0sx",
+      "ok": false,
+      "connect_ms": 320,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0sx",
+        "connect_time": 0.30083274841308594,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "AMC",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0t3",
+        "ok": false,
+        "connect_ms": 300,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0t3",
+          "connect_time": 0.29898977279663086,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0t3",
+      "ok": false,
+      "connect_ms": 300,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0t3",
+        "connect_time": 0.29898977279663086,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Warner Channel",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0zx",
+        "ok": false,
+        "connect_ms": 301,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0zx",
+          "connect_time": 0.2984805107116699,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0zx",
+      "ok": false,
+      "connect_ms": 301,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0zx",
+        "connect_time": 0.2984805107116699,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Sony Channel",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0t7",
+        "ok": false,
+        "connect_ms": 295,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0t7",
+          "connect_time": 0.30206942558288574,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0t7",
+      "ok": false,
+      "connect_ms": 295,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0t7",
+        "connect_time": 0.30206942558288574,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Universal Channel",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0t3",
+        "ok": false,
+        "connect_ms": 299,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0t3",
+          "connect_time": 0.30542850494384766,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0t3",
+      "ok": false,
+      "connect_ms": 299,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0t3",
+        "connect_time": 0.30542850494384766,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "AXN",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0rp",
+        "ok": false,
+        "connect_ms": 302,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0rp",
+          "connect_time": 0.3133251667022705,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0rp",
+      "ok": false,
+      "connect_ms": 302,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0rp",
+        "connect_time": 0.3133251667022705,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "FX",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0sw",
+        "ok": false,
+        "connect_ms": 307,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sw",
+          "connect_time": 0.32764172554016113,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0sw",
+      "ok": false,
+      "connect_ms": 307,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0sw",
+        "connect_time": 0.32764172554016113,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "TNT",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0sv",
+        "ok": false,
+        "connect_ms": 299,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sv",
+          "connect_time": 0.3066368103027344,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0sv",
+      "ok": false,
+      "connect_ms": 299,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0sv",
+        "connect_time": 0.3066368103027344,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Space",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0rm",
+        "ok": false,
+        "connect_ms": 303,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0rm",
+          "connect_time": 0.3097224235534668,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0rm",
+      "ok": false,
+      "connect_ms": 303,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0rm",
+        "connect_time": 0.3097224235534668,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Cinecanal",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0sx",
+        "ok": false,
+        "connect_ms": 294,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sx",
+          "connect_time": 0.4011533260345459,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0sx",
+      "ok": false,
+      "connect_ms": 294,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0sx",
+        "connect_time": 0.4011533260345459,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Golden",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0zx",
+        "ok": false,
+        "connect_ms": 308,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0zx",
+          "connect_time": 0.3004138469696045,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0zx",
+      "ok": false,
+      "connect_ms": 308,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0zx",
+        "connect_time": 0.3004138469696045,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Golden Edge",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0t7",
+        "ok": false,
+        "connect_ms": 304,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0t7",
+          "connect_time": 0.3104572296142578,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0t7",
+      "ok": false,
+      "connect_ms": 304,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0t7",
+        "connect_time": 0.3104572296142578,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Studio Universal",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0rp",
+        "ok": false,
+        "connect_ms": 303,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0rp",
+          "connect_time": 0.30022716522216797,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0rp",
+      "ok": false,
+      "connect_ms": 303,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0rp",
+        "connect_time": 0.30022716522216797,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "TBS",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0sw",
+        "ok": false,
+        "connect_ms": 297,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sw",
+          "connect_time": 0.3017876148223877,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0sw",
+      "ok": false,
+      "connect_ms": 297,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0sw",
+        "connect_time": 0.3017876148223877,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Comedy Central",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0sv",
+        "ok": false,
+        "connect_ms": 300,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sv",
+          "connect_time": 0.30225372314453125,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0sv",
+      "ok": false,
+      "connect_ms": 300,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0sv",
+        "connect_time": 0.30225372314453125,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Discovery Channel",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0rm",
+        "ok": false,
+        "connect_ms": 301,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0rm",
+          "connect_time": 0.297194242477417,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0rm",
+      "ok": false,
+      "connect_ms": 301,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0rm",
+        "connect_time": 0.297194242477417,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Discovery Home",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0sx",
+        "ok": false,
+        "connect_ms": 306,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sx",
+          "connect_time": 0.36942028999328613,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0sx",
+      "ok": false,
+      "connect_ms": 306,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0sx",
+        "connect_time": 0.36942028999328613,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Discovery ID",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0zx",
+        "ok": false,
+        "connect_ms": 318,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0zx",
+          "connect_time": 0.3092348575592041,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0zx",
+      "ok": false,
+      "connect_ms": 318,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0zx",
+        "connect_time": 0.3092348575592041,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "History",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0t7",
+        "ok": false,
+        "connect_ms": 302,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0t7",
+          "connect_time": 0.31099438667297363,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0t7",
+      "ok": false,
+      "connect_ms": 302,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0t7",
+        "connect_time": 0.31099438667297363,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Nat Geo",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0t3",
+        "ok": false,
+        "connect_ms": 300,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0t3",
+          "connect_time": 0.3057539463043213,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0t3",
+      "ok": false,
+      "connect_ms": 300,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0t3",
+        "connect_time": 0.3057539463043213,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Animal Planet",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0rp",
+        "ok": false,
+        "connect_ms": 300,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0rp",
+          "connect_time": 0.30927419662475586,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0rp",
+      "ok": false,
+      "connect_ms": 300,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0rp",
+        "connect_time": 0.30927419662475586,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Disney Channel",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0sv",
+        "ok": false,
+        "connect_ms": 300,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sv",
+          "connect_time": 0.3025498390197754,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0sv",
+      "ok": false,
+      "connect_ms": 300,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0sv",
+        "connect_time": 0.3025498390197754,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Disney XD",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0rm",
+        "ok": false,
+        "connect_ms": 299,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0rm",
+          "connect_time": 0.301464319229126,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0rm",
+      "ok": false,
+      "connect_ms": 299,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0rm",
+        "connect_time": 0.301464319229126,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Nickelodeon",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0sx",
+        "ok": false,
+        "connect_ms": 298,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sx",
+          "connect_time": 0.30330967903137207,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0sx",
+      "ok": false,
+      "connect_ms": 298,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0sx",
+        "connect_time": 0.30330967903137207,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Nick Jr",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0zx",
+        "ok": false,
+        "connect_ms": 304,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0zx",
+          "connect_time": 0.2940831184387207,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0zx",
+      "ok": false,
+      "connect_ms": 304,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0zx",
+        "connect_time": 0.2940831184387207,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Discovery Kids",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0t7",
+        "ok": false,
+        "connect_ms": 299,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0t7",
+          "connect_time": 0.298398494720459,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0t7",
+      "ok": false,
+      "connect_ms": 299,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0t7",
+        "connect_time": 0.298398494720459,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "CNN",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0t3",
+        "ok": false,
+        "connect_ms": 335,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0t3",
+          "connect_time": 0.3223145008087158,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0t3",
+      "ok": false,
+      "connect_ms": 335,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0t3",
+        "connect_time": 0.3223145008087158,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "CNN Espanol",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0rp",
+        "ok": false,
+        "connect_ms": 306,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0rp",
+          "connect_time": 0.3040344715118408,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0rp",
+      "ok": false,
+      "connect_ms": 306,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0rp",
+        "connect_time": 0.3040344715118408,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "BBC World",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0sw",
+        "ok": false,
+        "connect_ms": 297,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sw",
+          "connect_time": 0.3050706386566162,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0sw",
+      "ok": false,
+      "connect_ms": 297,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0sw",
+        "connect_time": 0.3050706386566162,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "DW",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0sv",
+        "ok": false,
+        "connect_ms": 300,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sv",
+          "connect_time": 0.30561351776123047,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0sv",
+      "ok": false,
+      "connect_ms": 300,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0sv",
+        "connect_time": 0.30561351776123047,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "TeleSur",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0rm",
+        "ok": false,
+        "connect_ms": 298,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0rm",
+          "connect_time": 0.29848241806030273,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0rm",
+      "ok": false,
+      "connect_ms": 298,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0rm",
+        "connect_time": 0.29848241806030273,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "MTV",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0sx",
+        "ok": false,
+        "connect_ms": 298,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0sx",
+          "connect_time": 0.29956793785095215,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0sx",
+      "ok": false,
+      "connect_ms": 298,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0sx",
+        "connect_time": 0.29956793785095215,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "VH1",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0zx",
+        "ok": false,
+        "connect_ms": 305,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0zx",
+          "connect_time": 0.30528879165649414,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0zx",
+      "ok": false,
+      "connect_ms": 305,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0zx",
+        "connect_time": 0.30528879165649414,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Telehit",
+    "streams": [
+      {
+        "url": "http://38.41.8.1:8000/play/a0t7",
+        "ok": false,
+        "connect_ms": 299,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.41.8.1:8000/play/a0t7",
+          "connect_time": 0.29866766929626465,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.41.8.1:8000/play/a0t7",
+      "ok": false,
+      "connect_ms": 299,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.41.8.1:8000/play/a0t7",
+        "connect_time": 0.29866766929626465,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  },
+  {
+    "channel": "Movistar Deportes",
+    "streams": [
+      {
+        "url": "http://38.137.192.250:8000/play/a06z",
+        "ok": false,
+        "connect_ms": 205,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://38.137.192.250:8000/play/a06z",
+          "connect_time": 0.21257519721984863,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      },
+      {
+        "url": "http://45.177.21.6:9000/play/a01c",
+        "ok": false,
+        "connect_ms": 187,
+        "server": "astra",
+        "type": "unknown",
+        "quality": {
+          "url": "http://45.177.21.6:9000/play/a01c",
+          "connect_time": 0.18901324272155762,
+          "server": "Astra",
+          "type": "unknown",
+          "ok": false,
+          "issues": [
+            "no_data"
+          ]
+        }
+      }
+    ],
+    "best": {
+      "url": "http://38.137.192.250:8000/play/a06z",
+      "ok": false,
+      "connect_ms": 205,
+      "server": "astra",
+      "type": "unknown",
+      "quality": {
+        "url": "http://38.137.192.250:8000/play/a06z",
+        "connect_time": 0.21257519721984863,
+        "server": "Astra",
+        "type": "unknown",
+        "ok": false,
+        "issues": [
+          "no_data"
+        ]
+      }
+    }
+  }
+]

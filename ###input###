@@ -1,0 +1,321 @@
+* Serving Flask app 'input_tester'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8081
+ * Running on http://192.168.1.5:8081
+Press CTRL+C to quit
+192.168.1.2 - - [17/Apr/2026 03:39:26] "GET / HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'ArrowLeft', 'code': 'ArrowLeft', 'keyCode': 37, 'bubbles': True, 'time': '2026-04-17T06:39:34.278Z'}
+192.168.1.2 - - [17/Apr/2026 03:39:34] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'ArrowDown', 'code': 'ArrowDown', 'keyCode': 40, 'bubbles': True, 'time': '2026-04-17T06:39:37.284Z'}
+192.168.1.2 - - [17/Apr/2026 03:39:37] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'ArrowRight', 'code': 'ArrowRight', 'keyCode': 39, 'bubbles': True, 'time': '2026-04-17T06:39:38.789Z'}
+192.168.1.2 - - [17/Apr/2026 03:39:38] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Enter', 'code': 'Enter', 'keyCode': 13, 'bubbles': True, 'time': '2026-04-17T06:39:39.993Z'}
+192.168.1.2 - - [17/Apr/2026 03:39:40] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'ArrowUp', 'code': 'ArrowUp', 'keyCode': 38, 'bubbles': True, 'time': '2026-04-17T06:39:41.599Z'}
+192.168.1.2 - - [17/Apr/2026 03:39:41] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Unidentified', 'code': '', 'keyCode': 1019, 'bubbles': True, 'time': '2026-04-17T06:39:44.807Z'}
+192.168.1.2 - - [17/Apr/2026 03:39:44] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'ArrowDown', 'code': 'ArrowDown', 'keyCode': 40, 'bubbles': True, 'time': '2026-04-17T06:40:04.148Z'}
+192.168.1.2 - - [17/Apr/2026 03:40:04] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Unidentified', 'code': '', 'keyCode': 403, 'bubbles': True, 'time': '2026-04-17T06:40:06.655Z'}
+192.168.1.2 - - [17/Apr/2026 03:40:06] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Unidentified', 'code': '', 'keyCode': 404, 'bubbles': True, 'time': '2026-04-17T06:40:07.358Z'}
+192.168.1.2 - - [17/Apr/2026 03:40:07] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Unidentified', 'code': '', 'keyCode': 405, 'bubbles': True, 'time': '2026-04-17T06:40:08.061Z'}
+192.168.1.2 - - [17/Apr/2026 03:40:08] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Unidentified', 'code': '', 'keyCode': 406, 'bubbles': True, 'time': '2026-04-17T06:40:08.664Z'}
+192.168.1.2 - - [17/Apr/2026 03:40:08] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Unidentified', 'code': '', 'keyCode': 406, 'bubbles': True, 'time': '2026-04-17T06:40:11.973Z'}
+192.168.1.2 - - [17/Apr/2026 03:40:11] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Unidentified', 'code': '', 'keyCode': 405, 'bubbles': True, 'time': '2026-04-17T06:40:12.676Z'}
+192.168.1.2 - - [17/Apr/2026 03:40:12] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Unidentified', 'code': '', 'keyCode': 404, 'bubbles': True, 'time': '2026-04-17T06:40:13.280Z'}
+192.168.1.2 - - [17/Apr/2026 03:40:13] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Unidentified', 'code': '', 'keyCode': 403, 'bubbles': True, 'time': '2026-04-17T06:40:13.882Z'}
+192.168.1.2 - - [17/Apr/2026 03:40:13] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'PageUp', 'code': 'PageUp', 'keyCode': 33, 'bubbles': True, 'time': '2026-04-17T06:40:36.029Z'}
+192.168.1.2 - - [17/Apr/2026 03:40:36] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'PageDown', 'code': 'PageDown', 'keyCode': 34, 'bubbles': True, 'time': '2026-04-17T06:40:37.134Z'}
+192.168.1.2 - - [17/Apr/2026 03:40:37] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Unidentified', 'code': '', 'keyCode': 26, 'bubbles': True, 'time': '2026-04-17T06:40:39.941Z'}
+192.168.1.2 - - [17/Apr/2026 03:40:39] "POST /log HTTP/1.1" 200 -
+192.168.1.2 - - [17/Apr/2026 03:41:03] "GET / HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '`', 'code': 'Backquote', 'keyCode': 192, 'bubbles': True, 'time': '2026-04-17T06:41:17.091Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:17] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '1', 'code': 'Digit1', 'keyCode': 49, 'bubbles': True, 'time': '2026-04-17T06:41:17.692Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:17] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '2', 'code': 'Digit2', 'keyCode': 50, 'bubbles': True, 'time': '2026-04-17T06:41:18.195Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:18] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '3', 'code': 'Digit3', 'keyCode': 51, 'bubbles': True, 'time': '2026-04-17T06:41:18.698Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:18] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '4', 'code': 'Digit4', 'keyCode': 52, 'bubbles': True, 'time': '2026-04-17T06:41:19.200Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:19] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '5', 'code': 'Digit5', 'keyCode': 53, 'bubbles': True, 'time': '2026-04-17T06:41:19.703Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:19] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '6', 'code': 'Digit6', 'keyCode': 54, 'bubbles': True, 'time': '2026-04-17T06:41:20.206Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:20] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '7', 'code': 'Digit7', 'keyCode': 55, 'bubbles': True, 'time': '2026-04-17T06:41:21.210Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:21] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '8', 'code': 'Digit8', 'keyCode': 56, 'bubbles': True, 'time': '2026-04-17T06:41:21.712Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:21] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '9', 'code': 'Digit9', 'keyCode': 57, 'bubbles': True, 'time': '2026-04-17T06:41:22.317Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:22] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '0', 'code': 'Digit0', 'keyCode': 48, 'bubbles': True, 'time': '2026-04-17T06:41:22.820Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:22] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '-', 'code': 'Minus', 'keyCode': 189, 'bubbles': True, 'time': '2026-04-17T06:41:23.423Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:23] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '=', 'code': 'Equal', 'keyCode': 187, 'bubbles': True, 'time': '2026-04-17T06:41:23.925Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:23] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Backspace', 'code': 'Backspace', 'keyCode': 8, 'bubbles': True, 'time': '2026-04-17T06:41:25.030Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:24] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Enter', 'code': 'Enter', 'keyCode': 13, 'bubbles': True, 'time': '2026-04-17T06:41:28.136Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:28] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Shift', 'code': 'ShiftRight', 'keyCode': 161, 'bubbles': True, 'time': '2026-04-17T06:41:29.741Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:29] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Unidentified', 'code': '', 'keyCode': 61710, 'bubbles': True, 'time': '2026-04-17T06:41:30.344Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:30] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '/', 'code': 'Slash', 'keyCode': 191, 'bubbles': True, 'time': '2026-04-17T06:41:30.747Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:30] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '.', 'code': 'Period', 'keyCode': 190, 'bubbles': True, 'time': '2026-04-17T06:41:31.150Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:31] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': ',', 'code': 'Comma', 'keyCode': 188, 'bubbles': True, 'time': '2026-04-17T06:41:31.552Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:31] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'm', 'code': 'KeyM', 'keyCode': 77, 'bubbles': True, 'time': '2026-04-17T06:41:31.953Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:31] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'n', 'code': 'KeyN', 'keyCode': 78, 'bubbles': True, 'time': '2026-04-17T06:41:32.455Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:32] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'b', 'code': 'KeyB', 'keyCode': 66, 'bubbles': True, 'time': '2026-04-17T06:41:32.858Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:32] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'v', 'code': 'KeyV', 'keyCode': 86, 'bubbles': True, 'time': '2026-04-17T06:41:33.260Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:33] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'c', 'code': 'KeyC', 'keyCode': 67, 'bubbles': True, 'time': '2026-04-17T06:41:33.663Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:33] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'x', 'code': 'KeyX', 'keyCode': 88, 'bubbles': True, 'time': '2026-04-17T06:41:33.965Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:33] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'z', 'code': 'KeyZ', 'keyCode': 90, 'bubbles': True, 'time': '2026-04-17T06:41:34.468Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:34] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Unidentified', 'code': '', 'keyCode': 60, 'bubbles': True, 'time': '2026-04-17T06:41:34.770Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:34] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Shift', 'code': 'ShiftLeft', 'keyCode': 160, 'bubbles': True, 'time': '2026-04-17T06:41:35.074Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:34] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Control', 'code': 'ControlLeft', 'keyCode': 17, 'bubbles': True, 'time': '2026-04-17T06:41:35.975Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:35] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Meta', 'code': 'MetaLeft', 'keyCode': 91, 'bubbles': True, 'time': '2026-04-17T06:41:39.985Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:39] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Alt', 'code': 'AltLeft', 'keyCode': 18, 'bubbles': True, 'time': '2026-04-17T06:41:40.988Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:40] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': ' ', 'code': 'Space', 'keyCode': 32, 'bubbles': True, 'time': '2026-04-17T06:41:42.593Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:42] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Alt', 'code': 'AltLeft', 'keyCode': 18, 'bubbles': True, 'time': '2026-04-17T06:41:43.297Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:43] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Meta', 'code': 'MetaRight', 'keyCode': 92, 'bubbles': True, 'time': '2026-04-17T06:41:43.799Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:43] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Alt', 'code': 'AltLeft', 'keyCode': 18, 'bubbles': True, 'time': '2026-04-17T06:41:44.302Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:44] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Control', 'code': 'ControlLeft', 'keyCode': 17, 'bubbles': True, 'time': '2026-04-17T06:41:44.805Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:44] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Tab', 'code': 'Tab', 'keyCode': 9, 'bubbles': True, 'time': '2026-04-17T06:41:45.809Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:45] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'q', 'code': 'KeyQ', 'keyCode': 81, 'bubbles': True, 'time': '2026-04-17T06:41:46.312Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:46] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'w', 'code': 'KeyW', 'keyCode': 87, 'bubbles': True, 'time': '2026-04-17T06:41:46.612Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:46] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'e', 'code': 'KeyE', 'keyCode': 69, 'bubbles': True, 'time': '2026-04-17T06:41:47.316Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:47] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'r', 'code': 'KeyR', 'keyCode': 82, 'bubbles': True, 'time': '2026-04-17T06:41:47.618Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:47] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 't', 'code': 'KeyT', 'keyCode': 84, 'bubbles': True, 'time': '2026-04-17T06:41:48.021Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:48] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'y', 'code': 'KeyY', 'keyCode': 89, 'bubbles': True, 'time': '2026-04-17T06:41:48.425Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:48] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'u', 'code': 'KeyU', 'keyCode': 85, 'bubbles': True, 'time': '2026-04-17T06:41:48.727Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:48] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'i', 'code': 'KeyI', 'keyCode': 73, 'bubbles': True, 'time': '2026-04-17T06:41:49.031Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:48] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'o', 'code': 'KeyO', 'keyCode': 79, 'bubbles': True, 'time': '2026-04-17T06:41:49.333Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:49] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'p', 'code': 'KeyP', 'keyCode': 80, 'bubbles': True, 'time': '2026-04-17T06:41:49.735Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:49] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '[', 'code': 'BracketLeft', 'keyCode': 219, 'bubbles': True, 'time': '2026-04-17T06:41:50.037Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:49] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': ']', 'code': 'BracketRight', 'keyCode': 221, 'bubbles': True, 'time': '2026-04-17T06:41:50.439Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:50] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Enter', 'code': 'Enter', 'keyCode': 13, 'bubbles': True, 'time': '2026-04-17T06:41:50.841Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:50] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '\\', 'code': 'Backslash', 'keyCode': 220, 'bubbles': True, 'time': '2026-04-17T06:41:51.444Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:51] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': "'", 'code': 'Quote', 'keyCode': 222, 'bubbles': True, 'time': '2026-04-17T06:41:51.846Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:51] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': ';', 'code': 'Semicolon', 'keyCode': 186, 'bubbles': True, 'time': '2026-04-17T06:41:52.047Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:51] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'l', 'code': 'KeyL', 'keyCode': 76, 'bubbles': True, 'time': '2026-04-17T06:41:52.349Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:52] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'k', 'code': 'KeyK', 'keyCode': 75, 'bubbles': True, 'time': '2026-04-17T06:41:52.651Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:52] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'j', 'code': 'KeyJ', 'keyCode': 74, 'bubbles': True, 'time': '2026-04-17T06:41:53.054Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:53] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'h', 'code': 'KeyH', 'keyCode': 72, 'bubbles': True, 'time': '2026-04-17T06:41:53.456Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:53] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'g', 'code': 'KeyG', 'keyCode': 71, 'bubbles': True, 'time': '2026-04-17T06:41:53.758Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:53] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'f', 'code': 'KeyF', 'keyCode': 70, 'bubbles': True, 'time': '2026-04-17T06:41:54.161Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:54] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'd', 'code': 'KeyD', 'keyCode': 68, 'bubbles': True, 'time': '2026-04-17T06:41:54.463Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:54] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 's', 'code': 'KeyS', 'keyCode': 83, 'bubbles': True, 'time': '2026-04-17T06:41:54.764Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:54] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'a', 'code': 'KeyA', 'keyCode': 65, 'bubbles': True, 'time': '2026-04-17T06:41:55.066Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:55] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'CapsLock', 'code': 'CapsLock', 'keyCode': 20, 'bubbles': True, 'time': '2026-04-17T06:41:55.369Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:55] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Shift', 'code': 'ShiftLeft', 'keyCode': 160, 'bubbles': True, 'time': '2026-04-17T06:41:55.671Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:55] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Unidentified', 'code': '', 'keyCode': 60, 'bubbles': True, 'time': '2026-04-17T06:41:56.073Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:55] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'z', 'code': 'KeyZ', 'keyCode': 90, 'bubbles': True, 'time': '2026-04-17T06:41:56.376Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:56] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'x', 'code': 'KeyX', 'keyCode': 88, 'bubbles': True, 'time': '2026-04-17T06:41:56.779Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:56] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'c', 'code': 'KeyC', 'keyCode': 67, 'bubbles': True, 'time': '2026-04-17T06:41:57.081Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:56] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'v', 'code': 'KeyV', 'keyCode': 86, 'bubbles': True, 'time': '2026-04-17T06:41:57.484Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:57] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'b', 'code': 'KeyB', 'keyCode': 66, 'bubbles': True, 'time': '2026-04-17T06:41:57.786Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:57] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'b', 'code': 'KeyB', 'keyCode': 66, 'bubbles': True, 'time': '2026-04-17T06:41:57.988Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:57] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'n', 'code': 'KeyN', 'keyCode': 78, 'bubbles': True, 'time': '2026-04-17T06:41:58.389Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:58] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'm', 'code': 'KeyM', 'keyCode': 77, 'bubbles': True, 'time': '2026-04-17T06:41:58.791Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:58] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': ',', 'code': 'Comma', 'keyCode': 188, 'bubbles': True, 'time': '2026-04-17T06:41:59.193Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:59] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '.', 'code': 'Period', 'keyCode': 190, 'bubbles': True, 'time': '2026-04-17T06:41:59.496Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:59] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': '/', 'code': 'Slash', 'keyCode': 191, 'bubbles': True, 'time': '2026-04-17T06:41:59.798Z'}
+192.168.1.2 - - [17/Apr/2026 03:41:59] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Unidentified', 'code': '', 'keyCode': 61710, 'bubbles': True, 'time': '2026-04-17T06:42:00.200Z'}
+192.168.1.2 - - [17/Apr/2026 03:42:00] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Shift', 'code': 'ShiftRight', 'keyCode': 161, 'bubbles': True, 'time': '2026-04-17T06:42:00.501Z'}
+192.168.1.2 - - [17/Apr/2026 03:42:00] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Control', 'code': 'ControlLeft', 'keyCode': 17, 'bubbles': True, 'time': '2026-04-17T06:42:01.405Z'}
+192.168.1.2 - - [17/Apr/2026 03:42:01] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Alt', 'code': 'AltLeft', 'keyCode': 18, 'bubbles': True, 'time': '2026-04-17T06:42:01.807Z'}
+192.168.1.2 - - [17/Apr/2026 03:42:01] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Meta', 'code': 'MetaRight', 'keyCode': 92, 'bubbles': True, 'time': '2026-04-17T06:42:02.109Z'}
+192.168.1.2 - - [17/Apr/2026 03:42:02] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Alt', 'code': 'AltLeft', 'keyCode': 18, 'bubbles': True, 'time': '2026-04-17T06:42:02.412Z'}
+192.168.1.2 - - [17/Apr/2026 03:42:02] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': ' ', 'code': 'Space', 'keyCode': 32, 'bubbles': True, 'time': '2026-04-17T06:42:02.815Z'}
+192.168.1.2 - - [17/Apr/2026 03:42:02] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Alt', 'code': 'AltLeft', 'keyCode': 18, 'bubbles': True, 'time': '2026-04-17T06:42:03.517Z'}
+192.168.1.2 - - [17/Apr/2026 03:42:03] "POST /log HTTP/1.1" 200 -
+
+>>> INPUT RECIBIDO: {'key': 'Meta', 'code': 'MetaLeft', 'keyCode': 91, 'bubbles': True, 'time': '2026-04-17T06:42:03.820Z'}
+192.168.1.2 - - [17/Apr/2026 03:42:03] "POST /lo

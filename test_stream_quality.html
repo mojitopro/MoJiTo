@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Stream Quality Test</title>
+    <style>
+        body { background: #000; color: #0f0; font-family: monospace; padding: 20px; }
+        h1 { color: #f0f; }
+        .test { padding: 15px; margin: 10px 0; border: 1px solid #333; }
+        .ok { border-color: #0f0; }
+        .fail { border-color: #f00; }
+        .loading { color: #ff0; }
+        #results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Stream Quality Test</h1>
+    <div id="status">Cargando...</div>
+    <button onclick="runTest()">INICIAR TEST</button>
+    <div id="results"></div>
+
+    <script>
+    var results = [];
+    var current = 0;
+    var streams = [];
+    
+    var elStatus = document.getElementById('status');
+    var elResults = document.getElementById('results');
+    
+    // Cargar streams
+    fetch('/api/premium').then(r=>r.json()).then(d=>{
+        streams = d.channels;
+        elStatus.textContent = streams.length + ' canales listos para testear';
+    });
+    
+    function testStream(url, timeout) {
+        return new Promise(function(resolve) {
+            var video = document.createElement('video');
+            var timeoutId = setTimeout(function() {
+                video.src = '';
+                resolve({ok: false, error: 'timeout'});
+            }, timeout * 1000);
+            
+            video.onloadeddata = function() {
+                clearTimeout(timeoutId);
+                // Intentar reproducir
+                video.play().then(function() {
+                    // Recibir algunos segundos
+                    setTimeout(function() {
+                        if(video.currentTime > 0.5) {
+                            resolve({ok: true, currentTime: video.currentTime});
+                        } else {
+                            resolve({ok: false, error: 'no_playback'});
+                        }
+                        video.src = '';
+                    }, 2000);
+                }).catch(function(e) {
+                    resolve({ok: false, error: 'play_error'});
+                });
+            };
+            
+            video.onerror = function() {
+                clearTimeout(timeoutId);
+                resolve({ok: false, error: 'load_error'});
+            };
+            
+            video.src = url;
+            video.load();
+        });
+    }
+    
+    async function runTest() {
+        if(!streams.length) return;
+        
+        for(var i = 0; i < streams.length; i++) {
+            var ch = streams[i];
+            var url = ch.url || (ch.fallbacks && ch.fallbacks[0]) || '';
+            
+            elStatus.textContent = 'Testing ' + (i+1) + '/' + streams.length + ': ' + ch.name;
+            
+            if(!url) {
+                results.push({name: ch.name, ok: false, error: 'no_url'});
+                continue;
+            }
+            
+            var result = await testStream(url, 10);
+            
+            results.push({
+                name: ch.name,
+                ok: result.ok,
+                currentTime: result.currentTime,
+                error: result.error
+            });
+            
+            elResults.innerHTML = results.map(function(r) {
+                return '<div class="test ' + (r.ok ? 'ok' : 'fail') + '">' + 
+                    (r.ok ? '✓' : '✗') + ' ' + r.name + 
+                    (r.error ? ' (' + r.error + ')' : '') +
+                    '</div>';
+            }).join('');
+        }
+        
+        var okCount = results.filter(function(r){return r.ok;}).length;
+        elStatus.textContent = 'FIN: ' + okCount + '/' + results.length + ' funcionando';
+        
+        // Guardar
+        console.log(JSON.stringify(results, null, 2));
+    }
+    </script>
+</body>
+</html>

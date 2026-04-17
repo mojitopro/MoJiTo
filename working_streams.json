@@ -1,0 +1,317 @@
+[
+  {
+    "name": "Adult Swim",
+    "server": "Astra",
+    "url": "http://181.119.86.1:8000/play/a019"
+  },
+  {
+    "name": "Cartoon Network",
+    "server": "Astra",
+    "url": "http://181.119.86.1:8000/play/a01g"
+  },
+  {
+    "name": "ESPN",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0t3"
+  },
+  {
+    "name": "ESPN 2",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0rp"
+  },
+  {
+    "name": "ESPN 3",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sw"
+  },
+  {
+    "name": "ESPN 4",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sv"
+  },
+  {
+    "name": "ESPN 5",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0rm"
+  },
+  {
+    "name": "ESPN 6",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sx"
+  },
+  {
+    "name": "ESPN 7",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0zx"
+  },
+  {
+    "name": "ESPN Premium",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0t7"
+  },
+  {
+    "name": "Fox Sports 1",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sw"
+  },
+  {
+    "name": "Fox Sports 2",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sv"
+  },
+  {
+    "name": "Fox Sports 3",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0rm"
+  },
+  {
+    "name": "TNT Sports",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sx"
+  },
+  {
+    "name": "TyC Sports",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0zx"
+  },
+  {
+    "name": "TyC Sports 2",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0t7"
+  },
+  {
+    "name": "Win Sports",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0t3"
+  },
+  {
+    "name": "Gol TV",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0rp"
+  },
+  {
+    "name": "Directv Sports",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sv"
+  },
+  {
+    "name": "BeIN Sports",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0rm"
+  },
+  {
+    "name": "HBO",
+    "server": "Astra",
+    "url": "http://38.187.3.110:8000/play/a07z/index.m3u8"
+  },
+  {
+    "name": "HBO 2",
+    "server": "Astra",
+    "url": "http://45.181.120.65:9087/play/130/index.m3u8"
+  },
+  {
+    "name": "HBO Family",
+    "server": "Astra",
+    "url": "http://45.181.120.65:9087/play/a0gt/index.m3u8"
+  },
+  {
+    "name": "HBO Plus",
+    "server": "Astra",
+    "url": "http://38.250.125.162:9800/play/093/index.m3u8"
+  },
+  {
+    "name": "HBO Xtreme",
+    "server": "Astra",
+    "url": "http://45.181.120.65:9087/play/128/index.m3u8"
+  },
+  {
+    "name": "Cinemax",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0rp"
+  },
+  {
+    "name": "Star Channel",
+    "server": "Astra",
+    "url": "http://45.181.120.65:9087/play/109/index.m3u8"
+  },
+  {
+    "name": "Star TVE",
+    "server": "Astra",
+    "url": "http://38.7.223.20:8000/play/a0ir"
+  },
+  {
+    "name": "Paramount",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sx"
+  },
+  {
+    "name": "AMC",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0t3"
+  },
+  {
+    "name": "Warner Channel",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0zx"
+  },
+  {
+    "name": "Sony Channel",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0t7"
+  },
+  {
+    "name": "Universal Channel",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0t3"
+  },
+  {
+    "name": "AXN",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0rp"
+  },
+  {
+    "name": "FX",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sw"
+  },
+  {
+    "name": "TNT",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sv"
+  },
+  {
+    "name": "Space",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0rm"
+  },
+  {
+    "name": "Cinecanal",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sx"
+  },
+  {
+    "name": "Golden",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0zx"
+  },
+  {
+    "name": "Golden Edge",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0t7"
+  },
+  {
+    "name": "Studio Universal",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0rp"
+  },
+  {
+    "name": "TBS",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sw"
+  },
+  {
+    "name": "Comedy Central",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sv"
+  },
+  {
+    "name": "Discovery Channel",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0rm"
+  },
+  {
+    "name": "Discovery Home",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sx"
+  },
+  {
+    "name": "Discovery ID",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0zx"
+  },
+  {
+    "name": "History",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0t7"
+  },
+  {
+    "name": "Nat Geo",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0t3"
+  },
+  {
+    "name": "Animal Planet",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0rp"
+  },
+  {
+    "name": "Disney Channel",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sv"
+  },
+  {
+    "name": "Disney XD",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0rm"
+  },
+  {
+    "name": "Nickelodeon",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sx"
+  },
+  {
+    "name": "Nick Jr",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0zx"
+  },
+  {
+    "name": "Discovery Kids",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0t7"
+  },
+  {
+    "name": "CNN",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0t3"
+  },
+  {
+    "name": "CNN Espanol",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0rp"
+  },
+  {
+    "name": "BBC World",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sw"
+  },
+  {
+    "name": "DW",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sv"
+  },
+  {
+    "name": "TeleSur",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0rm"
+  },
+  {
+    "name": "MTV",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0sx"
+  },
+  {
+    "name": "VH1",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0zx"
+  },
+  {
+    "name": "Telehit",
+    "server": "Astra",
+    "url": "http://38.41.8.1:8000/play/a0t7"
+  },
+  {
+    "name": "Movistar Deportes",
+    "server": "Astra",
+    "url": "http://45.177.21.6:9000/play/a01c"
+  }
+]
