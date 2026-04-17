@@ -7,25 +7,36 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; background: #000; color: #fff; font-family: Arial, sans-serif; }
-        #video { width: 100%; height: 100%; display: none; background: #000; }
-        #menu { padding: 20px; }
-        .logo { font-size: 42px; font-weight: bold; text-align: center; margin: 15px 0; }
-        .logo span { color: #dc143c; text-shadow: 0 0 15px #ff0000; }
-        #msg { text-align: center; color: #dc143c; min-height: 24px; margin: 10px 0; font-size: 14px; }
-        #list { height: 380px; overflow-y: auto; }
-        .ch { padding: 15px; border-bottom: 1px solid #222; color: #aaa; font-size: 16px; }
-        .ch:hover { background: #111; }
+        #video { width: 100%; height: 100%; display: none; object-fit: contain; }
+        #videoExternal { display: none; width: 100%; height: 100%; background: #111; align-items: center; justify-content: center; flex-direction: column; }
+        .menu { padding: 15px; }
+        .logo { font-size: 32px; font-weight: bold; text-align: center; margin: 10px 0; }
+        .logo span { color: #dc143c; text-shadow: 0 0 10px #dc143c; }
+        .msg { text-align: center; color: #dc143c; min-height: 20px; margin: 10px 0; font-size: 14px; }
+        .list { height: 60vh; overflow-y: auto; }
+        .ch { padding: 14px; border-bottom: 1px solid #222; color: #aaa; font-size: 14px; cursor: pointer; }
+        .ch:hover, .ch:active { background: #111; }
         .ch.active { background: #dc143c; color: #fff; }
-        .btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; }
-        .btn { padding: 15px 10px; background: #8b0000; border: none; color: #fff; font-size: 14px; cursor: pointer; border-radius: 5px; }
+        .ch.error { color: #f44; }
+        .ch.ok { color: #4f4; }
+        .btn { padding: 12px 20px; background: #8b0000; border: none; color: #fff; font-size: 14px; margin: 5px; cursor: pointer; border-radius: 5px; }
         .btn:active { background: #dc143c; }
+        .btns { display: flex; gap: 5px; flex-wrap: wrap; }
     </style>
 </head>
 <body>
 
-<video id="video" controls></video>
+<video id="video" controls playsinline></video>
 
-<div id="menu">
+<div id="videoExternal">
+    <div style="font-size: 48px; color: #666;">📺</div>
+    <div style="color: #dc143c; margin: 20px 0;">Abriendo en VLC...</div>
+    <div style="color: #666; font-size: 14px;">Si no abre, usa la app VLC en tu TV</div>
+    <button class="btn" onclick="openVLC()" style="margin-top: 20px;">ABRIR EN VLC</button>
+    <button class="btn" onclick="back()">VOLVER</button>
+</div>
+
+<div id="menu" class="menu">
     <div class="logo"><span>MoJiTo</span> TV</div>
     
     <div class="btns">
@@ -35,26 +46,26 @@
         <button class="btn" onclick="filter('infantil')">INFANTIL</button>
     </div>
     
-    <div id="msg">63 canales - Toca o ↑↓</div>
-    <div id="list"></div>
+    <div class="msg" id="msg">Cargando canales...</div>
+    <div class="list" id="list"></div>
     
     <div class="btns">
-        <button class="btn" onclick="prev()">◀ ANTERIOR</button>
-        <button class="btn" onclick="playIdx()">▶ PLAY</button>
-        <button class="btn" onclick="next()">SIGUIENTE ▶</button>
+        <button class="btn" onclick="prev()">◀</button>
+        <button class="btn" onclick="play()">▶ PLAY</button>
+        <button class="btn" onclick="next()">▶</button>
         <button class="btn" onclick="stop()">■ STOP</button>
     </div>
 </div>
 
 <script>
-var BASE = window.location.protocol+'//'+window.location.host;
-var streams = [], idx = 0, mode = 'all';
+var streams = [], idx = 0, mode = 'all', currentUrl = '';
+var video = document.getElementById('video');
+var menu = document.getElementById('menu');
+var videoExternal = document.getElementById('videoExternal');
 var elList = document.getElementById('list');
 var elMsg = document.getElementById('msg');
-var elVideo = document.getElementById('video');
-var elMenu = document.getElementById('menu');
 
-// Load channels
+// Cargar canales
 fetch('/api/premium').then(r=>r.json()).then(d=>{
     streams = d.channels || [];
     elMsg.textContent = streams.length + ' canales - Toca para ver';
@@ -62,10 +73,10 @@ fetch('/api/premium').then(r=>r.json()).then(d=>{
 });
 
 function render() {
-    var show = mode === 'all' ? streams : streams.filter(function(s){return s.category === mode;});
+    var show = mode === 'all' ? streams : streams.filter(s => s.category === mode);
     var html = '';
     for(var i=0; i<show.length; i++) {
-        html += '<div class="ch'+(i===idx?' active':'')+'" onclick="play('+i+')">'+(i+1)+'. '+show[i].name+'</div>';
+        html += '<div class="ch" onclick="select('+i+')">' + show[i].name + '</div>';
     }
     elList.innerHTML = html;
 }
@@ -74,74 +85,124 @@ function filter(cat) {
     mode = cat;
     idx = 0;
     render();
-    var catNames = {all:'Todos', Deportes:'Deportes', premium:'Premium', infantil:'Infantil'};
-    elMsg.textContent = catNames[cat] || cat;
+    elMsg.textContent = cat;
 }
 
-function play(i) {
+function select(i) {
     idx = i;
-    var show = mode === 'all' ? streams : streams.filter(function(s){return s.category === mode;});
-    var s = show[i];
-    if(!s) return;
+    var ch = streams[i];
+    if(!ch) return;
     
-    var url = s.url || (s.fallbacks && s.fallbacks[0]) || '';
+    var url = ch.url || (ch.fallbacks && ch.fallbacks[0]) || '';
+    currentUrl = url;
     
-    if(url) {
-        elVideo.src = url;
-        elVideo.style.display = 'block';
-        elMenu.style.display = 'none';
-        elVideo.play().catch(function(){
-            elMsg.textContent = 'Toca para reproducir';
-        });
-        elMsg.textContent = '▶ ' + s.name;
-    } else {
-        elMsg.textContent = 'Sin stream';
-    }
-}
-
-function playIdx() {
-    play(idx);
-}
-
-function prev() {
-    var show = mode === 'all' ? streams : streams.filter(function(s){return s.category === mode;});
-    idx = Math.max(0, idx-1);
-    elMsg.textContent = show[idx] ? show[idx].name : '';
-    render();
-}
-
-function next() {
-    var show = mode === 'all' ? streams : streams.filter(function(s){return s.category === mode;});
-    idx = Math.min(show.length-1, idx+1);
-    elMsg.textContent = show[idx] ? show[idx].name : '';
-    render();
-}
-
-function stop() {
-    elVideo.pause();
-    elVideo.style.display = 'none';
-    elMenu.style.display = 'block';
-    elMsg.textContent = 'Detenido';
-}
-
-// Keyboard
-document.addEventListener('keydown', function(e) {
-    var k = e.key;
-    
-    if(elVideo.style.display === 'block') {
-        if(k === 'Escape') stop();
+    if(!url) {
+        elMsg.textContent = 'Sin URL';
         return;
     }
     
-    if(k === 'ArrowDown' || k === 'ArrowRight') {
+    elMsg.textContent = 'Probando: ' + ch.name;
+    playStream(url, ch.name);
+}
+
+function playStream(url, name) {
+    // Intentar primero en navegador
+    video.src = url;
+    video.style.display = 'block';
+    menu.style.display = 'none';
+    
+    video.play().then(function() {
+        elMsg.textContent = '▶ Reproduciendo: ' + name;
+    }).catch(function() {
+        // Error - intentar VLC externo
+        elMsg.textContent = 'Navegador no puede - intentando VLC...';
+        setTimeout(function() {
+            showVLC(name);
+        }, 1500);
+    });
+}
+
+function showVLC(name) {
+    video.style.display = 'none';
+    videoExternal.style.display = 'flex';
+    menu.style.display = 'none';
+    elMsg.textContent = 'Abriendo: ' + name;
+    
+    // Intentar varios methods
+    var url = currentUrl;
+    
+    // Method 1: VLC protocol (Android TV con VLC)
+    try { window.location.href = 'vlc://' + url; } catch(e) {}
+    
+    // Method 2: External player intent (Android)
+    setTimeout(function() {
+        try {
+            // MX Player, VLC, etc
+            window.location.href = 'intent://' + url + '#Intent;package=com.mxtech.videoplayer.ad;end';
+        } catch(e) {}
+    }, 1000);
+    
+    // Method 3: JS directo
+    setTimeout(function() {
+        try {
+            window.open(url, '_blank');
+        } catch(e) {}
+    }, 2000);
+    
+    setTimeout(function() {
+        elMsg.textContent = 'Si no abrió, usa el botón';
+    }, 4000);
+}
+
+function openVLC() {
+    // Forzar apertura en VLC
+    window.location.href = 'vlc://' + currentUrl;
+}
+
+function back() {
+    video.style.display = 'none';
+    videoExternal.style.display = 'none';
+    menu.style.display = 'block';
+    video.pause();
+    elMsg.textContent = 'Detenido';
+}
+
+function play() {
+    select(idx);
+}
+
+function stop() {
+    video.pause();
+    video.src = '';
+    back();
+}
+
+function prev() {
+    idx = Math.max(0, idx-1);
+    select(idx);
+}
+
+function next() {
+    idx = Math.min(streams.length-1, idx+1);
+    select(idx);
+}
+
+// Teclado
+document.addEventListener('keydown', function(e) {
+    if(video.style.display === 'block' || videoExternal.style.display === 'flex') {
+        if(e.key === 'Escape') stop();
+        return;
+    }
+    
+    if(e.key === 'ArrowDown' || e.key === 'ArrowRight') {
         e.preventDefault();
         next();
-    } else if(k === 'ArrowUp' || k === 'ArrowLeft') {
+    } else if(e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
         e.preventDefault();
         prev();
-    } else if(k === 'Enter') {
+    } else if(e.key === 'Enter') {
         e.preventDefault();
-        playIdx();
+        play();
     }
 });
 </script>
