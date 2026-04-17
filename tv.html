@@ -12,8 +12,10 @@
         .logo { font-size: 28px; text-align: center; margin: 10px 0; }
         .logo span { color: #dc143c; text-shadow: 0 0 10px #dc143c; }
         .msg { text-align: center; color: #dc143c; min-height: 20px; margin: 10px 0; font-size: 14px; }
-        .list { height: 60vh; overflow-y: auto; }
+        .list { height: 55vh; overflow-y: auto; }
         .ch { padding: 14px; border-bottom: 1px solid #222; color: #aaa; font-size: 14px; }
+        .ch.hls { color: #4f4; }  /* Verde = HLS */
+        .ch.astra { color: #f44; }  /* Rojo = Astra */
         .ch.focused { background: #222; border-left: 4px solid #dc143c; }
         .btn { padding: 12px 20px; background: #8b0000; border: none; color: #fff; font-size: 14px; margin: 5px; cursor: pointer; border-radius: 5px; }
     </style>
@@ -24,7 +26,7 @@
 
 <div id="menu" class="menu">
     <div class="logo"><span>MoJiTo</span> TV</div>
-    <div class="msg" id="msg">↑↓ navegar | ENTER reproducir</div>
+    <div class="msg" id="msg">↑↓ navegar | ENTER reproducir | Todos los canales</div>
     <div class="list" id="list"></div>
     <div style="margin-top:10px;">
         <button class="btn" onclick="prev()">◀ ANTERIOR</button>
@@ -35,46 +37,75 @@
 </div>
 
 <script>
-var allStreams = [], hlsStreams = [], idx = 0;
+var allStreams = [], idx = 0, focusedIdx = 0;
 var video = document.getElementById('video');
 var menu = document.getElementById('menu');
 var elMsg = document.getElementById('msg');
 var elList = document.getElementById('list');
-var focusedIdx = 0;
 
 fetch('/api/premium').then(r=>r.json()).then(d=>{
     allStreams = d.channels || [];
-    // Separar HLS de Astra
-    hlsStreams = allStreams.filter(s => s.url && s.url.indexOf('.m3u8') > 0);
-    elMsg.textContent = hlsStreams.length + ' canales HLS - ↑↓ navegar';
+    elMsg.textContent = allStreams.length + ' canales - ↑↓ navegar';
     render();
 });
 
+function getType(url) {
+    if(!url) return 'unknown';
+    if(url.indexOf('.m3u8') > 0) return 'hls';
+    if(url.indexOf(':8000') > 0 || url.indexOf(':8001') > 0 || url.indexOf(':18000') > 0 || url.indexOf(':19000') > 0) return 'astra';
+    return 'direct';
+}
+
 function render() {
     var html = '';
-    for(var i=0; i<hlsStreams.length; i++) {
-        var active = (i === focusedIdx) ? 'focused' : '';
-        html += '<div class="ch ' + active + '" id="ch' + i + '">' + hlsStreams[i].name + '</div>';
+    for(var i=0; i<allStreams.length; i++) {
+        var type = getType(allStreams[i].url);
+        var typeClass = type === 'hls' ? 'hls' : (type === 'astra' ? 'astra' : '');
+        var focused = (i === focusedIdx) ? 'focused' : '';
+        html += '<div class="ch ' + typeClass + ' ' + focused + '" id="ch' + i + '">' + allStreams[i].name + '</div>';
     }
     elList.innerHTML = html;
-    // Scroll into view
     var el = document.getElementById('ch' + focusedIdx);
     if(el) el.scrollIntoView({block: 'center'});
 }
 
 function play() {
-    var ch = hlsStreams[focusedIdx];
-    if(!ch || !ch.url) return;
+    var ch = allStreams[focusedIdx];
+    if(!ch) return;
     
-    video.src = ch.url;
+    var url = ch.url || '';
+    if(!url && ch.fallbacks && ch.fallbacks.length > 0) {
+        url = ch.fallbacks[0];
+    }
+    
+    if(!url) {
+        elMsg.textContent = 'Sin URL: ' + ch.name;
+        return;
+    }
+    
+    elMsg.textContent = 'Intentando: ' + ch.name + ' (' + getType(url) + ')';
+    
+    video.src = url;
     video.style.display = 'block';
     menu.style.display = 'none';
     
-    video.play().then(function() {
-        elMsg.textContent = '▶ ' + ch.name;
-    }).catch(function() {
-        elMsg.textContent = 'Error: ' + ch.name;
-    });
+    var playPromise = video.play();
+    
+    if(playPromise) {
+        playPromise.then(function() {
+            elMsg.textContent = '▶ Reproduciendo: ' + ch.name;
+        }).catch(function(e) {
+            elMsg.textContent = 'Error: ' + ch.name + ' - Intenta otro';
+            // No volver al menu, dejar que intente de nuevo
+        });
+    }
+    
+    // Timeout - si no reproduce, mostrar mensaje
+    setTimeout(function() {
+        if(video.paused) {
+            elMsg.textContent = 'No funciona: ' + ch.name + ' - ↑↓ para otro';
+        }
+    }, 5000);
 }
 
 function stop() {
@@ -89,31 +120,29 @@ function prev() {
     focusedIdx = Math.max(0, focusedIdx - 1);
     idx = focusedIdx;
     render();
-    elMsg.textContent = hlsStreams[focusedIdx] ? hlsStreams[focusedIdx].name : '';
+    elMsg.textContent = allStreams[focusedIdx] ? allStreams[focusedIdx].name : '';
 }
 
 function next() {
-    focusedIdx = Math.min(hlsStreams.length - 1, focusedIdx + 1);
+    focusedIdx = Math.min(allStreams.length - 1, focusedIdx + 1);
     idx = focusedIdx;
     render();
-    elMsg.textContent = hlsStreams[focusedIdx] ? hlsStreams[focusedIdx].name : '';
+    elMsg.textContent = allStreams[focusedIdx] ? allStreams[focusedIdx].name : '';
 }
 
-// Keyboard - soporte para control remoto
+// Keyboard
 document.addEventListener('keydown', function(e) {
     var k = e.keyCode;
     
-    // Si video playing
     if(video.style.display === 'block') {
         if(k === 27) stop();  // ESC
         return;
     }
     
-    // Navegar
-    if(k === 38 || k === 33) {  // Up/PageUp
+    if(k === 38 || k === 33 || k === 37) {  // Up, PageUp, Left
         e.preventDefault();
         prev();
-    } else if(k === 40 || k === 34) {  // Down/PageDown
+    } else if(k === 40 || k === 34 || k === 39) {  // Down, PageDown, Right
         e.preventDefault();
         next();
     } else if(k === 13) {  // Enter
@@ -125,7 +154,7 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Click en items
+// Click
 elList.addEventListener('click', function(e) {
     if(e.target.classList.contains('ch')) {
         var id = e.target.id;
