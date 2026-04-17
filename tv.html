@@ -6,11 +6,18 @@
     <title>MoJiTo TV</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --magenta: #ff00ff;
+            --cyan: #00ffff;
+            --green: #00ff41;
+            --yellow: #ffff00;
+            --red: #ff3333;
+        }
         html, body {
             height: 100%;
             font-family: 'Courier New', monospace;
             background: #0a0a0a;
-            color: #00ff41;
+            color: var(--green);
             overflow: hidden;
         }
         .crt {
@@ -29,38 +36,37 @@
         }
         .sidebar {
             width: 280px;
-            border: 2px solid #00ff41;
+            border: 2px solid var(--magenta);
             padding: 15px;
-            background: rgba(0,20,0,0.8);
+            background: rgba(20,0,20,0.9);
         }
         .logo {
-            font-size: 28px;
+            font-size: 22px;
             text-align: center;
             margin-bottom: 20px;
-            text-shadow: 0 0 10px #00ff41;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { text-shadow: 0 0 10px #00ff41; }
-            50% { text-shadow: 0 0 20px #00ff41, 0 0 30px #00ff41; }
+            color: var(--cyan);
+            text-shadow: 2px 2px var(--magenta);
         }
         .cat-title {
-            color: #ff00ff;
-            font-size: 16px;
-            margin: 15px 0 10px 0;
-            border-bottom: 1px solid #ff00ff;
+            color: var(--magenta);
+            font-size: 14px;
+            margin: 12px 0 8px 0;
+            border-bottom: 1px solid var(--magenta);
+            padding-bottom: 5px;
         }
         .nav-item {
-            padding: 10px 15px;
-            margin: 5px 0;
+            padding: 8px 12px;
+            margin: 4px 0;
             cursor: pointer;
-            border: 1px solid #004411;
-            transition: all 0.2s;
+            border: 1px solid #330033;
+            color: #888;
+            transition: all 0.15s;
         }
-        .nav-item:hover, .nav-item.active {
-            background: #00ff41;
+        .nav-item:hover, .nav-item:focus, .nav-item.active {
+            background: var(--magenta);
             color: #000;
-            border-color: #00ff41;
+            border-color: var(--magenta);
+            outline: none;
         }
         .main {
             flex: 1;
@@ -70,29 +76,32 @@
         }
         .channels {
             flex: 1;
-            border: 2px solid #00ff41;
+            border: 2px solid var(--magenta);
             padding: 15px;
             overflow-y: auto;
-            background: rgba(0,20,0,0.8);
+            background: rgba(20,0,20,0.9);
         }
         .channel {
-            padding: 12px 20px;
-            margin: 8px 0;
+            padding: 10px 15px;
+            margin: 6px 0;
             cursor: pointer;
-            border: 1px solid #004411;
+            border: 1px solid #330033;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            color: #888;
         }
-        .channel:hover, .channel.active {
-            background: #00ff41;
+        .channel:hover, .channel:focus, .channel.active {
+            background: var(--magenta);
             color: #000;
+            border-color: var(--magenta);
+            outline: none;
         }
-        .channel-name { font-size: 16px; }
-        .channel-cat { font-size: 12px; opacity: 0.7; }
+        .channel-name { font-size: 14px; }
+        .channel-cat { font-size: 11px; opacity: 0.7; }
         .player {
             height: 60%;
-            border: 2px solid #00ff41;
+            border: 2px solid var(--cyan);
             background: #000;
             position: relative;
         }
@@ -127,7 +136,9 @@
         }
         .btn:hover { background: #00ff41; color: #000; }
         .btn:active { background: #00aa30; }
-        .info { margin-left: auto; display: flex; align-items: center; gap: 20px; }
+        .info { margin-left: auto; display: flex; align-items: center; gap: 20px; color: var(--cyan); }
+        .btn { padding: 10px 25px; border: 1px solid var(--cyan); cursor: pointer; background: transparent; color: var(--cyan); font-family: inherit; font-size: 14px; }
+        .btn:hover, .btn:focus, .btn:active { background: var(--cyan); color: #000; outline: none; }
     </style>
 </head>
 <body>
@@ -141,15 +152,15 @@
 ╚══════════════╝
 </div>
             <div class="cat-title">CATEGORÍAS</div>
-            <div class="nav-item active" data-cat="all" onclick="filter('all')">▸ Todos</div>
-            <div class="nav-item" data-cat="deportes" onclick="filter('deportes')">▸ Deportes</div>
-            <div class="nav-item" data-cat="premium" onclick="filter('premium')">▸ Premium</div>
-            <div class="nav-item" data-cat="infantil" onclick="filter('infantil')">▸ Infantil</div>
-            <div class="nav-item" data-cat="entretenimiento" onclick="filter('entretenimiento')">▸ Entretenimiento</div>
-            <div class="nav-item" data-cat="peliculas" onclick="filter('peliculas')">▸ Películas</div>
-            <div class="nav-item" data-cat="documentales" onclick="filter('documentales')">▸ Documentales</div>
-            <div class="nav-item" data-cat="noticias" onclick="filter('noticias')">▸ Noticias</div>
-            <div class="nav-item" data-cat="musica" onclick="filter('musica')">▸ Música</div>
+            <div class="nav-item active" data-cat="all" tabindex="0">▸ Todos</div>
+            <div class="nav-item" data-cat="deportes" tabindex="0">▸ Deportes</div>
+            <div class="nav-item" data-cat="premium" tabindex="0">▸ Premium</div>
+            <div class="nav-item" data-cat="infantil" tabindex="0">▸ Infantil</div>
+            <div class="nav-item" data-cat="entretenimiento" tabindex="0">▸ Entretenimiento</div>
+            <div class="nav-item" data-cat="peliculas" tabindex="0">▸ Películas</div>
+            <div class="nav-item" data-cat="documentales" tabindex="0">▸ Documentales</div>
+            <div class="nav-item" data-cat="noticias" tabindex="0">▸ Noticias</div>
+            <div class="nav-item" data-cat="musica" tabindex="0">▸ Música</div>
             <div class="cat-title">FAVORITOS</div>
             <div id="favorites"></div>
         </div>
@@ -173,10 +184,12 @@
         var currentCat = 'all';
         var selectedIndex = 0;
         var isPlaying = false;
+        var inSidebar = false;
         
         fetch('/api/premium').then(r=>r.json()).then(d=>{
             channels = d.channels || [];
             renderChannels();
+            document.querySelector('.nav-item').focus();
         });
         
         function filter(cat) {
@@ -184,7 +197,11 @@
             selectedIndex = 0;
             document.querySelectorAll('.nav-item').forEach(el=>{
                 el.classList.remove('active');
-                if(el.dataset.cat === cat) el.classList.add('active');
+                el.setAttribute('tabindex', '-1');
+                if(el.dataset.cat === cat) {
+                    el.classList.add('active');
+                    el.setAttribute('tabindex', '0');
+                }
             });
             renderChannels();
         }
@@ -193,15 +210,18 @@
             var list = document.getElementById('channelList');
             var filtered = currentCat === 'all' ? channels : channels.filter(c=>c.category === currentCat);
             list.innerHTML = filtered.map((c,i)=>'
-                <div class="channel'+(i===selectedIndex?' active':'')+'" onclick="play('+i+')" data-idx="'+i+'">
+                <div class="channel'+(i===selectedIndex?' active':'')+'" tabindex="0" ondblclick="play('+i+')">
                     <span class="channel-name">'+c.name+'</span>
                     <span class="channel-cat">'+c.category+'</span>
                 </div>
             ').join('');
+            
+            // Scroll to selected
+            var active = list.querySelector('.active');
+            if(active) active.scrollIntoView({block: 'center'});
         }
         
         function play(idx) {
-            selectedIndex = idx;
             var filtered = currentCat === 'all' ? channels : channels.filter(c=>c.category === currentCat);
             var ch = filtered[idx];
             if(!ch) return;
@@ -237,16 +257,51 @@
             var filtered = currentCat === 'all' ? channels : channels.filter(c=>c.category === currentCat);
             var total = filtered.length;
             
-            if(e.key === 'ArrowUp') {
-                selectedIndex = Math.max(0, selectedIndex - 1);
-                renderChannels();
+            // Left/Right to switch between sidebar and channels
+            if(e.key === 'ArrowRight') {
+                e.preventDefault();
+                inSidebar = false;
+                document.getElementById('channelList').querySelector('.channel')?.focus();
+            } else if(e.key === 'ArrowLeft') {
+                e.preventDefault();
+                inSidebar = true;
+                document.querySelector('.nav-item.active, .nav-item')?.focus();
+            } else if(e.key === 'ArrowUp') {
+                e.preventDefault();
+                if(inSidebar || document.activeElement.classList.contains('nav-item')) {
+                    var navs = document.querySelectorAll('.nav-item');
+                    var idx = Array.from(navs).findIndex(n => n === document.activeElement);
+                    if(idx > 0) navs[idx-1].focus();
+                } else {
+                    selectedIndex = Math.max(0, selectedIndex - 1);
+                    renderChannels();
+                    document.getElementById('channelList').querySelector('.active')?.focus();
+                }
             } else if(e.key === 'ArrowDown') {
-                selectedIndex = Math.min(total - 1, selectedIndex + 1);
-                renderChannels();
+                e.preventDefault();
+                if(inSidebar || document.activeElement.classList.contains('nav-item')) {
+                    var navs = document.querySelectorAll('.nav-item');
+                    var idx = Array.from(navs).findIndex(n => n === document.activeElement);
+                    if(idx < navs.length-1) navs[idx+1].focus();
+                } else {
+                    selectedIndex = Math.min(total - 1, selectedIndex + 1);
+                    renderChannels();
+                    document.getElementById('channelList').querySelector('.active')?.focus();
+                }
             } else if(e.key === 'Enter') {
-                play(selectedIndex);
+                e.preventDefault();
+                if(document.activeElement.classList.contains('nav-item')) {
+                    filter(document.activeElement.dataset.cat);
+                } else {
+                    play(selectedIndex);
+                }
             } else if(e.key === 'Escape') {
-                stopChannel();
+                e.preventDefault();
+                if(isPlaying) {
+                    stopChannel();
+                } else {
+                    document.querySelector('.nav-item')?.focus();
+                }
             }
         });
     </script>
