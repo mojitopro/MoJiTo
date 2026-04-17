@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import requests
 from pathlib import Path
 from flask import Flask, request, jsonify, redirect, send_file
 
@@ -105,6 +106,34 @@ def api_debug():
 @app.route('/health')
 def health():
     return jsonify({'status': 'ok', 'service': 'mojito-tv'})
+
+@app.route('/proxy/<path:url>')
+def proxy_stream(url):
+    import urllib.parse
+    from flask import Response, stream_with_context
+    
+    target_url = urllib.parse.unquote(url)
+    
+    try:
+        def generate():
+            r = requests.get(target_url, stream=True, headers={
+                'User-Agent': 'Mozilla/5.0 (SMART-TV) AppleWebKit/537.36',
+                'Referer': target_url
+            }, timeout=30, allow_redirects=True)
+            for chunk in r.iter_content(chunk_size=8192):
+                yield chunk
+        
+        return Response(stream_with_context(generate()), mimetype='video/mpeg')
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+@app.route('/play/<path:channel>')
+def play_channel(channel):
+    from selector import get_best_stream
+    result = get_best_stream(channel, premium_only=True)
+    if result and result.get('url'):
+        return jsonify({'status': 'ok', 'url': result['url'], 'fallbacks': result.get('fallbacks', [])})
+    return jsonify({'status': 'error', 'url': None})
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))

@@ -106,20 +106,38 @@ function select(i) {
 }
 
 function playStream(url, name) {
-    // Intentar primero en navegador
+    // Si es Astra (puerto 8000), usar proxy
+    if(url.indexOf(':8000') > 0 || url.indexOf(':8001') > 0 || url.indexOf(':18000') > 0) {
+        // Usar proxy del servidor
+        url = '/proxy/' + encodeURIComponent(url);
+    }
+    
+    elMsg.textContent = 'Cargando: ' + name + '...';
+    
+    // Intentar en navegador
     video.src = url;
     video.style.display = 'block';
     menu.style.display = 'none';
     
-    video.play().then(function() {
-        elMsg.textContent = '▶ Reproduciendo: ' + name;
-    }).catch(function() {
-        // Error - intentar VLC externo
-        elMsg.textContent = 'Navegador no puede - intentando VLC...';
-        setTimeout(function() {
+    var playAttempt = video.play();
+    
+    if(playAttempt) {
+        playAttempt.then(function() {
+            elMsg.textContent = '▶ Reproduciendo: ' + name;
+        }).catch(function(e) {
+            elMsg.textContent = 'Error: ' + e.message;
+            setTimeout(function() {
+                showVLC(name);
+            }, 2000);
+        });
+    }
+    
+    // Timeout - si no reproduce en 5 segundos, intentar VLC
+    setTimeout(function() {
+        if(video.paused || video.currentTime === 0) {
             showVLC(name);
-        }, 1500);
-    });
+        }
+    }, 5000);
 }
 
 function showVLC(name) {
