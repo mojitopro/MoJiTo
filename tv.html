@@ -716,90 +716,142 @@
 
     <script>
         // ============================================
-        // DATOS DE CONTENIDO - SIMULACION DE STREAMS
+        // DATOS DE CONTENIDO - DESDE API DE MOJITO
         // ============================================
-        var contentData = [
-            {
-                id: 1,
-                title: "Liminal Pool Ambience",
-                channel: "01 - DREAM PORTAL",
-                category: "ambient",
-                duration: "∞ LIVE",
-                url: "https://www.youtube.com/embed/4xDzrJKXOOY?autoplay=1&loop=1&playlist=4xDzrJKXOOY",
-                ascii: "    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n    ▓  ░░░░░░░░░░░░  ▓\n    ▓  ░  POOL   ░  ▓\n    ▓  ░  ROOMS  ░  ▓\n    ▓  ░░░░░░░░░░░░  ▓\n    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓\n    ████        ████\n    █  █        █  █\n    █  █        █  █",
-                description: "Ambiente liminal de piscina infinita. Espacios oniricos que existen entre los suenos."
-            },
-            {
-                id: 2,
-                title: "Retro Computer Terminal",
-                channel: "02 - LIMINAL POOL",
-                category: "retro",
-                duration: "∞ LIVE",
-                url: "https://www.youtube.com/embed/5qap5aO4i9A?autoplay=1&loop=1&playlist=5qap5aO4i9A",
-                ascii: "    ╔════════════════════╗\n    ║ C:\\>_SYSTEM READY  ║\n    ║                    ║\n    ║ [OK] BOOT COMPLETE ║\n    ║ [OK] MEMORY CHECK  ║\n    ║ [OK] DISK READY    ║\n    ║                    ║\n    ║ C:\\>_               ║\n    ╚════════════════════╝",
-                description: "Terminal de computadora retro de los 80s. Sonidos de modem y boot sequence."
-            },
-            {
-                id: 3,
-                title: "Neon City Rain",
-                channel: "03 - STATIC DREAMS",
-                category: "ambient",
-                duration: "∞ LIVE",
-                url: "https://www.youtube.com/embed/4xDzrJKXOOY?autoplay=1&loop=1&playlist=4xDzrJKXOOY",
-                ascii: "    ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄\n    █  ▓▓  ▓▓  ▓▓  █\n    █  ▓▓  ▓▓  ▓▓  █\n    █  ▓▓  ▓▓  ▓▓  █\n    █  ▓▓  ▓▓  ▓▓  █\n    ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀\n    ✦ NEON CITY ✦\n    ✦   RAIN    ✦",
-                description: "Ciudad de neón bajo la lluvia. Estética cyberpunk dreamcore."
-            },
-            {
-                id: 4,
-                title: "Forest Cabin Lofi",
-                channel: "04 - NEON FOREST",
-                category: "lofi",
-                duration: "∞ LIVE",
-                url: "https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&loop=1&playlist=jfKfPfyJRdk",
-                ascii: "         /\\    \n        /  \\   \n       /    \\  \n      /______\\ \n      |      | \n      |  []  | \n      |______| \n    ✦ FOREST ✦\n    ✦  CABIN ✦",
-                description: "Cabina en el bosque con musica lofi. Ambiente relajante para estudiar."
-            },
-            {
-                id: 5,
-                title: "Old TV Static",
-                channel: "05 - MEMORY LANE",
-                category: "retro",
-                duration: "∞ LIVE",
-                url: "https://www.youtube.com/embed/aqz-KE-bpKQ?autoplay=1&loop=1&playlist=aqz-KE-bpKQ",
-                ascii: "    ▓▒░▓▒░▓▒░▓▒░▓▒░\n    ░▓▒░▓▒░▓▒░▓▒░▓▒\n    ▒░▓▒░▓▒░▓▒░▓▒░\n    ▓▒░▓▒░▓▒░▓▒░▓▒\n    ░▓▒░▓▒░▓▒░▓▒░▓\n    ▒░▓▒░▓▒░▓▒░▓▒░\n    ✦ NO SIGNAL ✦",
-                description: "Estática de televisión antigua. Mensajes subliminales del subconsciente."
-            },
-            {
-                id: 6,
-                title: "Underwater Dreams",
-                channel: "01 - DREAM PORTAL",
-                category: "nature",
-                duration: "∞ LIVE",
-                url: "https://www.youtube.com/embed/2Vv-BfVoq4g?autoplay=1&loop=1&playlist=2Vv-BfVoq4g",
-                ascii: "    ~~~~ ~~~~ ~~~~\n    ~  ▓▓▓▓  ~  ▓▓  ~\n    ~ ▓▓▓▓▓▓ ~ ▓▓▓  ~\n    ~  ▓▓▓▓  ~  ▓▓  ~\n    ~~~~ ~~~~ ~~~~\n    ✦ UNDER ✦\n    ✦ WATER ✦",
-                description: "Suenos bajo el agua. Profundidades oceanicas misteriosas."
-            },
-            {
-                id: 7,
-                title: "Midnight Train",
-                channel: "02 - LIMINAL POOL",
-                category: "ambient",
-                duration: "∞ LIVE",
-                url: "https://www.youtube.com/embed/4xDzrJKXOOY?autoplay=1&loop=1&playlist=4xDzrJKXOOY",
-                ascii: "    ╭────────────╮\n    │  TRAIN     │\n    │  →→→→→→→   │\n    │  [__]      │\n    ╰────────────╯\n    ~~~ ~~~ ~~~ ~~~\n    ✦ MIDNIGHT ✦\n    ✦  EXPRESS ✦",
-                description: "Viaje en tren de medianoche. Destino desconocido, solo el viaje importa."
-            },
-            {
-                id: 8,
-                title: "Abandoned Mall",
-                channel: "03 - STATIC DREAMS",
-                category: "ambient",
-                duration: "∞ LIVE",
-                url: "https://www.youtube.com/embed/5qap5aO4i9A?autoplay=1&loop=1&playlist=5qap5aO4i9A",
-                ascii: "    ╔══════════════╗\n    ║  MALL      ║\n    ║  CLOSED    ║\n    ║  SINCE     ║\n    ║  199█      ║\n    ╚══════════════╝\n    ▓▓    ▓▓    ▓▓\n    ✦ LIMINAL ✦\n    ✦  SPACE  ✦",
-                description: "Centro comercial abandonado. Espacios liminales que evocan nostalgia."
+        var contentData = [];
+        var channelsLoaded = false;
+        var currentFilter = 'all';
+        var loadingChannels = false;
+
+        // ============================================
+        // CARGAR CANALES DESDE API
+        // ============================================
+        async function loadChannels() {
+            if (loadingChannels) return;
+            loadingChannels = true;
+            
+            try {
+                var response = await fetch('/api/channels?limit=500');
+                var data = await response.json();
+                
+                if (data.channels && data.channels.length > 0) {
+                    contentData = data.channels.map(function(ch, index) {
+                        var category = ch.category || 'General';
+                        var asciiArt = generateAsciiArt(ch.name);
+                        
+                        return {
+                            id: index + 1,
+                            title: ch.name,
+                            channel: ch.name,
+                            category: category.toLowerCase(),
+                            duration: ch.streams ? ch.streams + ' streams' : 'LIVE',
+                            url: ch.best_url,
+                            ascii: asciiArt,
+                            description: 'Canal: ' + ch.name + ' | Categoría: ' + category + ' | Streams disponibles: ' + (ch.streams || 0),
+                            fallbacks: ch.fallbacks || [],
+                            premium: ch.premium || false
+                        };
+                    });
+                    
+                    channelsLoaded = true;
+                    renderContentGrid(currentFilter);
+                    updateCategoryNav();
+                    
+                    console.log('%c MoJiTo TV - Canales cargados desde API ', 'background: #000; color: #00ff41; font-size: 16px; padding: 10px;');
+                    console.log('%c Total canales: ' + contentData.length, 'background: #000; color: #ff00ff; font-size: 12px; padding: 5px;');
+                }
+            } catch (error) {
+                console.error('Error cargando canales:', error);
+                loadFallbackData();
             }
-        ];
+            
+            loadingChannels = false;
+        }
+
+        // ============================================
+        // GENERAR ASCII ART PARA CADA CANAL
+        // ============================================
+        function generateAsciiArt(name) {
+            var asciiChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            var art = '';
+            var shortName = name.substring(0, 8).toUpperCase();
+            
+            art += '    ┌────────┐\n';
+            art += '    │';
+            for (var i = 0; i < shortName.length; i++) {
+                art += asciiChars.includes(shortName[i]) ? shortName[i] : '#';
+            }
+            art += '     │\n';
+            art += '    │  CH    │\n';
+            art += '    │  ' + (contentData.length % 99).toString().padStart(2, '0') + '   │\n';
+            art += '    └────────┘\n';
+            art += '    ═══════════\n';
+            
+            return art;
+        }
+
+        // ============================================
+        // DATOS DE RESERVA SI LA API FALLA
+        // ============================================
+        function loadFallbackData() {
+            contentData = [
+                { id: 1, title: "ESPN HD", channel: "ESPN", category: "deportes", duration: "LIVE", url: "", ascii: "    ┌────────┐\n    │  ESPN  │\n    │  HD    │\n    └────────┘", description: "Cargando desde base de datos..." },
+                { id: 2, title: "HBO", channel: "HBO", category: "cine", duration: "LIVE", url: "", ascii: "    ┌────────┐\n    │  HBO   │\n    │        │\n    └────────┘", description: "Cargando desde base de datos..." },
+                { id: 3, title: "Fox News", channel: "Fox News", category: "noticias", duration: "LIVE", url: "", ascii: "    ┌────────┐\n    │ FOX   │\n    │ NEWS  │\n    └────────┘", description: "Cargando desde base de datos..." }
+            ];
+            channelsLoaded = true;
+            renderContentGrid(currentFilter);
+        }
+
+        // ============================================
+        // ACTUALIZAR NAVEGACION DE CATEGORIAS
+        // ============================================
+        function updateCategoryNav() {
+            var categories = {};
+            contentData.forEach(function(ch) {
+                var cat = ch.category || 'general';
+                categories[cat] = (categories[cat] || 0) + 1;
+            });
+            
+            var sidebar = document.querySelector('.sidebar');
+            var existingCats = sidebar.querySelectorAll('[data-category]');
+            existingCats.forEach(function(el) {
+                if (el.getAttribute('data-category') !== 'all') {
+                    el.remove();
+                }
+            });
+            
+            var categorySection = sidebar.querySelector('.sidebar-title:last-of-type');
+            if (categorySection) {
+                Object.keys(categories).slice(0, 10).forEach(function(cat) {
+                    var div = document.createElement('div');
+                    div.className = 'nav-item';
+                    div.setAttribute('data-category', cat);
+                    div.textContent = '▸ ' + cat.charAt(0).toUpperCase() + cat.slice(1) + ' (' + categories[cat] + ')';
+                    categorySection.parentNode.insertBefore(div, categorySection.nextSibling);
+                });
+            }
+        }
+
+        // ============================================
+        // OBTENER STREAM MEJOR PARA UN CANAL
+        // ============================================
+        async function getStreamForChannel(channelName) {
+            try {
+                var response = await fetch('/api/channel/' + encodeURIComponent(channelName));
+                var data = await response.json();
+                
+                if (data.status === 'ok' && data.url) {
+                    return {
+                        url: data.url,
+                        fallbacks: data.fallbacks || []
+                    };
+                }
+            } catch (error) {
+                console.error('Error obteniendo stream:', error);
+            }
+            return null;
+        }
 
         // ============================================
         // ESTADO DE LA APLICACION
