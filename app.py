@@ -2,8 +2,10 @@
 import os
 from pathlib import Path
 from flask import Flask, request, jsonify, redirect, send_file
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 BASE_DIR = Path(__file__).resolve().parent
 
 def wants_premium_only():

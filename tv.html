@@ -619,11 +619,15 @@
                 <div class="nav-item" data-channel="4">05 - MEMORY LANE</div>
                 
                 <div class="sidebar-title" style="margin-top: 20px;">✦ CATEGORIAS ✦</div>
-                <div class="nav-item" data-category="all">▸ Todo</div>
-                <div class="nav-item" data-category="ambient">▸ Ambient</div>
-                <div class="nav-item" data-category="lofi">▸ Lofi</div>
-                <div class="nav-item" data-category="nature">▸ Nature</div>
-                <div class="nav-item" data-category="retro">▸ Retro</div>
+                <div class="nav-item" data-category="all">▸ Todos</div>
+                <div class="nav-item" data-category="deportes">▸ Deportes</div>
+                <div class="nav-item" data-category="premium">▸ Premium</div>
+                <div class="nav-item" data-category="infantil">▸ Infantil</div>
+                <div class="nav-item" data-category="entretenimiento">▸ Entretenimiento</div>
+                <div class="nav-item" data-category="peliculas">▸ Peliculas</div>
+                <div class="nav-item" data-category="documentales">▸ Documentales</div>
+                <div class="nav-item" data-category="noticias">▸ Noticias</div>
+                <div class="nav-item" data-category="musica">▸ Musica</div>
             </nav>
 
             <!-- AREA DE VIDEO -->
@@ -737,6 +741,7 @@
                 if (data.channels && data.channels.length > 0) {
                     contentData = data.channels.map(function(ch, index) {
                         var category = ch.category || 'General';
+                        var ascii = '    ┌────────┐\n    │ ' + (ch.name || 'UNKNOWN').substring(0,8).toUpperCase().padEnd(8) + ' │\n    │        │\n    └────────┘';
                         
                         return {
                             id: index + 1,
@@ -745,6 +750,7 @@
                             category: category.toLowerCase(),
                             duration: 'LIVE',
                             url: ch.url || '',
+                            ascii: ascii,
                             description: 'Canal: ' + ch.name + ' | Categoría: ' + category,
                             fallbacks: ch.fallbacks || [],
                             premium: ch.premium || false
@@ -1041,8 +1047,13 @@
                 videoPlayer.innerHTML = '';
                 
                 // Crear iframe para el stream
+                var streamUrl = content.url || '';
+                if (!streamUrl && content.fallbacks && content.fallbacks.length > 0) {
+                    streamUrl = content.fallbacks[0];
+                }
+                
                 var iframe = document.createElement('iframe');
-                iframe.src = content.url;
+                iframe.src = streamUrl;
                 iframe.setAttribute('allow', 'autoplay; encrypted-media');
                 iframe.setAttribute('allowfullscreen', 'true');
                 
