@@ -2,75 +2,148 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MoJiTo TV</title>
     <style>
-        * { -webkit-tap-highlight-color: transparent; }
-        body { background: #000; color: #0f0; font-family: monospace; margin: 0; padding: 10px; touch-action: manipulation; }
-        h1 { text-align: center; color: #0ff; margin: 10px 0; font-size: 24px; }
-        #status { text-align: center; color: #f0f; min-height: 24px; margin: 10px 0; font-size: 14px; }
-        .list { padding: 10px; }
-        .ch { 
-            background: #111; border: 2px solid #222; 
-            padding: 20px; margin: 8px 0; 
-            color: #888; font-size: 18px;
-            cursor: pointer;
-            border-radius: 5px;
-            -webkit-border-radius: 5px;
-        }
-        .ch:hover, .ch:active { background: #1a1a1a; }
-        .ch.active { background: #f0f; color: #000; border-color: #f0f; }
-        #player { width: 100%; height: 350px; background: #111; border: 3px solid #0ff; margin-top: 20px; }
-        iframe { width: 100%; height: 100%; border: none; }
-        .empty { display: flex; align-items: center; justify-content: center; height: 100%; color: #333; font-size: 18px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; background: #000; color: #fff; font-family: Arial, sans-serif; }
+        #video { width: 100%; height: 100%; display: none; background: #000; }
+        #menu { padding: 20px; }
+        .logo { font-size: 42px; font-weight: bold; text-align: center; margin: 15px 0; }
+        .logo span { color: #dc143c; text-shadow: 0 0 15px #ff0000; }
+        #msg { text-align: center; color: #dc143c; min-height: 24px; margin: 10px 0; font-size: 14px; }
+        #list { height: 380px; overflow-y: auto; }
+        .ch { padding: 15px; border-bottom: 1px solid #222; color: #aaa; font-size: 16px; }
+        .ch:hover { background: #111; }
+        .ch.active { background: #dc143c; color: #fff; }
+        .btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; }
+        .btn { padding: 15px 10px; background: #8b0000; border: none; color: #fff; font-size: 14px; cursor: pointer; border-radius: 5px; }
+        .btn:active { background: #dc143c; }
     </style>
 </head>
 <body>
-    <h1>MoJiTo TV</h1>
-    <div id="status">Cargando canales...</div>
-    <div class="list" id="list"></div>
-    <div id="player"><div class="empty">Toca un canal para ver</div></div>
 
-    <script>
-    var chs = [], idx = 0;
+<video id="video" controls></video>
+
+<div id="menu">
+    <div class="logo"><span>MoJiTo</span> TV</div>
     
-    // Cargar canales
-    fetch('/api/premium').then(r=>r.json()).then(d=>{
-        chs = d.channels || [];
-        document.getElementById('status').textContent = chs.length + ' canales - Toca para ver';
-        render();
-    });
+    <div class="btns">
+        <button class="btn" onclick="filter('all')">TODOS</button>
+        <button class="btn" onclick="filter('deportes')">DEPORTES</button>
+        <button class="btn" onclick="filter('premium')">PREMIUM</button>
+        <button class="btn" onclick="filter('infantil')">INFANTIL</button>
+    </div>
     
-    function render() {
-        var html = '';
-        for(var i=0; i<chs.length; i++) {
-            html += '<div class="ch'+(i===0?' active':'')+'" onclick="play('+i+')">'+chs[i].name+'</div>';
-        }
-        document.getElementById('list').innerHTML = html;
+    <div id="msg">63 canales - Toca o ↑↓</div>
+    <div id="list"></div>
+    
+    <div class="btns">
+        <button class="btn" onclick="prev()">◀ ANTERIOR</button>
+        <button class="btn" onclick="playIdx()">▶ PLAY</button>
+        <button class="btn" onclick="next()">SIGUIENTE ▶</button>
+        <button class="btn" onclick="stop()">■ STOP</button>
+    </div>
+</div>
+
+<script>
+var BASE = window.location.protocol+'//'+window.location.host;
+var streams = [], idx = 0, mode = 'all';
+var elList = document.getElementById('list');
+var elMsg = document.getElementById('msg');
+var elVideo = document.getElementById('video');
+var elMenu = document.getElementById('menu');
+
+// Load channels
+fetch('/api/premium').then(r=>r.json()).then(d=>{
+    streams = d.channels || [];
+    elMsg.textContent = streams.length + ' canales - Toca para ver';
+    render();
+});
+
+function render() {
+    var show = mode === 'all' ? streams : streams.filter(function(s){return s.category === mode;});
+    var html = '';
+    for(var i=0; i<show.length; i++) {
+        html += '<div class="ch'+(i===idx?' active':'')+'" onclick="play('+i+')">'+(i+1)+'. '+show[i].name+'</div>';
+    }
+    elList.innerHTML = html;
+}
+
+function filter(cat) {
+    mode = cat;
+    idx = 0;
+    render();
+    var catNames = {all:'Todos', Deportes:'Deportes', premium:'Premium', infantil:'Infantil'};
+    elMsg.textContent = catNames[cat] || cat;
+}
+
+function play(i) {
+    idx = i;
+    var show = mode === 'all' ? streams : streams.filter(function(s){return s.category === mode;});
+    var s = show[i];
+    if(!s) return;
+    
+    var url = s.url || (s.fallbacks && s.fallbacks[0]) || '';
+    
+    if(url) {
+        elVideo.src = url;
+        elVideo.style.display = 'block';
+        elMenu.style.display = 'none';
+        elVideo.play().catch(function(){
+            elMsg.textContent = 'Toca para reproducir';
+        });
+        elMsg.textContent = '▶ ' + s.name;
+    } else {
+        elMsg.textContent = 'Sin stream';
+    }
+}
+
+function playIdx() {
+    play(idx);
+}
+
+function prev() {
+    var show = mode === 'all' ? streams : streams.filter(function(s){return s.category === mode;});
+    idx = Math.max(0, idx-1);
+    elMsg.textContent = show[idx] ? show[idx].name : '';
+    render();
+}
+
+function next() {
+    var show = mode === 'all' ? streams : streams.filter(function(s){return s.category === mode;});
+    idx = Math.min(show.length-1, idx+1);
+    elMsg.textContent = show[idx] ? show[idx].name : '';
+    render();
+}
+
+function stop() {
+    elVideo.pause();
+    elVideo.style.display = 'none';
+    elMenu.style.display = 'block';
+    elMsg.textContent = 'Detenido';
+}
+
+// Keyboard
+document.addEventListener('keydown', function(e) {
+    var k = e.key;
+    
+    if(elVideo.style.display === 'block') {
+        if(k === 'Escape') stop();
+        return;
     }
     
-    function play(i) {
-        idx = i;
-        var c = chs[i];
-        if(!c) return;
-        var url = c.url || (c.fallbacks && c.fallbacks[0]) || '';
-        
-        // Highlight
-        var els = document.querySelectorAll('.ch');
-        for(var j=0; j<els.length; j++) els[j].classList.remove('active');
-        var el = document.getElementById('list').children[i];
-        if(el) {
-            el.classList.add('active');
-            el.scrollIntoView({block: 'center'});
-        }
-        
-        if(url) {
-            document.getElementById('player').innerHTML = '<iframe src="'+url+'" allow="autoplay"></iframe>';
-            document.getElementById('status').textContent = 'Reproduciendo: ' + c.name;
-        } else {
-            document.getElementById('status').textContent = 'Sin stream: ' + c.name;
-        }
+    if(k === 'ArrowDown' || k === 'ArrowRight') {
+        e.preventDefault();
+        next();
+    } else if(k === 'ArrowUp' || k === 'ArrowLeft') {
+        e.preventDefault();
+        prev();
+    } else if(k === 'Enter') {
+        e.preventDefault();
+        playIdx();
     }
-    </script>
+});
+</script>
 </body>
 </html>
