@@ -1,4 +1,4 @@
-# Workspace
+# MoJiTo TV Workspace
 
 ## Overview
 
@@ -15,6 +15,23 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **Validation**: Zod (`zod/v4`), `drizzle-zod`
 - **API codegen**: Orval (from OpenAPI spec)
 - **Build**: esbuild (CJS bundle)
+
+## Artifacts
+
+### MoJiTo TV (`artifacts/mojito-tv`)
+- React + Vite frontend TV streaming interface
+- Compatible with Chrome 46+ (pure inline styles, no CSS variables, no Grid)
+- TV view: channel list, video player, keyboard nav (arrows/enter/esc)
+- Dashboard view: stats and channel overview
+- Data from GitHub raw JSON files: `working_streams.json`
+
+### API Server (`artifacts/api-server`)
+- Express 5 backend
+- `/api/mojito/tv` — channel list (fetched from MoJiTo GitHub repo)
+- `/api/mojito/stats` — stream/cluster stats
+- `/api/mojito/channels` — channel list with limit
+- `/api/mojito/play/:id` — get stream URL for channel
+- Data cached from `https://raw.githubusercontent.com/mojitopro/MoJiTo/main/working_streams.json`
 
 ## Key Commands
 
