@@ -67,7 +67,7 @@ def get_top_clusters(limit=20):
 
 @app.route('/')
 def index():
-    return send_file('dashboard.html')
+    return send_file('tv.html')
 
 
 @app.route('/dashboard')
@@ -153,6 +153,94 @@ def api_cluster(cluster_id):
         'status': 'ok',
         'cluster': cluster,
         'streams': streams
+    })
+
+
+@app.route('/tv')
+@app.route('/tv.html')
+def tv():
+    return send_file('tv.html')
+
+
+@app.route('/api/tv')
+def api_tv():
+    db = get_db()
+    c = db.cursor()
+    
+    # Get clusters with fusion state (active monitoring)
+    c.execute("""
+        SELECT c.cluster_id, c.canonical_name, c.confidence,
+               (SELECT COUNT(*) FROM cluster_streams WHERE cluster_id = c.cluster_id) as stream_count,
+               f.active_stream, f.switch_count
+        FROM clusters c
+        LEFT JOIN fusion_state f ON c.cluster_id = f.cluster_id
+        ORDER BY f.switch_count DESC, stream_count DESC
+        LIMIT 100
+    """)
+    
+    channels = []
+    for row in c.fetchall():
+        channels.append({
+            'cluster_id': row[0],
+            'name': row[1],
+            'confidence': row[2],
+            'streams': row[3],
+            'fusion': row[4] is not None,
+            'active_stream': row[4],
+            'switches': row[5]
+        })
+    
+    return jsonify({
+        'status': 'ok',
+        'channels': channels,
+        'total': len(channels),
+        'fusion_count': sum(1 for ch in channels if ch['fusion'])
+    })
+
+
+@app.route('/api/play/<cluster_id>')
+def api_play(cluster_id):
+    db = get_db()
+    c = db.cursor()
+    
+    # Get active stream from fusion_state
+    c.execute("""
+        SELECT active_stream, backup_streams, switch_count
+        FROM fusion_state 
+        WHERE cluster_id = ?
+    """, (cluster_id,))
+    
+    row = c.fetchone()
+    
+    if row and row[0]:
+        url = row[0]
+        return jsonify({
+            'status': 'ok',
+            'url': url,
+            'backups': row[1],
+            'switches': row[2]
+        })
+    
+    # Fallback: get first stream from cluster
+    c.execute("""
+        SELECT stream_url 
+        FROM cluster_streams 
+        WHERE cluster_id = ?
+        ORDER BY priority DESC
+        LIMIT 1
+    """, (cluster_id,))
+    
+    row = c.fetchone()
+    
+    if row:
+        return jsonify({
+            'status': 'ok',
+            'url': row[0]
+        })
+    
+    return jsonify({
+        'status': 'error',
+        'error': 'no stream available'
     })
 
 
