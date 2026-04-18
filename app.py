@@ -167,15 +167,18 @@ def api_tv():
     db = get_db()
     c = db.cursor()
     
-    # Get clusters with fusion state (active monitoring)
+    # Get channels that are ONLINE and working
     c.execute("""
-        SELECT c.cluster_id, c.canonical_name, c.confidence,
+        SELECT c.cluster_id, c.canonical_name, cs.stream_url, 
                (SELECT COUNT(*) FROM cluster_streams WHERE cluster_id = c.cluster_id) as stream_count,
-               f.active_stream, f.switch_count
+               f.active_stream
         FROM clusters c
+        JOIN cluster_streams cs ON c.cluster_id = cs.cluster_id
         LEFT JOIN fusion_state f ON c.cluster_id = f.cluster_id
-        ORDER BY f.switch_count DESC, stream_count DESC
-        LIMIT 100
+        WHERE c.canonical_name != '' AND c.canonical_name NOT LIKE 'domain_%'
+        GROUP BY c.cluster_id
+        ORDER BY stream_count DESC, f.switch_count DESC
+        LIMIT 80
     """)
     
     channels = []
@@ -183,18 +186,35 @@ def api_tv():
         channels.append({
             'cluster_id': row[0],
             'name': row[1],
-            'confidence': row[2],
             'streams': row[3],
-            'fusion': row[4] is not None,
-            'active_stream': row[4],
-            'switches': row[5]
+            'url': row[2],
+            'fusion': row[4] is not None
         })
+    
+    # If no clusters, get from streams table directly
+    if not channels:
+        c.execute("""
+            SELECT DISTINCT channel, url FROM streams 
+            WHERE status = 'online' AND channel IS NOT NULL AND channel != ''
+            AND channel NOT LIKE '%clone%' AND channel NOT LIKE '%brute%'
+            AND LENGTH(channel) > 2 AND LENGTH(channel) < 35
+            ORDER BY channel
+            LIMIT 60
+        """)
+        for row in c.fetchall():
+            if row[0] and row[1]:
+                channels.append({
+                    'cluster_id': row[0][:12],
+                    'name': row[0],
+                    'streams': 1,
+                    'url': row[1],
+                    'fusion': True
+                })
     
     return jsonify({
         'status': 'ok',
         'channels': channels,
-        'total': len(channels),
-        'fusion_count': sum(1 for ch in channels if ch['fusion'])
+        'total': len(channels)
     })
 
 

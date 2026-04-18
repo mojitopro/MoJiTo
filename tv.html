@@ -1,348 +1,76 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MoJiTo TV</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; }
+        body { background: #000; color: #fff; font-family: Arial; height: 100vh; overflow: hidden; }
         
-        :root {
-            --bg: #000;
-            --card-bg: #111;
-            --text: #fff;
-            --accent: #00d4ff;
-            --accent-dim: #007799;
-            --success: #00ff88;
-            --warning: #ff8800;
-        }
+        #video { width: 100%; height: 55vh; background: #000; object-fit: contain; }
         
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            height: 100vh;
-            overflow: hidden;
-        }
+        #info { position: fixed; bottom: 10px; left: 10px; background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 5px; font-size: 16px; z-index: 10; }
         
-        /* Header */
-        .header {
-            background: linear-gradient(90deg, #111, #000);
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #222;
-        }
+        .nav { background: #111; padding: 10px; display: flex; justify-content: center; gap: 10px; }
+        .nav button { background: #222; border: none; color: #fff; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
         
-        .header h1 {
-            font-size: 20px;
-            color: var(--accent);
-        }
-        
-        .header .status {
-            font-size: 12px;
-            color: var(--success);
-        }
-        
-        /* Player */
-        .player {
-            background: #000;
-            height: 50vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        
-        .player video {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            background: #000;
-        }
-        
-        .player .placeholder {
-            text-align: center;
-            color: #444;
-        }
-        
-        .player .placeholder span {
-            font-size: 60px;
-            display: block;
-            margin-bottom: 10px;
-        }
-        
-        .now-playing {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background: rgba(0,0,0,0.8);
-            padding: 8px 15px;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        
-        /* Controls */
-        .controls {
-            background: #111;
-            padding: 10px;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-        
-        .controls button {
-            background: #222;
-            border: none;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        
-        .controls button.active {
-            background: var(--accent);
-            color: #000;
-        }
-        
-        /* Channel Grid */
-        .channels {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 8px;
-            padding: 15px;
-            overflow-y: auto;
-            height: calc(50vh - 120px);
-        }
-        
-        .channel {
-            background: var(--card-bg);
-            border: 2px solid transparent;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .channel:hover {
-            border-color: var(--accent-dim);
-            background: #1a1a1a;
-        }
-        
-        .channel.active {
-            border-color: var(--accent);
-            background: #0a1a2a;
-        }
-        
-        .channel .name {
-            font-size: 13px;
-            font-weight: bold;
-            color: #fff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .channel .streams {
-            font-size: 11px;
-            color: #666;
-            margin-top: 3px;
-        }
-        
-        .channel .fusion-badge {
-            display: inline-block;
-            background: var(--success);
-            color: #000;
-            font-size: 9px;
-            padding: 2px 5px;
-            border-radius: 3px;
-            margin-top: 3px;
-        }
-        
-        /* Loading */
-        .loading {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            display: none;
-        }
-        
-        .loading.show { display: flex; }
-        
-        .loading-content {
-            text-align: center;
-        }
-        
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid #222;
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        #chlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; padding: 10px; overflow-y: auto; height: 40vh; }
+        .ch { background: #111; border: 2px solid #222; border-radius: 5px; padding: 12px; text-align: center; cursor: pointer; }
+        .ch:hover { border-color: #00d4ff; background: #1a1a1a; }
+        .ch.active { border-color: #0f0; background: #001a0a; }
+        .ch .n { font-size: 13px; font-weight: bold; }
+        .ch .s { font-size: 10px; color: #0f0; margin-top: 5px; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>📺 MoJiTo TV</h1>
-        <div class="status">● FUSIÓN ACTIVA</div>
+    <video id="video" controls playsinline></video>
+    <div id="info">Selecciona un canal</div>
+    
+    <div class="nav">
+        <button onclick="prev()">◀</button>
+        <button onclick="stop()">■</button>
+        <button onclick="next()">▶</button>
     </div>
     
-    <div class="player" id="player">
-        <video id="video" controls playsinline></video>
-        <div class="placeholder" id="placeholder">
-            <span>📺</span>
-            Selecciona un canal
-        </div>
-        <div class="now-playing" id="nowPlaying" style="display:none"></div>
-    </div>
-    
-    <div class="controls">
-        <button onclick="prevChannel()">◀◀</button>
-        <button onclick="toggleView()" id="viewBtn">Solo Fusión</button>
-        <button onclick="nextChannel()">▶▶</button>
-    </div>
-    
-    <div class="channels" id="channels">
-        <!-- Canales -->
-    </div>
-    
-    <div class="loading" id="loading">
-        <div class="loading-content">
-            <div class="spinner"></div>
-            <div>Cargando...</div>
-        </div>
-    </div>
+    <div id="chlist"></div>
 
     <script>
-        let channels = [];
-        let currentIndex = -1;
-        let showFusion = true;
-        
-        // Cargar canales
-        async function loadChannels() {
-            try {
-                const res = await fetch('/api/tv');
-                const data = await res.json();
-                
-                if (data.status === 'ok') {
-                    channels = data.channels;
-                    renderChannels();
-                }
-            } catch (e) {
-                console.error('Error:', e);
-            }
-        }
-        
-        // Render canales
-        function renderChannels() {
-            const container = document.getElementById('channels');
-            container.innerHTML = '';
-            
-            // Filtrar: solo fusion por defecto
-            const filtered = showFusion ? channels.filter(c => c.fusion) : channels;
-            
-            filtered.forEach((ch, i) => {
-                const div = document.createElement('div');
-                div.className = 'channel' + (i === currentIndex ? ' active' : '');
-                div.onclick = () => playChannel(i);
-                div.innerHTML = `
-                    <div class="name">${ch.name}</div>
-                    <div class="streams">${ch.streams} links</div>
-                    ${ch.fusion ? '<div class="fusion-badge">FUSIÓN</div>' : ''}
-                `;
-                container.appendChild(div);
-            });
-            
-            document.getElementById('viewBtn').textContent = showFusion ? 'Ver Todos' : 'Solo Fusión';
-            document.getElementById('viewBtn').className = showFusion ? 'active' : '';
-        }
-        
-        // Reproducir canal
-        async function playChannel(index) {
-            const filtered = showFusion ? channels.filter(c => c.fusion) : channels;
-            const ch = filtered[index];
-            if (!ch) return;
-            
-            currentIndex = index;
-            renderChannels();
-            
-            document.getElementById('loading').classList.add('show');
-            document.getElementById('placeholder').style.display = 'none';
-            document.getElementById('video').style.display = 'block';
-            
-            document.getElementById('nowPlaying').textContent = `▶ ${ch.name}`;
-            document.getElementById('nowPlaying').style.display = 'block';
-            
-            // Obtener stream activo
-            try {
-                const res = await fetch(`/api/play/${ch.cluster_id}`);
-                const data = await res.json();
-                
-                if (data.status === 'ok' && data.url) {
-                    const video = document.getElementById('video');
-                    video.src = data.url;
-                    video.play();
-                } else {
-                    alert('Canal no disponible');
-                }
-            } catch (e) {
-                alert('Error: ' + e.message);
-            }
-            
-            document.getElementById('loading').classList.remove('show');
-        }
-        
-        // Navegación
-        function nextChannel() {
-            const filtered = showFusion ? channels.filter(c => c.fusion) : channels;
-            if (filtered.length === 0) return;
-            currentIndex = (currentIndex + 1) % filtered.length;
-            playChannel(currentIndex);
-        }
-        
-        function prevChannel() {
-            const filtered = showFusion ? channels.filter(c => c.fusion) : channels;
-            if (filtered.length === 0) return;
-            currentIndex = (currentIndex - 1 + filtered.length) % filtered.length;
-            playChannel(currentIndex);
-        }
-        
-        function toggleView() {
-            showFusion = !showFusion;
-            currentIndex = -1;
-            renderChannels();
-        }
-        
-        // Keyboard controls
-        document.addEventListener('keydown', function(e) {
-            if (e.keyCode === 39 || e.keyCode === 40) nextChannel();  // → ↓
-            if (e.keyCode === 37 || e.keyCode === 38) prevChannel();  // ← ↑
-            if (e.keyCode === 13) {  // ENTER
-                if (currentIndex >= 0) playChannel(currentIndex);
-                else playChannel(0);
-            }
-            if (e.keyCode === 27) {  // ESC
-                document.getElementById('video').pause();
-                document.getElementById('video').src = '';
-            }
+    var canales = [];
+    
+    // Cargar canales desde la API
+    fetch('/api/tv').then(r=>r.json()).then(d=>{
+        canales = d.channels.filter(c=>c.fusion && c.streams>0).slice(0,60);
+        render();
+    });
+
+    function render(){
+        var html = '';
+        canales.forEach((c,i)=>{
+            html += `<div class="ch" onclick="play(${i})"><div class="n">${c.name}</div><div class="s">● FUSION</div></div>`;
         });
-        
-        // Iniciar
-        loadChannels();
+        document.getElementById('chlist').innerHTML = html;
+    }
+
+    var idx = 0;
+    function play(i){
+        idx = i;
+        var c = canales[i];
+        document.getElementById('info').textContent = '▶ ' + c.name;
+        document.getElementById('video').src = c.url;
+        document.getElementById('video').play();
+        render();
+    }
+    function next(){ idx = (idx+1)%canales.length; play(idx); }
+    function prev(){ idx = (idx-1+canales.length)%canales.length; play(idx); }
+    function stop(){ document.getElementById('video').pause(); document.getElementById('video').src=''; document.getElementById('info').textContent = 'Parado'; }
+    
+    document.onkeydown = e => {
+        if(e.keyCode==39||e.keyCode==40) next();
+        if(e.keyCode==37||e.keyCode==38) prev();
+        if(e.keyCode==13) play(idx);
+        if(e.keyCode==27) stop();
+    };
     </script>
 </body>
 </html>
