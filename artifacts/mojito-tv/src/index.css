@@ -1,42 +1,3 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *));
-
-@theme inline {
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --font-sans: var(--app-font-sans);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-}
-
-:root {
-  --background: 222 47% 6%;
-  --foreground: 210 40% 98%;
-  --border: 225 25% 16%;
-  --input: 225 25% 14%;
-  --ring: 192 100% 50%;
-  --card: 225 30% 8%;
-  --card-foreground: 210 40% 95%;
-  --primary: 192 100% 50%;
-  --primary-foreground: 225 47% 6%;
-  --muted: 225 25% 14%;
-  --muted-foreground: 215 20% 55%;
-  --app-font-sans: Arial, sans-serif;
-  --radius: 0.5rem;
-}
-
 * {
   margin: 0;
   padding: 0;
@@ -45,28 +6,149 @@
 
 html, body, #root {
   height: 100%;
+  background: #000;
 }
 
 body {
-  background: #000;
-  color: #fff;
-  font-family: Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
+  color: #c8ff00;
+  font-family: "Courier New", Courier, monospace;
+  -webkit-font-smoothing: none;
+  image-rendering: pixelated;
 }
 
-::-webkit-scrollbar {
-  width: 4px;
+/* CRT Scanlines overlay */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.18) 2px,
+    rgba(0, 0, 0, 0.18) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
 }
 
-::-webkit-scrollbar-track {
-  background: #0a0a15;
+/* Phosphor glow effect on text */
+.crt-glow {
+  text-shadow: 0 0 4px currentColor, 0 0 10px currentColor;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #2a2a4e;
-  border-radius: 2px;
+/* Static noise keyframe */
+@-webkit-keyframes static-noise {
+  0%   { opacity: 0.03; -webkit-transform: translateX(0px) translateY(0px); }
+  10%  { opacity: 0.06; -webkit-transform: translateX(-1px) translateY(1px); }
+  20%  { opacity: 0.04; -webkit-transform: translateX(2px) translateY(-1px); }
+  30%  { opacity: 0.07; -webkit-transform: translateX(-1px) translateY(2px); }
+  40%  { opacity: 0.03; -webkit-transform: translateX(1px) translateY(0px); }
+  50%  { opacity: 0.05; -webkit-transform: translateX(0px) translateY(-1px); }
+  60%  { opacity: 0.04; -webkit-transform: translateX(-2px) translateY(1px); }
+  70%  { opacity: 0.06; -webkit-transform: translateX(1px) translateY(-2px); }
+  80%  { opacity: 0.03; -webkit-transform: translateX(0px) translateY(1px); }
+  90%  { opacity: 0.05; -webkit-transform: translateX(-1px) translateY(0px); }
+  100% { opacity: 0.03; -webkit-transform: translateX(0px) translateY(0px); }
+}
+@keyframes static-noise {
+  0%   { opacity: 0.03; transform: translateX(0px) translateY(0px); }
+  10%  { opacity: 0.06; transform: translateX(-1px) translateY(1px); }
+  20%  { opacity: 0.04; transform: translateX(2px) translateY(-1px); }
+  30%  { opacity: 0.07; transform: translateX(-1px) translateY(2px); }
+  40%  { opacity: 0.03; transform: translateX(1px) translateY(0px); }
+  50%  { opacity: 0.05; transform: translateX(0px) translateY(-1px); }
+  60%  { opacity: 0.04; transform: translateX(-2px) translateY(1px); }
+  70%  { opacity: 0.06; transform: translateX(1px) translateY(-2px); }
+  80%  { opacity: 0.03; transform: translateX(0px) translateY(1px); }
+  90%  { opacity: 0.05; transform: translateX(-1px) translateY(0px); }
+  100% { opacity: 0.03; transform: translateX(0px) translateY(0px); }
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #00d4ff55;
+/* Flicker */
+@-webkit-keyframes flicker {
+  0%   { opacity: 1; }
+  92%  { opacity: 1; }
+  93%  { opacity: 0.85; }
+  94%  { opacity: 1; }
+  96%  { opacity: 0.9; }
+  97%  { opacity: 1; }
+  100% { opacity: 1; }
+}
+@keyframes flicker {
+  0%   { opacity: 1; }
+  92%  { opacity: 1; }
+  93%  { opacity: 0.85; }
+  94%  { opacity: 1; }
+  96%  { opacity: 0.9; }
+  97%  { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+/* Text glitch */
+@-webkit-keyframes glitch {
+  0%   { -webkit-transform: translateX(0); clip: rect(0,9999px,0,0); }
+  5%   { -webkit-transform: translateX(-3px); clip: rect(20px,9999px,30px,0); }
+  10%  { -webkit-transform: translateX(3px); clip: rect(50px,9999px,60px,0); }
+  15%  { -webkit-transform: translateX(0); clip: rect(0,9999px,0,0); }
+  80%  { -webkit-transform: translateX(0); clip: rect(0,9999px,0,0); }
+  85%  { -webkit-transform: translateX(-2px); clip: rect(10px,9999px,20px,0); }
+  90%  { -webkit-transform: translateX(2px); clip: rect(40px,9999px,50px,0); }
+  95%  { -webkit-transform: translateX(0); clip: rect(0,9999px,0,0); }
+  100% { -webkit-transform: translateX(0); clip: rect(0,9999px,0,0); }
+}
+@keyframes glitch {
+  0%   { transform: translateX(0); clip: rect(0,9999px,0,0); }
+  5%   { transform: translateX(-3px); clip: rect(20px,9999px,30px,0); }
+  10%  { transform: translateX(3px); clip: rect(50px,9999px,60px,0); }
+  15%  { transform: translateX(0); clip: rect(0,9999px,0,0); }
+  80%  { transform: translateX(0); clip: rect(0,9999px,0,0); }
+  85%  { transform: translateX(-2px); clip: rect(10px,9999px,20px,0); }
+  90%  { transform: translateX(2px); clip: rect(40px,9999px,50px,0); }
+  95%  { transform: translateX(0); clip: rect(0,9999px,0,0); }
+  100% { transform: translateX(0); clip: rect(0,9999px,0,0); }
+}
+
+/* Pulse for ON AIR dot */
+@-webkit-keyframes pulse-red {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.2; }
+  100% { opacity: 1; }
+}
+@keyframes pulse-red {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.2; }
+  100% { opacity: 1; }
+}
+
+/* Blink */
+@-webkit-keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Horizontal scan line sweep */
+@-webkit-keyframes hscan {
+  0%   { top: -4px; }
+  100% { top: 100%; }
+}
+@keyframes hscan {
+  0%   { top: -4px; }
+  100% { top: 100%; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: #000; }
+::-webkit-scrollbar-thumb { background: #2a3a00; }
+::-webkit-scrollbar-thumb:hover { background: #c8ff00; }
+
+/* Flicker class */
+.crt-flicker {
+  -webkit-animation: flicker 8s infinite;
+  animation: flicker 8s infinite;
 }
