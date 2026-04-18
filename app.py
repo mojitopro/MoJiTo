@@ -1,140 +1,178 @@
 #!/usr/bin/env python3
-import os
-import requests
+"""
+MoJiTo Dashboard Server
+"""
+from flask import Flask, jsonify, request, send_file
 from pathlib import Path
-from flask import Flask, request, jsonify, redirect, send_file
+import sqlite3
 
 app = Flask(__name__)
-BASE_DIR = Path(__file__).resolve().parent
 
-def wants_premium_only():
-    category = request.args.get('category', '').strip().lower()
-    premium_flag = request.args.get('premium', '').strip().lower()
-    mode = request.args.get('mode', '').strip().lower()
+ROOT = Path(__file__).parent
+DB_PATH = str(ROOT / 'data' / 'normalized' / 'streams.db')
 
-    if category in {'premium', 'on-demand', 'ondemand', 'vod'}:
-        return True
-    if premium_flag in {'1', 'true', 'yes', 'on'}:
-        return True
-    if mode in {'premium', 'on-demand', 'ondemand'}:
-        return True
-    return False
+
+def get_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def get_stats():
+    db = get_db()
+    c = db.cursor()
+    
+    stats = {}
+    
+    c.execute("SELECT COUNT(*) FROM streams")
+    stats['streams'] = c.fetchone()[0]
+    
+    c.execute("SELECT COUNT(*) FROM clusters")
+    stats['clusters'] = c.fetchone()[0]
+    
+    c.execute("SELECT COUNT(*) FROM cluster_streams")
+    stats['clustered'] = c.fetchone()[0]
+    
+    c.execute("SELECT COUNT(*) FROM fusion_state WHERE active_stream IS NOT NULL")
+    stats['fusion_active'] = c.fetchone()[0]
+    
+    c.execute("SELECT COUNT(*) FROM stream_metrics")
+    stats['metrics'] = c.fetchone()[0]
+    
+    return stats
+
+
+def get_top_clusters(limit=20):
+    db = get_db()
+    c = db.cursor()
+    
+    c.execute(f"""
+        SELECT c.canonical_name, c.confidence,
+               (SELECT COUNT(*) FROM cluster_streams WHERE cluster_id = c.cluster_id) as stream_count
+        FROM clusters c
+        ORDER BY stream_count DESC
+        LIMIT {limit}
+    """)
+    
+    clusters = []
+    for row in c.fetchall():
+        clusters.append({
+            'name': row[0],
+            'confidence': row[1],
+            'streams': row[2]
+        })
+    
+    return clusters
+
 
 @app.route('/')
 def index():
-    return send_file(str(BASE_DIR / 'tv.html'))
+    return send_file('dashboard.html')
 
-@app.route('/tv.html')
-@app.route('/tv')
-def tv():
-    return send_file(str(BASE_DIR / 'tv.html'))
 
-@app.route('/api/channels')
-def api_channels():
-    from selector import get_all_channels
-    premium_only = wants_premium_only()
-    sort_by = request.args.get('sort', 'latency').strip().lower()
-    limit = request.args.get('limit', type=int)
-    channels = get_all_channels(limit=limit, premium_only=premium_only, sort_by=sort_by)
+@app.route('/dashboard')
+@app.route('/dashboard.html')
+def dashboard():
+    stats = get_stats()
+    clusters = get_top_clusters(20)
+    
+    fusion_pct = 0
+    if stats['clusters'] > 0:
+        fusion_pct = min(100, (stats['fusion_active'] / stats['clusters']) * 100)
+    
+    # Generate cluster cards HTML
+    clusters_html = ''
+    for i, cl in enumerate(clusters):
+        active = 'cold' if i >= stats['fusion_active'] else 'active'
+        clusters_html += f'''
+        <div class="cluster-card">
+            <div class="name">{cl['name'][:50]}</div>
+            <div class="streams"><span>{cl['streams']}</span> streams · {cl['confidence']:.0%} confidence</div>
+            <span class="status {active}">{active}</span>
+        </div>
+        '''
+    
+    if not clusters_html:
+        clusters_html = '<p style="color:#666;">No hay clusters aún. Ejecuta ./run.sh pipeline</p>'
+    
+    # Read template
+    with open('dashboard.html') as f:
+        html = f.read()
+    
+    # Replace placeholders
+    html = html.replace('{{STREAMS}}', str(stats['streams']))
+    html = html.replace('{{CLUSTERS}}', str(stats['clusters']))
+    html = html.replace('{{CLUSTERED}}', str(stats['clustered']))
+    html = html.replace('{{FUSION_ACTIVE}}', str(stats['fusion_active']))
+    html = html.replace('{{FUSION_PCT}}', str(int(fusion_pct)))
+    html = html.replace('{{CLUSTERS_HTML}}', clusters_html)
+    
+    return html
 
-    return jsonify({
-        'status': 'ok',
-        'category': 'premium' if premium_only else 'all',
-        'sort': sort_by,
-        'channels': channels,
-    })
-
-@app.route('/api/stream/<path:channel>')
-@app.route('/api/channel/<path:channel>')
-def api_stream(channel):
-    from selector import get_best_stream
-    result = get_best_stream(channel, premium_only=wants_premium_only())
-    if result:
-        return jsonify({
-            'status': 'ok',
-            'stream': result,
-            **result
-        })
-    return jsonify({
-        'status': 'error',
-        'error': 'channel not found',
-        'url': None,
-        'fallbacks': []
-    })
-
-@app.route('/api/search')
-def api_search():
-    from selector import search_channels
-    q = request.args.get('q', '').strip()
-    if not q:
-        return jsonify({
-            'status': 'ok',
-            'streams': [],
-        })
-    premium_only = wants_premium_only()
-    results = search_channels(q, premium_only=premium_only)
-    return jsonify({
-        'status': 'ok',
-        'premium_only': premium_only,
-        'streams': results,
-    })
 
 @app.route('/api/stats')
 def api_stats():
-    from selector import get_stats
-    return jsonify(get_stats())
-
-@app.route('/api/premium')
-def api_premium():
-    import json
-    from pathlib import Path
-    path = BASE_DIR / 'premium_consolidated.json'
-    if path.exists():
-        with open(path) as f:
-            data = json.load(f)
-            return jsonify({'status': 'ok', 'channels': data.get('channels', [])})
-    return jsonify({'status': 'error', 'channels': []})
-
-@app.route('/api/debug')
-def api_debug():
-    ua = request.headers.get('User-Agent', '')
+    stats = get_stats()
     return jsonify({
-        'user_agent': ua,
-        'html_version': 'modern'
+        'status': 'ok',
+        'stats': stats
     })
+
+
+@app.route('/api/channels')
+def api_channels():
+    limit = request.args.get('limit', 50, type=int)
+    clusters = get_top_clusters(limit)
+    return jsonify({
+        'status': 'ok',
+        'channels': clusters
+    })
+
+
+@app.route('/api/cluster/<cluster_id>')
+def api_cluster(cluster_id):
+    db = get_db()
+    c = db.cursor()
+    
+    c.execute("SELECT * FROM clusters WHERE cluster_id = ?", (cluster_id,))
+    cluster = dict(c.fetchone()) if c.fetchone() else None
+    
+    if not cluster:
+        return jsonify({'status': 'error', 'error': 'cluster not found'})
+    
+    c.execute("""
+        SELECT stream_url, priority, is_primary 
+        FROM cluster_streams 
+        WHERE cluster_id = ?
+        ORDER BY priority DESC
+    """, (cluster_id,))
+    
+    streams = [dict(row) for row in c.fetchall()]
+    
+    return jsonify({
+        'status': 'ok',
+        'cluster': cluster,
+        'streams': streams
+    })
+
 
 @app.route('/health')
 def health():
-    return jsonify({'status': 'ok', 'service': 'mojito-tv'})
+    return jsonify({'status': 'ok', 'service': 'mojito-dashboard'})
 
-@app.route('/proxy/<path:url>')
-def proxy_stream(url):
-    import urllib.parse
-    from flask import Response, stream_with_context
-    
-    target_url = urllib.parse.unquote(url)
-    
-    try:
-        def generate():
-            r = requests.get(target_url, stream=True, headers={
-                'User-Agent': 'Mozilla/5.0 (SMART-TV) AppleWebKit/537.36',
-                'Referer': target_url
-            }, timeout=30, allow_redirects=True)
-            for chunk in r.iter_content(chunk_size=8192):
-                yield chunk
-        
-        return Response(stream_with_context(generate()), mimetype='video/mpeg')
-    except Exception as e:
-        return jsonify({'error': str(e)})
-
-@app.route('/play/<path:channel>')
-def play_channel(channel):
-    from selector import get_best_stream
-    result = get_best_stream(channel, premium_only=True)
-    if result and result.get('url'):
-        return jsonify({'status': 'ok', 'url': result['url'], 'fallbacks': result.get('fallbacks', [])})
-    return jsonify({'status': 'error', 'url': None})
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8080))
-    app.run(host='0.0.0.0', port=port, threaded=True, debug=False)
+    import os
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='MoJiTo Dashboard')
+    parser.add_argument('--port', '-p', type=int, default=int(os.environ.get('PORT', 8080)))
+    parser.add_argument('--host', default='0.0.0.0')
+    args = parser.parse_args()
+    
+    print(f"🌐 MoJiTo Dashboard: http://{args.host}:{args.port}")
+    print(f"   Dashboard: http://{args.host}:{args.port}/")
+    print(f"   API:      http://{args.host}:{args.port}/api/stats")
+    print(f"   Channels: http://{args.host}:{args.port}/api/channels")
+    
+    app.run(host=args.host, port=args.port, threaded=True, debug=False)
