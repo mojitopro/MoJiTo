@@ -31,11 +31,12 @@ function getCategory(name: string): string {
 export default function MojitoTV() {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
-  const [currentIdx, setCurrentIdx] = useState(-1);
+  const [playingIdx, setPlayingIdx] = useState(-1);   // canal que está reproduciendo
+  const [focusedIdx, setFocusedIdx] = useState(0);    // canal resaltado (cursor de navegación)
   const [loading, setLoading] = useState(true);
   const [playerState, setPlayerState] = useState<"idle" | "playing" | "error">("idle");
   const [infoVisible, setInfoVisible] = useState(false);
-  const [catIdx, setCatIdx] = useState(CATEGORIES.length - 1); // default "Todos"
+  const [catIdx, setCatIdx] = useState(CATEGORIES.length - 1); // "Todos"
   const [showList, setShowList] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const infoTimer = useRef<number | null>(null);
@@ -70,11 +71,19 @@ export default function MojitoTV() {
     infoTimer.current = window.setTimeout(() => setInfoVisible(false), 5000);
   }, []);
 
-  const playChannel = useCallback((idx: number, chList?: Channel[]) => {
-    const list = chList || filtered;
-    const ch = list[idx];
+  const scrollFocusedIntoView = useCallback((idx: number) => {
+    setTimeout(() => {
+      const el = listRef.current?.querySelectorAll("[data-channel]")[idx] as HTMLElement | null;
+      el?.scrollIntoView({ block: "nearest" });
+    }, 30);
+  }, []);
+
+  // Play the channel at given index in filtered list
+  const playChannel = useCallback((idx: number) => {
+    const ch = filtered[idx];
     if (!ch) return;
-    setCurrentIdx(idx);
+    setPlayingIdx(idx);
+    setFocusedIdx(idx);
     setPlayerState("playing");
     showInfo();
     if (videoRef.current) {
@@ -93,54 +102,104 @@ export default function MojitoTV() {
           .catch(() => setPlayerState("error"));
       });
     }
-    // Scroll channel into view
-    setTimeout(() => {
-      const el = listRef.current?.querySelector("[data-active='true']") as HTMLElement | null;
-      el?.scrollIntoView({ block: "nearest" });
-    }, 50);
-  }, [filtered, showInfo]);
+    scrollFocusedIntoView(idx);
+  }, [filtered, showInfo, scrollFocusedIntoView]);
 
+  // Move cursor UP — keyCode 38 (↑) or 37 (←)
+  const movePrev = useCallback(() => {
+    setFocusedIdx((i) => {
+      const next = (i - 1 + Math.max(filtered.length, 1)) % Math.max(filtered.length, 1);
+      scrollFocusedIntoView(next);
+      return next;
+    });
+  }, [filtered.length, scrollFocusedIntoView]);
+
+  // Move cursor DOWN — keyCode 40 (↓) or 39 (→)
+  const moveNext = useCallback(() => {
+    setFocusedIdx((i) => {
+      const next = (i + 1) % Math.max(filtered.length, 1);
+      scrollFocusedIntoView(next);
+      return next;
+    });
+  }, [filtered.length, scrollFocusedIntoView]);
+
+  // Play+jump to next channel (CH+ button)
   const chNext = useCallback(() => {
-    const next = (currentIdx + 1) % Math.max(filtered.length, 1);
+    const next = (playingIdx + 1) % Math.max(filtered.length, 1);
     playChannel(next);
-  }, [currentIdx, filtered, playChannel]);
+  }, [playingIdx, filtered.length, playChannel]);
 
+  // Play+jump to prev channel (CH- button)
   const chPrev = useCallback(() => {
-    const prev = (currentIdx - 1 + filtered.length) % Math.max(filtered.length, 1);
+    const prev = (playingIdx - 1 + filtered.length) % Math.max(filtered.length, 1);
     playChannel(prev);
-  }, [currentIdx, filtered, playChannel]);
+  }, [playingIdx, filtered.length, playChannel]);
 
   const catNext = useCallback(() => {
     setCatIdx((i) => (i + 1) % CATEGORIES.length);
-    setCurrentIdx(-1);
+    setPlayingIdx(-1);
+    setFocusedIdx(0);
+    setPlayerState("idle");
+    if (videoRef.current) { videoRef.current.pause(); videoRef.current.src = ""; }
   }, []);
 
   const catPrev = useCallback(() => {
     setCatIdx((i) => (i - 1 + CATEGORIES.length) % CATEGORIES.length);
-    setCurrentIdx(-1);
+    setPlayingIdx(-1);
+    setFocusedIdx(0);
+    setPlayerState("idle");
+    if (videoRef.current) { videoRef.current.pause(); videoRef.current.src = ""; }
   }, []);
 
   const stopPlayer = useCallback(() => {
     if (videoRef.current) { videoRef.current.pause(); videoRef.current.src = ""; }
     setPlayerState("idle");
-    setCurrentIdx(-1);
+    setPlayingIdx(-1);
   }, []);
 
-  // Keyboard fallback — may not fire on Philco TV remote but works on PC/browser
+  // ENTER — reproduce el canal enfocado actualmente
+  const playFocused = useCallback(() => {
+    playChannel(focusedIdx);
+  }, [focusedIdx, playChannel]);
+
+  // ── Keyboard handler — keycodes reales del control Philco ──
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.keyCode === 40 || e.keyCode === 39) { e.preventDefault(); chNext(); }
-      else if (e.keyCode === 38 || e.keyCode === 37) { e.preventDefault(); chPrev(); }
-      else if (e.keyCode === 34) { e.preventDefault(); catNext(); }    // PageDown
-      else if (e.keyCode === 33) { e.preventDefault(); catPrev(); }    // PageUp
-      else if (e.keyCode === 13) { if (currentIdx >= 0) playChannel(currentIdx); } // Enter
-      else if (e.keyCode === 27) { stopPlayer(); }                     // ESC
+      switch (e.keyCode) {
+        case 38: // ↑ — mover cursor arriba
+        case 37: // ← — mover cursor arriba
+          e.preventDefault();
+          movePrev();
+          break;
+        case 40: // ↓ — mover cursor abajo
+        case 39: // → — mover cursor abajo
+          e.preventDefault();
+          moveNext();
+          break;
+        case 13: // ENTER/OK — reproducir el canal enfocado
+          e.preventDefault();
+          playFocused();
+          break;
+        case 33: // PageUp — categoría anterior
+          e.preventDefault();
+          catPrev();
+          break;
+        case 34: // PageDown — categoría siguiente
+          e.preventDefault();
+          catNext();
+          break;
+        case 27: // ESC/BACK — detener
+          e.preventDefault();
+          stopPlayer();
+          break;
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [chNext, chPrev, catNext, catPrev, playChannel, stopPlayer, currentIdx]);
+  }, [movePrev, moveNext, playFocused, catPrev, catNext, stopPlayer]);
 
-  const currentChannel = currentIdx >= 0 ? filtered[currentIdx] : null;
+  const playingChannel = playingIdx >= 0 ? filtered[playingIdx] : null;
+  const focusedChannel = filtered[focusedIdx] || null;
 
   return (
     <div style={{
@@ -163,7 +222,6 @@ export default function MojitoTV() {
         flexShrink: 0,
         justifyContent: "space-between",
       }}>
-        {/* Logo */}
         <div style={{
           background: "linear-gradient(135deg, #00d4ff, #7b2cbf)",
           borderRadius: "6px",
@@ -174,7 +232,7 @@ export default function MojitoTV() {
           lineHeight: 1,
         }}>MoJiTo</div>
 
-        {/* Category selector — large buttons for remote clicking */}
+        {/* Category nav — PageUp / PageDown / click */}
         <div style={{ display: "flex", alignItems: "center" }}>
           <TvBtn onClick={catPrev} wide={false} title="Categoria anterior (PageUp)">&#9664;</TvBtn>
           <div style={{
@@ -192,7 +250,6 @@ export default function MojitoTV() {
           <TvBtn onClick={catNext} wide={false} title="Categoria siguiente (PageDown)">&#9654;</TvBtn>
         </div>
 
-        {/* Status + list toggle */}
         <div style={{ display: "flex", alignItems: "center" }}>
           {stats && (
             <div style={{ fontSize: "13px", color: "#00d4ff", marginRight: "12px" }}>
@@ -219,20 +276,39 @@ export default function MojitoTV() {
             flexDirection: "column",
             overflow: "hidden",
           }}>
-            {/* Channel count */}
+            {/* Status bar */}
             <div style={{
               padding: "8px 14px",
               borderBottom: "1px solid #1a1a35",
-              color: "#555",
               fontSize: "12px",
               display: "flex",
               justifyContent: "space-between",
+              color: "#555",
             }}>
               <span>{activeCat}</span>
               <span>{filtered.length} canales</span>
             </div>
 
-            {/* Channel list — SCROLLABLE, each item is a large click target */}
+            {/* Focused channel preview — shows what's highlighted */}
+            {focusedChannel && playerState !== "playing" && (
+              <div style={{
+                padding: "10px 14px",
+                borderBottom: "1px solid #1a1a35",
+                background: "#0e0e20",
+              }}>
+                <div style={{ fontSize: "11px", color: "#00d4ff", letterSpacing: "1px", marginBottom: "4px" }}>
+                  ► SELECCIONADO
+                </div>
+                <div style={{ fontSize: "14px", fontWeight: "bold", color: "#fff" }}>
+                  {focusedChannel.name}
+                </div>
+                <div style={{ fontSize: "11px", color: "#555", marginTop: "2px" }}>
+                  Presiona ENTER u OK para reproducir
+                </div>
+              </div>
+            )}
+
+            {/* Scrollable channel list */}
             <div ref={listRef} style={{ flex: 1, overflowY: "auto", overflowX: "hidden" }}>
               {loading && (
                 <div style={{ textAlign: "center", padding: "50px 16px", color: "#444" }}>
@@ -249,26 +325,35 @@ export default function MojitoTV() {
                   key={ch.cluster_id}
                   number={idx + 1}
                   channel={ch}
-                  active={idx === currentIdx}
+                  playing={idx === playingIdx}
+                  focused={idx === focusedIdx}
                   onClick={() => playChannel(idx)}
                 />
               ))}
             </div>
 
-            {/* REMOTE-STYLE CONTROLS at bottom */}
+            {/* Remote-style controls at bottom */}
             <div style={{
               borderTop: "2px solid #1a1a35",
               padding: "12px",
               background: "#050508",
             }}>
+              {/* Play focused = ENTER equivalent */}
               <div style={{ display: "flex", justifyContent: "center", marginBottom: "8px" }}>
-                <TvBtn onClick={chPrev} wide title="Canal anterior (↑)">&#9650; CH-</TvBtn>
+                <TvBtn onClick={playFocused} wide accent title="Reproducir canal seleccionado (ENTER)">
+                  &#9654; REPRODUCIR
+                </TvBtn>
               </div>
-              <div style={{ display: "flex", justifyContent: "center", marginBottom: "8px" }}>
-                <TvBtn onClick={stopPlayer} wide danger title="Detener (ESC)">&#9632; STOP</TvBtn>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                <TvBtn onClick={movePrev} wide={false} title="Canal anterior en lista (↑)">&#9650; Subir</TvBtn>
+                <TvBtn onClick={moveNext} wide={false} title="Canal siguiente en lista (↓)">&#9660; Bajar</TvBtn>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                <TvBtn onClick={chPrev} wide={false} title="Reproducir canal anterior">&#9650;&#9650; CH-</TvBtn>
+                <TvBtn onClick={chNext} wide={false} title="Reproducir canal siguiente">CH+ &#9660;&#9660;</TvBtn>
               </div>
               <div style={{ display: "flex", justifyContent: "center" }}>
-                <TvBtn onClick={chNext} wide title="Canal siguiente (↓)">&#9660; CH+</TvBtn>
+                <TvBtn onClick={stopPlayer} wide danger title="Detener (ESC)">&#9632; STOP</TvBtn>
               </div>
             </div>
           </div>
@@ -305,25 +390,23 @@ export default function MojitoTV() {
                 marginBottom: "24px",
               }}>MoJiTo</div>
               <div style={{ color: "#555", fontSize: "15px", marginBottom: "36px" }}>
-                Selecciona un canal de la lista
+                Navega con ↑↓ y presiona OK para reproducir
               </div>
 
-              {/* On-screen remote hint */}
+              {/* Remote keycode reference */}
               <div style={{
                 background: "#0a0a18",
                 border: "1px solid #2a2a4e",
                 borderRadius: "12px",
                 padding: "16px 24px",
               }}>
-                <div style={{ color: "#666", fontSize: "12px", textAlign: "center", marginBottom: "14px" }}>
-                  CONTROL REMOTO
+                <div style={{ color: "#444", fontSize: "11px", textAlign: "center", marginBottom: "14px", letterSpacing: "2px" }}>
+                  CONTROL REMOTO PHILCO
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <RemoteHintRow icon="&#9650;&#9660;" label="CH+ / CH-" note="Canal siguiente / anterior" />
-                  <RemoteHintRow icon="&#9654;" label="ENTER/OK" note="Reproducir seleccionado" />
-                  <RemoteHintRow icon="&#9632;" label="ESC/BACK" note="Detener reproduccion" />
-                  <RemoteHintRow icon="&#9664;&#9654;" label="PgUp/PgDn" note="Cambiar categoria" />
-                </div>
+                <RemoteHintRow keycode="38/40" icon="&#9650;&#9660;" label="Navegar lista" note="Arriba / Abajo sin reproducir" />
+                <RemoteHintRow keycode="13" icon="OK" label="ENTER / OK" note="Reproducir canal seleccionado" />
+                <RemoteHintRow keycode="27" icon="&#9632;" label="ESC / BACK" note="Detener reproduccion" />
+                <RemoteHintRow keycode="33/34" icon="&#9664;&#9654;" label="PgUp / PgDn" note="Cambiar categoria" />
               </div>
             </div>
           )}
@@ -346,19 +429,18 @@ export default function MojitoTV() {
               <div style={{ color: "#666", fontSize: "14px", marginBottom: "30px" }}>
                 El canal puede estar offline
               </div>
-              {/* Big clickable buttons for TV remote */}
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <TvBtn onClick={chNext} wide title="Siguiente canal">&#9660; Siguiente canal</TvBtn>
+                <TvBtn onClick={chNext} wide title="Siguiente canal (↓ + OK)">&#9660; Siguiente canal</TvBtn>
                 <div style={{ height: "10px" }} />
-                <TvBtn onClick={chPrev} wide title="Canal anterior">&#9650; Canal anterior</TvBtn>
+                <TvBtn onClick={chPrev} wide title="Canal anterior (↑ + OK)">&#9650; Canal anterior</TvBtn>
                 <div style={{ height: "10px" }} />
-                <TvBtn onClick={stopPlayer} wide danger title="Detener">&#9632; Detener</TvBtn>
+                <TvBtn onClick={stopPlayer} wide danger title="Detener (ESC)">&#9632; Detener</TvBtn>
               </div>
             </div>
           )}
 
-          {/* NOW PLAYING BANNER — appears on channel change, auto-hides */}
-          {infoVisible && currentChannel && (
+          {/* NOW PLAYING banner */}
+          {infoVisible && playingChannel && (
             <div style={{
               position: "absolute",
               bottom: "20px",
@@ -376,21 +458,21 @@ export default function MojitoTV() {
                 <div style={{ color: "#00d4ff", fontSize: "11px", letterSpacing: "2px", marginBottom: "6px" }}>
                   ● EN VIVO
                 </div>
-                <div style={{ fontSize: "22px", fontWeight: "bold" }}>{currentChannel.name}</div>
+                <div style={{ fontSize: "22px", fontWeight: "bold" }}>{playingChannel.name}</div>
                 <div style={{ color: "#666", fontSize: "12px", marginTop: "4px" }}>
-                  {getCategory(currentChannel.name)} · FUSION activa
+                  {getCategory(playingChannel.name)} · FUSION activa
                 </div>
               </div>
               <div style={{ textAlign: "right" }}>
                 <div style={{ color: "#00d4ff", fontSize: "28px", fontWeight: "bold" }}>
-                  {currentIdx + 1}
+                  {playingIdx + 1}
                 </div>
                 <div style={{ color: "#555", fontSize: "12px" }}>/ {filtered.length}</div>
               </div>
             </div>
           )}
 
-          {/* FLOATING REMOTE — visible on screen, big buttons, click-only */}
+          {/* Floating remote — top right when playing */}
           {playerState === "playing" && !infoVisible && (
             <FloatingRemote
               onPrev={chPrev}
@@ -405,15 +487,13 @@ export default function MojitoTV() {
   );
 }
 
-/* ── Floating on-screen remote control ── */
+/* ── Floating on-screen remote ── */
 function FloatingRemote({ onPrev, onNext, onStop, onInfo }: {
   onPrev: () => void; onNext: () => void; onStop: () => void; onInfo: () => void;
 }) {
   const [visible, setVisible] = useState(false);
-
   return (
     <div style={{ position: "absolute", top: "12px", right: "12px" }}>
-      {/* Toggle button always visible */}
       <button
         onClick={() => setVisible((v) => !v)}
         style={{
@@ -432,9 +512,8 @@ function FloatingRemote({ onPrev, onNext, onStop, onInfo }: {
         }}
         title="Control remoto"
       >
-        &#9741;
+        &#9635;
       </button>
-
       {visible && (
         <div style={{
           marginTop: "6px",
@@ -446,11 +525,11 @@ function FloatingRemote({ onPrev, onNext, onStop, onInfo }: {
           flexDirection: "column",
           alignItems: "center",
         }}>
-          <RemBtn onClick={onPrev} title="Canal anterior">&#9650;</RemBtn>
+          <RemBtn onClick={onPrev} title="CH anterior">&#9650;</RemBtn>
           <div style={{ height: "6px" }} />
-          <RemBtn onClick={onInfo} title="Info del canal">i</RemBtn>
+          <RemBtn onClick={onInfo} title="Info">i</RemBtn>
           <div style={{ height: "6px" }} />
-          <RemBtn onClick={onNext} title="Canal siguiente">&#9660;</RemBtn>
+          <RemBtn onClick={onNext} title="CH siguiente">&#9660;</RemBtn>
           <div style={{ height: "6px" }} />
           <RemBtn onClick={onStop} title="Detener" danger>&#9632;</RemBtn>
         </div>
@@ -487,27 +566,36 @@ function RemBtn({ onClick, title, children, danger }: {
   );
 }
 
-/* ── Channel row — large click target for TV remote ── */
-function ChannelRow({ number, channel, active, onClick }: {
-  number: number; channel: Channel; active: boolean; onClick: () => void;
+/* ── Channel row ── */
+function ChannelRow({ number, channel, playing, focused, onClick }: {
+  number: number; channel: Channel; playing: boolean; focused: boolean; onClick: () => void;
 }) {
+  const isHighlighted = playing || focused;
   return (
     <div
       onClick={onClick}
-      data-active={active ? "true" : "false"}
+      data-channel="true"
       style={{
-        padding: "14px 14px",
+        padding: "12px 14px",
         cursor: "pointer",
         borderBottom: "1px solid #0f0f1e",
-        background: active ? "linear-gradient(90deg, #001830, #100a20)" : "transparent",
-        borderLeft: active ? "4px solid #00d4ff" : "4px solid transparent",
+        background: playing
+          ? "linear-gradient(90deg, #001830, #100a20)"
+          : focused
+          ? "#0e0e1e"
+          : "transparent",
+        borderLeft: playing
+          ? "4px solid #00d4ff"
+          : focused
+          ? "4px solid #7b2cbf"
+          : "4px solid transparent",
         display: "flex",
         alignItems: "center",
-        minHeight: "58px",
+        minHeight: "56px",
       }}
     >
       <div style={{
-        color: active ? "#00d4ff" : "#333",
+        color: playing ? "#00d4ff" : focused ? "#7b2cbf" : "#333",
         fontSize: "12px",
         fontWeight: "bold",
         width: "28px",
@@ -520,48 +608,50 @@ function ChannelRow({ number, channel, active, onClick }: {
       <div style={{ flex: 1, overflow: "hidden" }}>
         <div style={{
           fontSize: "15px",
-          fontWeight: active ? "bold" : "normal",
-          color: active ? "#fff" : "#ccc",
+          fontWeight: isHighlighted ? "bold" : "normal",
+          color: playing ? "#fff" : focused ? "#ddd" : "#aaa",
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
         }}>
           {channel.name}
         </div>
-        <div style={{ fontSize: "11px", color: active ? "#00d4ff88" : "#333", marginTop: "3px" }}>
+        <div style={{
+          fontSize: "11px",
+          color: playing ? "#00d4ff88" : focused ? "#7b2cbf88" : "#333",
+          marginTop: "3px",
+        }}>
           {getCategory(channel.name)} · FUSION
         </div>
       </div>
-      {active && (
-        <div style={{
-          flexShrink: 0,
-          width: "8px",
-          height: "8px",
-          borderRadius: "50%",
-          background: "#0f0",
-          marginLeft: "8px",
-        }} />
-      )}
+      <div style={{ flexShrink: 0, marginLeft: "8px" }}>
+        {playing && (
+          <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#0f0" }} />
+        )}
+        {!playing && focused && (
+          <div style={{ color: "#7b2cbf", fontSize: "14px" }}>&#9654;</div>
+        )}
+      </div>
     </div>
   );
 }
 
-/* ── Large TV remote button ── */
-function TvBtn({ onClick, children, wide, danger, title }: {
-  onClick: () => void; children: React.ReactNode; wide: boolean; danger?: boolean; title?: string;
+/* ── Large TV button ── */
+function TvBtn({ onClick, children, wide, danger, accent, title }: {
+  onClick: () => void; children: React.ReactNode; wide: boolean; danger?: boolean; accent?: boolean; title?: string;
 }) {
   return (
     <button
       onClick={onClick}
       title={title}
       style={{
-        background: danger ? "#200808" : "#0e0e20",
-        border: danger ? "2px solid #ff4444" : "2px solid #2a2a5e",
-        color: danger ? "#ff6666" : "#ccc",
+        background: danger ? "#200808" : accent ? "linear-gradient(90deg, #00d4ff22, #7b2cbf22)" : "#0e0e20",
+        border: danger ? "2px solid #ff4444" : accent ? "2px solid #00d4ff" : "2px solid #2a2a5e",
+        color: danger ? "#ff6666" : accent ? "#00d4ff" : "#ccc",
         borderRadius: "8px",
         padding: wide ? "12px 0" : "10px 14px",
         width: wide ? "240px" : "auto",
-        fontSize: "16px",
+        fontSize: "15px",
         fontWeight: "bold",
         cursor: "pointer",
         fontFamily: "Arial, sans-serif",
@@ -578,32 +668,27 @@ function TvBtn({ onClick, children, wide, danger, title }: {
 }
 
 /* ── Remote hint row ── */
-function RemoteHintRow({ icon, label, note }: { icon: string; label: string; note: string }) {
+function RemoteHintRow({ keycode, icon, label, note }: { keycode: string; icon: string; label: string; note: string }) {
   return (
-    <div style={{
-      display: "flex",
-      alignItems: "center",
-      marginBottom: "10px",
-      width: "280px",
-    }}>
+    <div style={{ display: "flex", alignItems: "center", marginBottom: "10px", width: "300px" }}>
       <div style={{
         background: "#1a1a35",
         border: "1px solid #2a2a5e",
         borderRadius: "5px",
-        padding: "4px 10px",
+        padding: "4px 8px",
         fontSize: "13px",
         color: "#00d4ff",
-        minWidth: "50px",
+        minWidth: "54px",
         textAlign: "center",
         fontWeight: "bold",
-        marginRight: "12px",
+        marginRight: "10px",
         flexShrink: 0,
       }}>
         {icon}
       </div>
       <div>
         <div style={{ fontSize: "13px", color: "#fff", fontWeight: "bold" }}>{label}</div>
-        <div style={{ fontSize: "11px", color: "#555" }}>{note}</div>
+        <div style={{ fontSize: "10px", color: "#444" }}>{note} · keyCode {keycode}</div>
       </div>
     </div>
   );
