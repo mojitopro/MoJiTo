@@ -11,7 +11,7 @@ from runtime.db import Database, Cluster
 
 LEVELS = ['cold', 'warm', 'hot', 'active']
 
-LEVEL thresholds = {
+LEVEL_THRESHOLDS = {
     'cold': 0,
     'warm': 10,
     'hot': 50,
@@ -43,11 +43,11 @@ class LevelManager:
         
         usage_score = switches_1h * 10 + active_streams
         
-        if usage_score >= LEVELS['active']:
+        if usage_score >= LEVEL_THRESHOLDS['active']:
             return 'active'
-        elif usage_score >= LEVELS['hot']:
+        elif usage_score >= LEVEL_THRESHOLDS['hot']:
             return 'hot'
-        elif usage_score >= LEVELS['warm']:
+        elif usage_score >= LEVEL_THRESHOLDS['warm']:
             return 'warm'
         else:
             return 'cold'
@@ -74,11 +74,12 @@ class LevelManager:
                 WHERE f.switch_count > 20
             """)
         elif level == 'active':
-            cursor.execute("""
+            threshold = int(time.time()) - 300
+            cursor.execute(f"""
                 SELECT c.* FROM clusters c
                 JOIN fusion_state f ON f.cluster_id = c.cluster_id
-                WHERE f.last_switch > ?
-            """, (int(time.time()) - 300))
+                WHERE f.last_switch > {threshold}
+            """)
         else:
             return []
         

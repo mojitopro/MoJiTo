@@ -6,8 +6,8 @@ from typing import Optional
 from dataclasses import dataclass, asdict
 
 
-DATA_DIR = Path(__file__).parent.parent / 'data' / 'normalized'
-DB_PATH = str(DATA_DIR / 'streams.db')
+ROOT = Path(__file__).parent.parent.parent
+DB_PATH = str(ROOT / 'data' / 'normalized' / 'streams.db')
 
 
 @dataclass
@@ -67,9 +67,21 @@ class FusionState:
 class Database:
     def __init__(self, path: str = None):
         self.path = path or DB_PATH
-        Path(self.path).parent.mkdir(parents=True, exist_ok=True)
+        if path is None:
+            path = DB_PATH
+        
+        # Use existing DB if it exists
+        if not Path(self.path).exists():
+            Path(self.path).parent.mkdir(parents=True, exist_ok=True)
+        
         self.conn = sqlite3.connect(self.path, check_same_thread=False)
         self.conn.row_factory = sqlite3.Row
+        
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='streams'")
+        if cursor.fetchone():
+            return  # Tables exist
+        
         self._init_tables()
     
     def _init_tables(self):
@@ -140,14 +152,12 @@ class Database:
             )
         """)
         
-        cursor.execute("""
-            CREATE INDEX IF NOT EXISTS idx_streams_channel ON streams(channel);
-            CREATE INDEX IF NOT EXISTS idx_streams_status ON streams(status);
-            CREATE INDEX IF NOT EXISTS idx_stream_metrics_last_check ON stream_metrics(last_check);
-            CREATE INDEX IF NOT EXISTS idx_clusters_canonical ON clusters(canonical_name);
-            CREATE INDEX IF NOT EXISTS idx_cluster_streams_cluster ON cluster_streams(cluster_id);
-            CREATE INDEX IF NOT EXISTS idx_fusion_state_cluster ON fusion_state(cluster_id);
-        """)
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_streams_channel ON streams(channel)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_streams_status ON streams(status)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_stream_metrics_last_check ON stream_metrics(last_check)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_clusters_canonical ON clusters(canonical_name)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_cluster_streams_cluster ON cluster_streams(cluster_id)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_fusion_state_cluster ON fusion_state(cluster_id)")
         
         self.conn.commit()
     
@@ -271,7 +281,12 @@ class Database:
     def get_cluster_streams(self, cluster_id: str) -> list[ClusterStream]:
         cursor = self.conn.cursor()
         cursor.execute("SELECT * FROM cluster_streams WHERE cluster_id = ? ORDER BY priority DESC", (cluster_id,))
-        return [ClusterStream(**dict(row), is_primary=bool(row['is_primary'])) for row in cursor.fetchall()]
+        result = []
+        for row in cursor.fetchall():
+            d = dict(row)
+            d['is_primary'] = bool(d.get('is_primary', 0))
+            result.append(ClusterStream(**d))
+        return result
     
     def get_all_clusters(self) -> list[Cluster]:
         cursor = self.conn.cursor()
