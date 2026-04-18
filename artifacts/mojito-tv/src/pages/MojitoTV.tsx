@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 interface Channel {
   cluster_id: string;
@@ -15,76 +15,68 @@ interface Stats {
   fusion_active: number;
 }
 
-type View = "tv" | "dashboard";
-
 const BASE = "/api/mojito";
 
-function MojitoTV() {
+const CATEGORIES = ["Deportes", "Cine", "Noticias", "Infantil", "Todos"];
+
+function getCategory(name: string): string {
+  const n = name.toLowerCase();
+  if (/espn|fox sport|tyc|win sport|gol|directv sport|bein|sport|futbol|deportes|movistar dep/.test(n)) return "Deportes";
+  if (/hbo|cinemax|star|cinema|golden|warner|tnt|fx|axn|studio|paramount|universal|sony|cine|amc|starz/.test(n)) return "Cine";
+  if (/cnn|bbc|dw|telesur|noticias|news|info|telam/.test(n)) return "Noticias";
+  if (/disney|nick|cartoon|kids|junior|jr|discovery kid|baby/.test(n)) return "Infantil";
+  return "Todos";
+}
+
+export default function MojitoTV() {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [currentIdx, setCurrentIdx] = useState(-1);
-  const [view, setView] = useState<View>("tv");
   const [loading, setLoading] = useState(true);
   const [playerState, setPlayerState] = useState<"idle" | "playing" | "error">("idle");
-  const [searchTerm, setSearchTerm] = useState("");
   const [infoVisible, setInfoVisible] = useState(false);
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [catIdx, setCatIdx] = useState(CATEGORIES.length - 1); // default "Todos"
+  const [showList, setShowList] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const infoTimer = useRef<number | null>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setLoading(true);
     fetch(BASE + "/tv")
       .then((r) => r.json())
-      .then((data) => {
-        const chs: Channel[] = (data.channels || [])
-          .filter((c: Channel) => c.fusion && c.streams > 0)
-          .slice(0, 80);
-        setChannels(chs);
-        setLoading(false);
-      })
+      .then((data) => { setChannels(data.channels || []); setLoading(false); })
       .catch(() => {
         fetch(BASE + "/channels?limit=80")
           .then((r) => r.json())
-          .then((data) => {
-            setChannels(data.channels || []);
-            setLoading(false);
-          })
+          .then((data) => { setChannels(data.channels || []); setLoading(false); })
           .catch(() => setLoading(false));
       });
-
     fetch(BASE + "/stats")
       .then((r) => r.json())
       .then((data) => setStats(data.stats || null))
       .catch(() => {});
   }, []);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (view !== "tv") return;
-      if (e.keyCode === 40 || e.keyCode === 39) next();
-      else if (e.keyCode === 38 || e.keyCode === 37) prev();
-      else if (e.keyCode === 13) {
-        if (currentIdx >= 0) playChannel(currentIdx);
-      } else if (e.keyCode === 27) stopPlayer();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  });
-
+  const activeCat = CATEGORIES[catIdx];
   const filtered = channels.filter((c) => {
-    if (searchTerm && !c.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
-    if (activeCategory === "fusion") return c.fusion;
-    return true;
+    if (activeCat === "Todos") return true;
+    return getCategory(c.name) === activeCat;
   });
 
-  function playChannel(idx: number) {
-    const ch = filtered[idx];
+  const showInfo = useCallback(() => {
+    setInfoVisible(true);
+    if (infoTimer.current) clearTimeout(infoTimer.current);
+    infoTimer.current = window.setTimeout(() => setInfoVisible(false), 5000);
+  }, []);
+
+  const playChannel = useCallback((idx: number, chList?: Channel[]) => {
+    const list = chList || filtered;
+    const ch = list[idx];
     if (!ch) return;
     setCurrentIdx(idx);
     setPlayerState("playing");
     showInfo();
-
     if (videoRef.current) {
       videoRef.current.src = ch.url;
       videoRef.current.load();
@@ -96,394 +88,397 @@ function MojitoTV() {
               videoRef.current.src = data.url;
               videoRef.current.load();
               videoRef.current.play().catch(() => setPlayerState("error"));
-            }
+            } else setPlayerState("error");
           })
           .catch(() => setPlayerState("error"));
       });
     }
-  }
+    // Scroll channel into view
+    setTimeout(() => {
+      const el = listRef.current?.querySelector("[data-active='true']") as HTMLElement | null;
+      el?.scrollIntoView({ block: "nearest" });
+    }, 50);
+  }, [filtered, showInfo]);
 
-  function next() {
+  const chNext = useCallback(() => {
     const next = (currentIdx + 1) % Math.max(filtered.length, 1);
     playChannel(next);
-  }
+  }, [currentIdx, filtered, playChannel]);
 
-  function prev() {
+  const chPrev = useCallback(() => {
     const prev = (currentIdx - 1 + filtered.length) % Math.max(filtered.length, 1);
     playChannel(prev);
-  }
+  }, [currentIdx, filtered, playChannel]);
 
-  function stopPlayer() {
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.src = "";
-    }
+  const catNext = useCallback(() => {
+    setCatIdx((i) => (i + 1) % CATEGORIES.length);
+    setCurrentIdx(-1);
+  }, []);
+
+  const catPrev = useCallback(() => {
+    setCatIdx((i) => (i - 1 + CATEGORIES.length) % CATEGORIES.length);
+    setCurrentIdx(-1);
+  }, []);
+
+  const stopPlayer = useCallback(() => {
+    if (videoRef.current) { videoRef.current.pause(); videoRef.current.src = ""; }
     setPlayerState("idle");
     setCurrentIdx(-1);
-  }
+  }, []);
 
-  function showInfo() {
-    setInfoVisible(true);
-    if (infoTimer.current) clearTimeout(infoTimer.current);
-    infoTimer.current = window.setTimeout(() => setInfoVisible(false), 4000);
-  }
+  // Keyboard fallback — may not fire on Philco TV remote but works on PC/browser
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.keyCode === 40 || e.keyCode === 39) { e.preventDefault(); chNext(); }
+      else if (e.keyCode === 38 || e.keyCode === 37) { e.preventDefault(); chPrev(); }
+      else if (e.keyCode === 34) { e.preventDefault(); catNext(); }    // PageDown
+      else if (e.keyCode === 33) { e.preventDefault(); catPrev(); }    // PageUp
+      else if (e.keyCode === 13) { if (currentIdx >= 0) playChannel(currentIdx); } // Enter
+      else if (e.keyCode === 27) { stopPlayer(); }                     // ESC
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [chNext, chPrev, catNext, catPrev, playChannel, stopPlayer, currentIdx]);
 
   const currentChannel = currentIdx >= 0 ? filtered[currentIdx] : null;
 
   return (
-    <div style={{ background: "#000", minHeight: "100vh", color: "#fff", fontFamily: "Arial, sans-serif" }}>
-      {/* Top Nav */}
+    <div style={{
+      background: "#000",
+      height: "100vh",
+      color: "#fff",
+      fontFamily: "Arial, Helvetica, sans-serif",
+      display: "flex",
+      flexDirection: "column",
+      overflow: "hidden",
+    }}>
+      {/* TOP BAR */}
       <div style={{
-        background: "linear-gradient(135deg, #0a0a18 0%, #12122a 100%)",
+        background: "#0a0a18",
         borderBottom: "2px solid #00d4ff",
         display: "flex",
         alignItems: "center",
-        justifyContent: "space-between",
-        padding: "0 20px",
-        height: "52px",
+        padding: "0 16px",
+        height: "56px",
         flexShrink: 0,
+        justifyContent: "space-between",
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        {/* Logo */}
+        <div style={{
+          background: "linear-gradient(135deg, #00d4ff, #7b2cbf)",
+          borderRadius: "6px",
+          padding: "6px 14px",
+          fontWeight: "bold",
+          fontSize: "20px",
+          letterSpacing: "2px",
+          lineHeight: 1,
+        }}>MoJiTo</div>
+
+        {/* Category selector — large buttons for remote clicking */}
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <TvBtn onClick={catPrev} wide={false} title="Categoria anterior (PageUp)">&#9664;</TvBtn>
           <div style={{
-            background: "linear-gradient(135deg, #00d4ff, #7b2cbf)",
+            background: "#12122a",
+            border: "1px solid #00d4ff",
             borderRadius: "6px",
-            padding: "4px 12px",
+            padding: "6px 20px",
+            fontSize: "15px",
             fontWeight: "bold",
-            fontSize: "18px",
-            letterSpacing: "2px",
-          }}>MoJiTo</div>
-          <span style={{ color: "#888", fontSize: "12px" }}>TV Streaming</span>
+            color: "#00d4ff",
+            minWidth: "110px",
+            textAlign: "center",
+            margin: "0 6px",
+          }}>{activeCat}</div>
+          <TvBtn onClick={catNext} wide={false} title="Categoria siguiente (PageDown)">&#9654;</TvBtn>
         </div>
 
-        <div style={{ display: "flex", gap: "8px" }}>
-          <NavButton active={view === "tv"} onClick={() => setView("tv")}>TV</NavButton>
-          <NavButton active={view === "dashboard"} onClick={() => setView("dashboard")}>Dashboard</NavButton>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        {/* Status + list toggle */}
+        <div style={{ display: "flex", alignItems: "center" }}>
           {stats && (
-            <div style={{ fontSize: "12px", color: "#00d4ff" }}>
+            <div style={{ fontSize: "13px", color: "#00d4ff", marginRight: "12px" }}>
               <span style={{ color: "#0f0" }}>●</span> {stats.fusion_active} activos
             </div>
           )}
+          <TvBtn onClick={() => setShowList((v) => !v)} wide={false} title="Mostrar/ocultar lista">
+            {showList ? "[ ]" : "[=]"}
+          </TvBtn>
         </div>
       </div>
 
-      {view === "tv" ? (
-        <TVView
-          channels={filtered}
-          currentIdx={currentIdx}
-          playerState={playerState}
-          infoVisible={infoVisible}
-          currentChannel={currentChannel}
-          searchTerm={searchTerm}
-          activeCategory={activeCategory}
-          loading={loading}
-          videoRef={videoRef}
-          onPlay={playChannel}
-          onNext={next}
-          onPrev={prev}
-          onStop={stopPlayer}
-          onSearch={setSearchTerm}
-          onCategory={setActiveCategory}
-          onError={() => setPlayerState("error")}
-        />
-      ) : (
-        <DashboardView stats={stats} channels={channels} />
+      {/* MAIN CONTENT */}
+      <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+
+        {/* CHANNEL LIST PANEL */}
+        {showList && (
+          <div style={{
+            width: "290px",
+            flexShrink: 0,
+            background: "#08080f",
+            borderRight: "2px solid #1a1a35",
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
+          }}>
+            {/* Channel count */}
+            <div style={{
+              padding: "8px 14px",
+              borderBottom: "1px solid #1a1a35",
+              color: "#555",
+              fontSize: "12px",
+              display: "flex",
+              justifyContent: "space-between",
+            }}>
+              <span>{activeCat}</span>
+              <span>{filtered.length} canales</span>
+            </div>
+
+            {/* Channel list — SCROLLABLE, each item is a large click target */}
+            <div ref={listRef} style={{ flex: 1, overflowY: "auto", overflowX: "hidden" }}>
+              {loading && (
+                <div style={{ textAlign: "center", padding: "50px 16px", color: "#444" }}>
+                  Cargando canales...
+                </div>
+              )}
+              {!loading && filtered.length === 0 && (
+                <div style={{ textAlign: "center", padding: "50px 16px", color: "#444", fontSize: "13px" }}>
+                  Sin canales en esta categoria
+                </div>
+              )}
+              {filtered.map((ch, idx) => (
+                <ChannelRow
+                  key={ch.cluster_id}
+                  number={idx + 1}
+                  channel={ch}
+                  active={idx === currentIdx}
+                  onClick={() => playChannel(idx)}
+                />
+              ))}
+            </div>
+
+            {/* REMOTE-STYLE CONTROLS at bottom */}
+            <div style={{
+              borderTop: "2px solid #1a1a35",
+              padding: "12px",
+              background: "#050508",
+            }}>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: "8px" }}>
+                <TvBtn onClick={chPrev} wide title="Canal anterior (↑)">&#9650; CH-</TvBtn>
+              </div>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: "8px" }}>
+                <TvBtn onClick={stopPlayer} wide danger title="Detener (ESC)">&#9632; STOP</TvBtn>
+              </div>
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <TvBtn onClick={chNext} wide title="Canal siguiente (↓)">&#9660; CH+</TvBtn>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* VIDEO PLAYER PANEL */}
+        <div style={{ flex: 1, background: "#000", position: "relative", overflow: "hidden" }}>
+          <video
+            ref={videoRef}
+            controls
+            playsInline
+            onError={() => setPlayerState("error")}
+            style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+          />
+
+          {/* IDLE SCREEN */}
+          {playerState === "idle" && (
+            <div style={{
+              position: "absolute",
+              top: 0, left: 0, right: 0, bottom: 0,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "radial-gradient(ellipse at center, #080820 0%, #000 100%)",
+            }}>
+              <div style={{
+                background: "linear-gradient(135deg, #00d4ff, #7b2cbf)",
+                borderRadius: "10px",
+                padding: "8px 28px",
+                fontWeight: "bold",
+                fontSize: "42px",
+                letterSpacing: "4px",
+                marginBottom: "24px",
+              }}>MoJiTo</div>
+              <div style={{ color: "#555", fontSize: "15px", marginBottom: "36px" }}>
+                Selecciona un canal de la lista
+              </div>
+
+              {/* On-screen remote hint */}
+              <div style={{
+                background: "#0a0a18",
+                border: "1px solid #2a2a4e",
+                borderRadius: "12px",
+                padding: "16px 24px",
+              }}>
+                <div style={{ color: "#666", fontSize: "12px", textAlign: "center", marginBottom: "14px" }}>
+                  CONTROL REMOTO
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <RemoteHintRow icon="&#9650;&#9660;" label="CH+ / CH-" note="Canal siguiente / anterior" />
+                  <RemoteHintRow icon="&#9654;" label="ENTER/OK" note="Reproducir seleccionado" />
+                  <RemoteHintRow icon="&#9632;" label="ESC/BACK" note="Detener reproduccion" />
+                  <RemoteHintRow icon="&#9664;&#9654;" label="PgUp/PgDn" note="Cambiar categoria" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ERROR SCREEN */}
+          {playerState === "error" && (
+            <div style={{
+              position: "absolute",
+              top: 0, left: 0, right: 0, bottom: 0,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "rgba(0,0,0,0.9)",
+            }}>
+              <div style={{ fontSize: "48px", marginBottom: "16px" }}>⚠</div>
+              <div style={{ color: "#ff4444", fontSize: "20px", fontWeight: "bold", marginBottom: "8px" }}>
+                Stream no disponible
+              </div>
+              <div style={{ color: "#666", fontSize: "14px", marginBottom: "30px" }}>
+                El canal puede estar offline
+              </div>
+              {/* Big clickable buttons for TV remote */}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <TvBtn onClick={chNext} wide title="Siguiente canal">&#9660; Siguiente canal</TvBtn>
+                <div style={{ height: "10px" }} />
+                <TvBtn onClick={chPrev} wide title="Canal anterior">&#9650; Canal anterior</TvBtn>
+                <div style={{ height: "10px" }} />
+                <TvBtn onClick={stopPlayer} wide danger title="Detener">&#9632; Detener</TvBtn>
+              </div>
+            </div>
+          )}
+
+          {/* NOW PLAYING BANNER — appears on channel change, auto-hides */}
+          {infoVisible && currentChannel && (
+            <div style={{
+              position: "absolute",
+              bottom: "20px",
+              left: "20px",
+              right: "20px",
+              background: "rgba(8,8,24,0.92)",
+              border: "1px solid #00d4ff44",
+              borderRadius: "10px",
+              padding: "14px 18px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}>
+              <div>
+                <div style={{ color: "#00d4ff", fontSize: "11px", letterSpacing: "2px", marginBottom: "6px" }}>
+                  ● EN VIVO
+                </div>
+                <div style={{ fontSize: "22px", fontWeight: "bold" }}>{currentChannel.name}</div>
+                <div style={{ color: "#666", fontSize: "12px", marginTop: "4px" }}>
+                  {getCategory(currentChannel.name)} · FUSION activa
+                </div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ color: "#00d4ff", fontSize: "28px", fontWeight: "bold" }}>
+                  {currentIdx + 1}
+                </div>
+                <div style={{ color: "#555", fontSize: "12px" }}>/ {filtered.length}</div>
+              </div>
+            </div>
+          )}
+
+          {/* FLOATING REMOTE — visible on screen, big buttons, click-only */}
+          {playerState === "playing" && !infoVisible && (
+            <FloatingRemote
+              onPrev={chPrev}
+              onNext={chNext}
+              onStop={stopPlayer}
+              onInfo={showInfo}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Floating on-screen remote control ── */
+function FloatingRemote({ onPrev, onNext, onStop, onInfo }: {
+  onPrev: () => void; onNext: () => void; onStop: () => void; onInfo: () => void;
+}) {
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <div style={{ position: "absolute", top: "12px", right: "12px" }}>
+      {/* Toggle button always visible */}
+      <button
+        onClick={() => setVisible((v) => !v)}
+        style={{
+          background: "rgba(10,10,24,0.85)",
+          border: "1px solid #2a2a5e",
+          color: "#00d4ff",
+          borderRadius: "6px",
+          width: "44px",
+          height: "44px",
+          fontSize: "18px",
+          cursor: "pointer",
+          fontFamily: "Arial, sans-serif",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+        title="Control remoto"
+      >
+        &#9741;
+      </button>
+
+      {visible && (
+        <div style={{
+          marginTop: "6px",
+          background: "rgba(8,8,20,0.95)",
+          border: "1px solid #2a2a5e",
+          borderRadius: "10px",
+          padding: "10px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}>
+          <RemBtn onClick={onPrev} title="Canal anterior">&#9650;</RemBtn>
+          <div style={{ height: "6px" }} />
+          <RemBtn onClick={onInfo} title="Info del canal">i</RemBtn>
+          <div style={{ height: "6px" }} />
+          <RemBtn onClick={onNext} title="Canal siguiente">&#9660;</RemBtn>
+          <div style={{ height: "6px" }} />
+          <RemBtn onClick={onStop} title="Detener" danger>&#9632;</RemBtn>
+        </div>
       )}
     </div>
   );
 }
 
-function NavButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        background: active ? "linear-gradient(90deg, #00d4ff22, #7b2cbf22)" : "transparent",
-        border: active ? "1px solid #00d4ff55" : "1px solid #333",
-        color: active ? "#00d4ff" : "#888",
-        padding: "5px 16px",
-        borderRadius: "4px",
-        cursor: "pointer",
-        fontSize: "13px",
-        fontWeight: active ? "bold" : "normal",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
-interface TVViewProps {
-  channels: Channel[];
-  currentIdx: number;
-  playerState: "idle" | "playing" | "error";
-  infoVisible: boolean;
-  currentChannel: Channel | null;
-  searchTerm: string;
-  activeCategory: string;
-  loading: boolean;
-  videoRef: React.RefObject<HTMLVideoElement>;
-  onPlay: (idx: number) => void;
-  onNext: () => void;
-  onPrev: () => void;
-  onStop: () => void;
-  onSearch: (v: string) => void;
-  onCategory: (v: string) => void;
-  onError: () => void;
-}
-
-function TVView({
-  channels, currentIdx, playerState, infoVisible, currentChannel, searchTerm, activeCategory,
-  loading, videoRef, onPlay, onNext, onPrev, onStop, onSearch, onCategory, onError,
-}: TVViewProps) {
-  return (
-    <div style={{ display: "flex", height: "calc(100vh - 52px)", overflow: "hidden" }}>
-      {/* Left Panel: Channel List */}
-      <div style={{
-        width: "280px",
-        flexShrink: 0,
-        background: "#080810",
-        borderRight: "1px solid #1a1a30",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-      }}>
-        {/* Search */}
-        <div style={{ padding: "10px", borderBottom: "1px solid #1a1a30" }}>
-          <input
-            type="text"
-            placeholder="Buscar canal..."
-            value={searchTerm}
-            onChange={(e) => onSearch(e.target.value)}
-            style={{
-              width: "100%",
-              background: "#12121a",
-              border: "1px solid #2a2a4e",
-              borderRadius: "4px",
-              color: "#fff",
-              padding: "7px 10px",
-              fontSize: "13px",
-              outline: "none",
-              boxSizing: "border-box",
-              fontFamily: "Arial, sans-serif",
-            }}
-          />
-        </div>
-
-        {/* Categories */}
-        <div style={{ display: "flex", gap: "6px", padding: "8px 10px", borderBottom: "1px solid #1a1a30" }}>
-          {[{ id: "all", label: "Todos" }, { id: "fusion", label: "Fusion" }].map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => onCategory(cat.id)}
-              style={{
-                background: activeCategory === cat.id ? "#00d4ff22" : "#12121a",
-                border: activeCategory === cat.id ? "1px solid #00d4ff" : "1px solid #2a2a4e",
-                color: activeCategory === cat.id ? "#00d4ff" : "#888",
-                padding: "4px 10px",
-                borderRadius: "12px",
-                cursor: "pointer",
-                fontSize: "11px",
-                fontFamily: "Arial, sans-serif",
-              }}
-            >
-              {cat.label}
-            </button>
-          ))}
-          <span style={{ marginLeft: "auto", color: "#444", fontSize: "11px", lineHeight: "26px" }}>
-            {channels.length}
-          </span>
-        </div>
-
-        {/* Channel List */}
-        <div style={{ overflowY: "auto", flex: 1 }}>
-          {loading && (
-            <div style={{ textAlign: "center", padding: "40px 20px", color: "#444" }}>
-              <div style={{ fontSize: "24px", marginBottom: "10px" }}>⟳</div>
-              Cargando canales...
-            </div>
-          )}
-          {!loading && channels.length === 0 && (
-            <div style={{ textAlign: "center", padding: "40px 20px", color: "#444", fontSize: "13px" }}>
-              No hay canales disponibles.<br />Verifica la conexión al servidor MoJiTo.
-            </div>
-          )}
-          {channels.map((ch, idx) => (
-            <ChannelItem
-              key={ch.cluster_id + idx}
-              channel={ch}
-              active={idx === currentIdx}
-              onClick={() => onPlay(idx)}
-            />
-          ))}
-        </div>
-
-        {/* Controls */}
-        <div style={{ borderTop: "1px solid #1a1a30", padding: "10px", display: "flex", gap: "6px", justifyContent: "center" }}>
-          <ControlBtn onClick={onPrev} title="Anterior">◀</ControlBtn>
-          <ControlBtn onClick={onStop} title="Detener" danger>■</ControlBtn>
-          <ControlBtn onClick={onNext} title="Siguiente">▶</ControlBtn>
-        </div>
-      </div>
-
-      {/* Right Panel: Player */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#000", position: "relative", overflow: "hidden" }}>
-        {/* Video */}
-        <div style={{ flex: 1, background: "#000", position: "relative" }}>
-          <video
-            ref={videoRef}
-            controls
-            playsInline
-            onError={onError}
-            style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
-          />
-
-          {/* Idle overlay */}
-          {playerState === "idle" && (
-            <div style={{
-              position: "absolute", inset: 0, display: "flex", flexDirection: "column",
-              alignItems: "center", justifyContent: "center",
-              background: "radial-gradient(ellipse at center, #0a0a20 0%, #000 100%)",
-            }}>
-              <div style={{
-                background: "linear-gradient(135deg, #00d4ff, #7b2cbf)",
-                borderRadius: "8px",
-                padding: "6px 20px",
-                fontWeight: "bold",
-                fontSize: "32px",
-                letterSpacing: "3px",
-                marginBottom: "20px",
-              }}>MoJiTo</div>
-              <div style={{ color: "#444", fontSize: "14px" }}>Selecciona un canal para comenzar</div>
-              <div style={{ marginTop: "30px", display: "flex", gap: "20px" }}>
-                <KeyHint keys={["▲▼◀▶"]} label="Navegar" />
-                <KeyHint keys={["ENTER"]} label="Reproducir" />
-                <KeyHint keys={["ESC"]} label="Detener" />
-              </div>
-            </div>
-          )}
-
-          {/* Error overlay */}
-          {playerState === "error" && (
-            <div style={{
-              position: "absolute", inset: 0, display: "flex", flexDirection: "column",
-              alignItems: "center", justifyContent: "center",
-              background: "rgba(0,0,0,0.85)",
-            }}>
-              <div style={{ fontSize: "36px", marginBottom: "12px" }}>⚠</div>
-              <div style={{ color: "#ff4444", fontSize: "16px", marginBottom: "8px" }}>Stream no disponible</div>
-              <div style={{ color: "#666", fontSize: "13px", marginBottom: "20px" }}>El canal puede estar offline temporalmente</div>
-              <div style={{ display: "flex", gap: "10px" }}>
-                <ActionBtn onClick={onNext}>Siguiente canal ▶</ActionBtn>
-                <ActionBtn onClick={onStop} secondary>Detener</ActionBtn>
-              </div>
-            </div>
-          )}
-
-          {/* Info overlay */}
-          {infoVisible && currentChannel && (
-            <div style={{
-              position: "absolute", bottom: "20px", left: "20px", right: "20px",
-              background: "rgba(0,0,0,0.85)",
-              border: "1px solid #00d4ff33",
-              borderRadius: "8px", padding: "12px 16px",
-              backdropFilter: "blur(4px)",
-              transition: "opacity 0.3s",
-            }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <div style={{ color: "#00d4ff", fontSize: "11px", marginBottom: "4px", letterSpacing: "1px" }}>
-                    EN VIVO
-                  </div>
-                  <div style={{ fontSize: "18px", fontWeight: "bold" }}>{currentChannel.name}</div>
-                  <div style={{ color: "#888", fontSize: "12px", marginTop: "4px" }}>
-                    {currentChannel.streams} streams · FUSION activa
-                  </div>
-                </div>
-                <div style={{ color: "#444", fontSize: "12px" }}>
-                  Canal {channels.indexOf(currentChannel) + 1} / {channels.length}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ChannelItem({ channel, active, onClick }: { channel: Channel; active: boolean; onClick: () => void }) {
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        padding: "10px 12px",
-        cursor: "pointer",
-        borderBottom: "1px solid #0f0f1a",
-        background: active ? "linear-gradient(90deg, #00d4ff15, #7b2cbf15)" : "transparent",
-        borderLeft: active ? "3px solid #00d4ff" : "3px solid transparent",
-        transition: "background 0.15s",
-        userSelect: "none",
-      }}
-    >
-      <div style={{
-        fontSize: "13px",
-        fontWeight: active ? "bold" : "normal",
-        color: active ? "#fff" : "#ccc",
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-      }}>
-        {channel.name}
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "4px" }}>
-        <span style={{ fontSize: "9px", color: "#0f0" }}>● FUSION</span>
-        <span style={{ fontSize: "10px", color: "#555" }}>{channel.streams} streams</span>
-      </div>
-    </div>
-  );
-}
-
-function ControlBtn({ onClick, title, children, danger }: { onClick: () => void; title?: string; children: React.ReactNode; danger?: boolean }) {
+function RemBtn({ onClick, title, children, danger }: {
+  onClick: () => void; title: string; children: React.ReactNode; danger?: boolean;
+}) {
   return (
     <button
       onClick={onClick}
       title={title}
       style={{
-        background: danger ? "#200a0a" : "#12121a",
-        border: danger ? "1px solid #ff444433" : "1px solid #2a2a4e",
-        color: danger ? "#ff6666" : "#aaa",
-        width: "40px", height: "32px",
-        borderRadius: "4px",
+        background: danger ? "#300a0a" : "#12122a",
+        border: danger ? "2px solid #ff4444" : "2px solid #2a2a5e",
+        color: danger ? "#ff6666" : "#fff",
+        borderRadius: "8px",
+        width: "54px",
+        height: "54px",
+        fontSize: "20px",
         cursor: "pointer",
-        fontSize: "14px",
         fontFamily: "Arial, sans-serif",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
-function ActionBtn({ onClick, children, secondary }: { onClick: () => void; children: React.ReactNode; secondary?: boolean }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        background: secondary ? "#1a1a2e" : "linear-gradient(90deg, #00d4ff, #7b2cbf)",
-        border: secondary ? "1px solid #00d4ff" : "none",
-        color: "#fff",
-        padding: "8px 18px",
-        borderRadius: "5px",
-        cursor: "pointer",
-        fontSize: "13px",
-        fontFamily: "Arial, sans-serif",
         fontWeight: "bold",
       }}
     >
@@ -492,148 +487,124 @@ function ActionBtn({ onClick, children, secondary }: { onClick: () => void; chil
   );
 }
 
-function KeyHint({ keys, label }: { keys: string[]; label: string }) {
-  return (
-    <div style={{ textAlign: "center" }}>
-      <div style={{ display: "flex", gap: "4px", justifyContent: "center", marginBottom: "6px" }}>
-        {keys.map((k) => (
-          <span key={k} style={{
-            background: "#1a1a30",
-            border: "1px solid #2a2a5e",
-            borderRadius: "3px",
-            padding: "2px 8px",
-            fontSize: "11px",
-            color: "#00d4ff",
-          }}>{k}</span>
-        ))}
-      </div>
-      <div style={{ fontSize: "11px", color: "#444" }}>{label}</div>
-    </div>
-  );
-}
-
-function DashboardView({ stats, channels }: { stats: Stats | null; channels: Channel[] }) {
-  const fusionPct = stats && stats.clusters > 0
-    ? Math.min(100, Math.round((stats.fusion_active / stats.clusters) * 100))
-    : 0;
-
-  return (
-    <div style={{ overflowY: "auto", height: "calc(100vh - 52px)", padding: "24px", background: "#0a0a0f" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-        {/* Header */}
-        <div style={{ marginBottom: "28px" }}>
-          <h2 style={{ fontSize: "22px", fontWeight: "bold", color: "#fff", margin: 0 }}>
-            Sistema MoJiTo
-          </h2>
-          <p style={{ color: "#666", fontSize: "13px", marginTop: "6px" }}>
-            Reconstruccion Adaptativa de Streams (Fusion Engine)
-          </p>
-        </div>
-
-        {/* Stats */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", marginBottom: "28px" }}>
-          <StatCard label="Streams Totales" value={stats?.streams ?? "–"} color="#00d4ff" desc="Todos los streams en la base de datos" />
-          <StatCard label="Clusters" value={stats?.clusters ?? "–"} color="#7b2cbf" desc="Canales reales agrupados" />
-          <StatCard label="En Clusters" value={stats?.clustered ?? "–"} color="#fff" desc="Streams agrupados logicamente" />
-          <StatCard
-            label="Fusion Activa"
-            value={stats?.fusion_active ?? "–"}
-            color="#ff8800"
-            desc={"Monitoreados simultaneamente · " + fusionPct + "% cobertura"}
-            progress={fusionPct}
-          />
-        </div>
-
-        {/* Explain */}
-        <div style={{
-          background: "#12121a",
-          border: "1px solid #2a2a4e",
-          borderRadius: "10px",
-          padding: "20px",
-          marginBottom: "28px",
-        }}>
-          <h3 style={{ color: "#00d4ff", fontSize: "16px", marginBottom: "14px", marginTop: 0 }}>Como funciona MoJiTo</h3>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-            <ConceptCard title="Stream" icon="🌊" desc="Una URL que reproduce video en vivo. Cada canal puede tener docenas de links diferentes." />
-            <ConceptCard title="Cluster" icon="📦" desc='Un "canal real". Todos los URLs que reproducen el mismo contenido se agrupan en un cluster.' />
-            <ConceptCard title="Fusion" icon="⚡" desc="El motor que monitorea todos los streams en tiempo real y siempre sirve el mejor disponible." />
-          </div>
-        </div>
-
-        {/* Top Channels */}
-        <div>
-          <h3 style={{ color: "#fff", fontSize: "16px", marginBottom: "14px" }}>Canales disponibles ({channels.length})</h3>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-            {channels.slice(0, 30).map((ch, i) => (
-              <div key={i} style={{
-                background: "#12121a",
-                border: "1px solid #2a2a4e",
-                borderRadius: "6px",
-                padding: "10px 14px",
-                minWidth: "180px",
-                flex: "1 1 180px",
-                maxWidth: "240px",
-              }}>
-                <div style={{ fontSize: "13px", fontWeight: "bold", color: "#fff", marginBottom: "6px",
-                  overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {ch.name}
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: "10px", color: "#0f0" }}>● FUSION</span>
-                  <span style={{ fontSize: "10px", color: "#555" }}>{ch.streams} streams</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function StatCard({ label, value, color, desc, progress }: {
-  label: string; value: number | string; color: string; desc: string; progress?: number;
+/* ── Channel row — large click target for TV remote ── */
+function ChannelRow({ number, channel, active, onClick }: {
+  number: number; channel: Channel; active: boolean; onClick: () => void;
 }) {
   return (
-    <div style={{
-      background: "#12121a",
-      border: "1px solid #2a2a4e",
-      borderRadius: "10px",
-      padding: "20px",
-      flex: "1 1 200px",
-      minWidth: "180px",
-    }}>
-      <div style={{ color: "#888", fontSize: "12px", marginBottom: "8px" }}>{label}</div>
-      <div style={{ fontSize: "34px", fontWeight: "bold", color, marginBottom: "6px" }}>{value}</div>
-      <div style={{ color: "#555", fontSize: "11px" }}>{desc}</div>
-      {progress !== undefined && (
+    <div
+      onClick={onClick}
+      data-active={active ? "true" : "false"}
+      style={{
+        padding: "14px 14px",
+        cursor: "pointer",
+        borderBottom: "1px solid #0f0f1e",
+        background: active ? "linear-gradient(90deg, #001830, #100a20)" : "transparent",
+        borderLeft: active ? "4px solid #00d4ff" : "4px solid transparent",
+        display: "flex",
+        alignItems: "center",
+        minHeight: "58px",
+      }}
+    >
+      <div style={{
+        color: active ? "#00d4ff" : "#333",
+        fontSize: "12px",
+        fontWeight: "bold",
+        width: "28px",
+        flexShrink: 0,
+        textAlign: "right",
+        marginRight: "10px",
+      }}>
+        {number}
+      </div>
+      <div style={{ flex: 1, overflow: "hidden" }}>
         <div style={{
-          background: "#1a1a2e",
-          borderRadius: "4px",
-          height: "6px",
+          fontSize: "15px",
+          fontWeight: active ? "bold" : "normal",
+          color: active ? "#fff" : "#ccc",
           overflow: "hidden",
-          marginTop: "10px",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
         }}>
-          <div style={{
-            background: "linear-gradient(90deg, #00d4ff, #7b2cbf)",
-            height: "100%",
-            width: progress + "%",
-            borderRadius: "4px",
-            transition: "width 0.5s",
-          }} />
+          {channel.name}
         </div>
+        <div style={{ fontSize: "11px", color: active ? "#00d4ff88" : "#333", marginTop: "3px" }}>
+          {getCategory(channel.name)} · FUSION
+        </div>
+      </div>
+      {active && (
+        <div style={{
+          flexShrink: 0,
+          width: "8px",
+          height: "8px",
+          borderRadius: "50%",
+          background: "#0f0",
+          marginLeft: "8px",
+        }} />
       )}
     </div>
   );
 }
 
-function ConceptCard({ title, icon, desc }: { title: string; icon: string; desc: string }) {
+/* ── Large TV remote button ── */
+function TvBtn({ onClick, children, wide, danger, title }: {
+  onClick: () => void; children: React.ReactNode; wide: boolean; danger?: boolean; title?: string;
+}) {
   return (
-    <div style={{ flex: "1 1 200px", minWidth: "180px" }}>
-      <div style={{ fontSize: "20px", marginBottom: "6px" }}>{icon} {title}</div>
-      <div style={{ color: "#888", fontSize: "13px", lineHeight: "1.5" }}>{desc}</div>
-    </div>
+    <button
+      onClick={onClick}
+      title={title}
+      style={{
+        background: danger ? "#200808" : "#0e0e20",
+        border: danger ? "2px solid #ff4444" : "2px solid #2a2a5e",
+        color: danger ? "#ff6666" : "#ccc",
+        borderRadius: "8px",
+        padding: wide ? "12px 0" : "10px 14px",
+        width: wide ? "240px" : "auto",
+        fontSize: "16px",
+        fontWeight: "bold",
+        cursor: "pointer",
+        fontFamily: "Arial, sans-serif",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        letterSpacing: "1px",
+        minHeight: "48px",
+      }}
+    >
+      {children}
+    </button>
   );
 }
 
-export default MojitoTV;
+/* ── Remote hint row ── */
+function RemoteHintRow({ icon, label, note }: { icon: string; label: string; note: string }) {
+  return (
+    <div style={{
+      display: "flex",
+      alignItems: "center",
+      marginBottom: "10px",
+      width: "280px",
+    }}>
+      <div style={{
+        background: "#1a1a35",
+        border: "1px solid #2a2a5e",
+        borderRadius: "5px",
+        padding: "4px 10px",
+        fontSize: "13px",
+        color: "#00d4ff",
+        minWidth: "50px",
+        textAlign: "center",
+        fontWeight: "bold",
+        marginRight: "12px",
+        flexShrink: 0,
+      }}>
+        {icon}
+      </div>
+      <div>
+        <div style={{ fontSize: "13px", color: "#fff", fontWeight: "bold" }}>{label}</div>
+        <div style={{ fontSize: "11px", color: "#555" }}>{note}</div>
+      </div>
+    </div>
+  );
+}
