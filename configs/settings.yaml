@@ -1,0 +1,59 @@
+# MoJiTo Configuration
+
+pipeline:
+  name: "MoJiTo Pipeline"
+  version: "1.0.0"
+
+ingest:
+  max_concurrent: 10
+  timeout_seconds: 30
+
+fingerprint:
+  network:
+    enabled: true
+  temporal:
+    enabled: true
+    segment_count: 5
+    timeout_seconds: 5.0
+
+evaluation:
+  enabled: true
+  timeout_seconds: 10.0
+  sample_duration_seconds: 10.0
+  freeze_threshold: 0.01
+  cache_enabled: true
+
+fusion:
+  enabled: true
+  buffer_size: 30
+  switch_threshold: 0.3
+  check_interval_seconds: 5.0
+
+output:
+  default_format: "json"
+  default_path: "data/normalized/streams.json"
+
+data:
+  raw_path: "data/raw"
+  normalized_path: "data/normalized"
+  metrics_path: "data/metrics"
+
+database:
+  type: "sqlite"
+  path: "streams.db"
+
+normalization:
+  similarity_threshold: 0.8
+  levenshtein_enabled: true
+
+streaming:
+  user_agent: "Mozilla/5.0 (SMART-TV) AppleWebKit/537.36"
+  headers:
+    Accept: "*/*"
+    Accept-Encoding: "gzip, deflate"
+    Connection: "keep-alive"
+
+cache:
+  enabled: true
+  ttl_seconds: 3600
+  max_entries: 10000
