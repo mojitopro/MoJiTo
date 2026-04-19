@@ -169,10 +169,6 @@ def tv():
     return send_file('tv.html')
 
 
-def is_hd(url, title=''):
-    s = (url + ' ' + (title or '')).lower()
-    return '1080' in s or '/hd' in s or ' hd ' in s or 'fhd' in s or '.m3u8' in url
-
 @app.route('/api/tv')
 def api_tv():
     import json
@@ -188,25 +184,21 @@ def api_tv():
             for ch in ch_list:
                 name = ch.get('name', '').strip()
                 url = ch.get('url', '').strip()
-                title = ch.get('title', '').strip()
                 if name and url:
                     if name not in groups:
                         groups[name] = []
-                    groups[name].append({'url': url, 'title': title})
+                    groups[name].append(url)
         except:
             pass
     
+    def better_first(url):
+        u = url.lower()
+        return (u.endswith('.m3u8'), 'hd' in u or '1080' in u)
+    
     all_channels = []
-    for name, items in groups.items():
-        seen = {}
-        result = []
-        for item in items:
-            u = item['url']
-            if u not in seen:
-                seen[u] = True
-                result.append(item)
-        result.sort(key=lambda x: (not is_hd(x['url'], x.get('title', '')), x['url']))
-        urls = [x['url'] for x in result]
+    for name, urls in groups.items():
+        urls = list(dict.fromkeys(urls))
+        urls.sort(key=lambda x: (not better_first(x)[0], not better_first(x)[1], not better_first(x)[2]))
         all_channels.append({
             'name': name,
             'url': urls[0],
