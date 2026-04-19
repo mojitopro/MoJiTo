@@ -216,14 +216,14 @@
             }
             
             if (type === 'hls' && HLS.isSupported()) {
-                // HLS via proxy
+                // HLS stream
                 hls = new HLS({ 
                     enableWorker: true,
                     lowLatencyMode: false,
                     maxLoadingDelay: 4,
                     maxBufferLength: 30
                 });
-                hls.loadSource('/stream/' + url.replace('http://', ''));
+                hls.loadSource(url);
                 hls.attachMedia(v);
                 hls.on(HLS.Events.MANIFEST_PARSED, function() {
                     showOverlay('', false);
@@ -237,8 +237,8 @@
                     }
                 });
             } else {
-                // Direct stream via proxy
-                v.src = '/stream/' + url.replace('http://', '');
+                // Direct stream
+                v.src = url;
                 v.volume = 1;
                 
                 v.onloadeddata = function() {

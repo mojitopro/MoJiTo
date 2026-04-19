@@ -314,20 +314,12 @@ def hls_js():
         return '', 404
 
 
-@app.route('/stream/<path:url>')
-def proxy_stream(url):
-    try:
-        target = 'http://' + url
-        req = requests.get(target, stream=True, timeout=10, headers={
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'Referer': 'https://mojitopro.github.io/'
-        })
-        return Response(
-            stream_with_context(req.iter_content(chunk_size=8192)),
-            content_type=req.headers.get('content-type', 'video/mpeg')
-        )
-    except Exception as e:
-        return f'Stream error: {e}', 502
+@app.after_request
+def add_cors(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+    response.headers['Access-Control-Expose-Headers'] = '*'
+    return response
 
 
 @app.route('/health')
