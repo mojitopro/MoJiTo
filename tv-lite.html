@@ -6,7 +6,7 @@
     <title>MoJiTo TV</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; background: #050508; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; }
+        html, body { height: 100%; background: #0a0a0f; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; }
 
         #app { display: flex; flex-direction: column; height: 100vh; }
 
@@ -24,8 +24,7 @@
         }
         #player .bg-pattern {
             position: absolute; inset: 0;
-            background: radial-gradient(circle at center, #151520 0%, #000 100%);
-            opacity: 0.5;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #000 100%);
         }
         #player video {
             width: 100%; height: 100%;
@@ -35,14 +34,42 @@
         }
         #player.fs video { object-fit: cover; }
 
+        .play-overlay {
+            position: absolute;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        .play-btn {
+            width: 100px;
+            height: 100px;
+            background: rgba(0,212,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            box-shadow: 0 0 40px rgba(0,212,255,0.4);
+        }
+        .play-btn:hover { transform: scale(1.1); background: #00d4ff; }
+        .play-btn svg { width: 40px; height: 40px; fill: #000; margin-left: 5px; }
+        .play-text { color: #888; font-size: 14px; }
+
         #player-ui {
             position: absolute; inset: 0;
             z-index: 10;
             display: flex; flex-direction: column;
             justify-content: space-between;
             pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
-        #player-ui > * { pointer-events: auto; }
+        #player-ui.show { opacity: 1; pointer-events: auto; }
+        .fs #player-ui { opacity: 1; }
 
         .top-bar {
             display: flex; justify-content: space-between; align-items: center;
@@ -51,18 +78,17 @@
         }
         .channel-badge {
             background: linear-gradient(135deg, #00d4ff, #7b2cbf);
-            padding: 6px 14px; border-radius: 20px;
-            font-size: 14px; font-weight: 600;
+            padding: 8px 16px; border-radius: 20px;
+            font-size: 15px; font-weight: 600;
             text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
         .status-pill {
             display: flex; align-items: center; gap: 8px;
-            padding: 6px 12px; border-radius: 20px;
-            font-size: 12px; background: rgba(0,0,0,0.6); border: 1px solid #333;
+            padding: 8px 14px; border-radius: 20px;
+            font-size: 12px; background: rgba(0,0,0,0.7); border: 1px solid #333;
         }
         .status-pill .dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: #666;
+            width: 8px; height: 8px; border-radius: 50%; background: #666;
         }
         .status-pill.live .dot { background: #4f4; box-shadow: 0 0 8px #4f4; }
         .status-pill.error .dot { background: #f44; }
@@ -70,90 +96,78 @@
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
         .bottom-bar {
-            padding: 12px;
+            padding: 16px;
             background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-            transition: opacity 0.3s;
         }
-        .fs #player-ui { opacity: 0; }
-        .fs #player-ui:hover { opacity: 1; }
-        .controls { display: flex; gap: 8px; justify-content: center; }
+        .controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
         .ctrl-btn {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid #333;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid #444;
             color: #fff;
-            padding: 10px 20px; border-radius: 8px;
-            font-size: 13px; cursor: pointer;
+            padding: 12px 24px; border-radius: 8px;
+            font-size: 14px; cursor: pointer;
             transition: all 0.2s;
         }
-        .ctrl-btn:hover { background: rgba(255,255,255,0.2); }
+        .ctrl-btn:hover { background: rgba(255,255,255,0.25); }
         .ctrl-btn.active { background: #00d4ff; color: #000; border-color: #00d4ff; }
 
         #guide {
             flex: 1;
             display: flex; flex-direction: column;
-            background: #0a0a0f;
+            background: #0d0d12;
             border-top: 1px solid #1a1a2e;
             overflow: hidden;
         }
 
         #guide-header {
             padding: 12px 16px;
-            background: #0f0f15;
+            background: #12121a;
             border-bottom: 1px solid #1a1a2e;
             display: flex; gap: 12px; align-items: center;
         }
         #search {
             flex: 1;
-            background: #15151f;
+            background: #1a1a25;
             border: 1px solid #2a2a3e;
-            color: #fff; padding: 10px 14px;
+            color: #fff; padding: 12px 16px;
             border-radius: 8px; font-size: 14px;
         }
         #search:focus { outline: none; border-color: #00d4ff; }
-        .cat-btn {
-            background: transparent;
-            border: 1px solid #2a2a3e;
-            color: #888; padding: 8px 14px;
-            border-radius: 20px; font-size: 12px;
-            cursor: pointer; white-space: nowrap;
-        }
-        .cat-btn:hover, .cat-btn.active {
-            background: #00d4ff; color: #000; border-color: #00d4ff;
+        .ch-count {
+            color: #00d4ff; font-size: 14px; font-weight: 600; white-space: nowrap;
         }
 
         #channels {
             flex: 1;
             overflow-y: auto;
-            padding: 12px;
+            padding: 16px;
         }
         .ch-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
         }
         .ch-card {
-            background: #12121a;
-            border: 2px solid #1a1a2e;
+            background: #14141c;
+            border: 2px solid #222;
             border-radius: 12px;
-            padding: 14px 12px;
+            padding: 16px;
             cursor: pointer;
             transition: all 0.2s;
             position: relative;
-            overflow: hidden;
         }
         .ch-card:hover {
             border-color: #00d4ff;
             transform: translateY(-2px);
+            background: #1a1a28;
         }
         .ch-card.active {
             border-color: #00d4ff;
-            background: linear-gradient(135deg, #1a1a2e, #0f1520);
+            background: linear-gradient(135deg, #1a1a2e, #0f1525);
         }
         .ch-card .name {
-            font-size: 13px; font-weight: 600;
-            color: #fff; margin-bottom: 6px;
-            white-space: nowrap; overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: 14px; font-weight: 600;
+            color: #fff; margin-bottom: 8px;
         }
         .ch-card .meta {
             font-size: 11px; color: #666;
@@ -162,60 +176,29 @@
         }
         .ch-card .quality {
             background: #1a3a2a; color: #4f4;
-            padding: 2px 6px; border-radius: 4px;
+            padding: 3px 8px; border-radius: 4px;
             font-size: 10px; font-weight: 600;
         }
         .ch-card .sources {
-            background: #2a2a3e; color: #888;
-            padding: 2px 6px; border-radius: 4px;
+            background: #2a2a3e; color: #aaa;
+            padding: 3px 8px; border-radius: 4px;
             font-size: 10px;
-        }
-        .ch-card .loading {
-            position: absolute; inset: 0;
-            background: rgba(0,212,255,0.1);
-            display: none;
-        }
-        .ch-card.loading .loading {
-            display: block;
-            animation: shimmer 1.5s infinite;
-        }
-        @keyframes shimmer {
-            0%,100%{opacity:0.5} 50%{opacity:1}
         }
 
         .empty-state {
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            height: 100%; color: #444;
+            height: 200px; color: #444;
         }
-        .empty-state svg { width: 60px; height: 60px; margin-bottom: 16px; opacity: 0.5; }
-
-        #loading-overlay {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.9);
-            z-index: 9998;
-            display: none;
-            align-items: center; justify-content: center;
-            flex-direction: column;
-        }
-        #loading-overlay.show { display: flex; }
-        .spinner {
-            width: 50px; height: 50px;
-            border: 3px solid #222;
-            border-top-color: #00d4ff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text { margin-top: 16px; color: #00d4ff; }
+        .empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.5; }
 
         #toast {
-            position: fixed; bottom: 80px; left: 50%;
+            position: fixed; bottom: 100px; left: 50%;
             transform: translateX(-50%) translateY(100px);
-            background: #15151f;
+            background: #1a1a25;
             border: 1px solid #2a2a3e;
-            color: #fff; padding: 12px 24px;
-            border-radius: 30px; font-size: 13px;
+            color: #fff; padding: 14px 28px;
+            border-radius: 30px; font-size: 14px;
             z-index: 9997;
             opacity: 0; transition: all 0.3s;
         }
@@ -225,11 +208,20 @@
     </style>
 </head>
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.0/dist/hls.min.js"></script>
     <div id="app">
         <div id="player">
             <div class="bg-pattern"></div>
             <video id="video" playsinline webkit-playsinline></video>
-            <div id="player-ui" style="display:none">
+            
+            <div class="play-overlay" id="playOverlay" onclick="startPlaying()">
+                <div class="play-btn">
+                    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+                <div class="play-text">Toca para ver TV</div>
+            </div>
+
+            <div id="player-ui">
                 <div class="top-bar">
                     <div class="channel-badge" id="ch-name">Selecciona un canal</div>
                     <div class="status-pill" id="status">
@@ -239,9 +231,9 @@
                 </div>
                 <div class="bottom-bar">
                     <div class="controls">
-                        <button class="ctrl-btn" onclick="toggleFullscreen()">&#x26F6; F</button>
-                        <button class="ctrl-btn" onclick="stop()">&#x25A0;</button>
-                        <button class="ctrl-btn" onclick="nextSource()">&#x2630;</button>
+                        <button class="ctrl-btn" onclick="toggleFullscreen()">&#x26F6; Pantalla Completa</button>
+                        <button class="ctrl-btn" onclick="stop()">&#x25A0; Detener</button>
+                        <button class="ctrl-btn" onclick="nextSource()">&#x2630; Cambiar Fuente</button>
                     </div>
                 </div>
             </div>
@@ -250,6 +242,7 @@
         <div id="guide">
             <div id="guide-header">
                 <input type="text" id="search" placeholder="Buscar canales..." oninput="filterChannels()">
+                <span class="ch-count" id="chCount">0 canales</span>
             </div>
             <div id="channels">
                 <div class="ch-grid" id="ch-grid"></div>
@@ -257,23 +250,14 @@
         </div>
     </div>
 
-    <div id="loading-overlay">
-        <div class="spinner"></div>
-        <div class="loading-text">Conectando...</div>
-    </div>
-
     <div id="toast"></div>
 
     <script>
         var channels = [], filtered = [], currentIdx = 0, hls = null, playing = false, streams = [], streamIdx = 0;
-
-        function getXMLHttpRequest() {
-            if (window.XMLHttpRequest) return new XMLHttpRequest();
-            return new ActiveXObject('Microsoft.XMLHTTP');
-        }
+        var started = false;
 
         function request(url, callback) {
-            var xhr = getXMLHttpRequest();
+            var xhr = new XMLHttpRequest();
             xhr.open('GET', url, true);
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
@@ -292,7 +276,9 @@
                 }
                 var data = JSON.parse(resp);
                 channels = data.channels || [];
-                filterChannels();
+                filtered = channels;
+                document.getElementById('chCount').textContent = channels.length + ' canales';
+                renderChannels();
             });
         }
 
@@ -310,15 +296,14 @@
             }
             for (var i = 0; i < filtered.length; i++) {
                 var ch = filtered[i];
-                var hd = ch.streams > 1 && isHD(ch.url);
+                var hd = ch.streams > 1 || isHD(ch.url);
                 var active = i === currentIdx ? ' active' : '';
-                html += '<div class="ch-card' + active + '" onclick="selectChannel(' + i + ')">' +
+                html += '<div class="ch-card' + active + '" data-idx="' + i + '">' +
                     '<div class="name">' + ch.name + '</div>' +
                     '<div class="meta">' +
                         (hd ? '<span class="quality">HD</span>' : '<span></span>') +
                         (ch.streams > 1 ? '<span class="sources">' + ch.streams + ' fuentes</span>' : '') +
                     '</div>' +
-                    '<div class="loading"></div>' +
                 '</div>';
             }
             container.innerHTML = html;
@@ -335,7 +320,8 @@
                     }
                 }
             }
-            currentIdx = Math.min(currentIdx, Math.max(0, filtered.length - 1));
+            currentIdx = 0;
+            document.getElementById('chCount').textContent = filtered.length + ' / ' + channels.length + ' canales';
             renderChannels();
         }
 
@@ -345,13 +331,25 @@
             var ch = filtered[idx];
             if (ch) {
                 document.getElementById('ch-name').textContent = ch.name;
-                document.getElementById('player-ui').style.display = 'flex';
+                document.getElementById('playOverlay').style.display = 'none';
+                document.getElementById('player-ui').classList.add('show');
                 playCurrent();
             }
         }
 
+        function startPlaying() {
+            started = true;
+            document.getElementById('playOverlay').style.display = 'none';
+            if (filtered.length > 0) {
+                selectChannel(0);
+            }
+        }
+
         function playCurrent() {
-            if (!filtered.length || playing) return;
+            if (!filtered.length) return;
+            if (playing) {
+                stop();
+            }
             var ch = filtered[currentIdx];
             if (!ch) return;
             streams = ch.backups && ch.backups.length ? ch.backups : [ch.url];
@@ -368,18 +366,21 @@
 
         function doPlay() {
             if (streamIdx >= streams.length) {
-                setStatus('error', 'Sin fuente');
+                setStatus('error', 'Sin fuente disponible');
                 return;
             }
 
             var url = streams[streamIdx];
             var video = document.getElementById('video');
 
-            setStatus('connecting', 'Fuente ' + (streamIdx + 1) + '...');
+            setStatus('connecting', 'Conectando...');
 
-            if (hls) { hls.destroy(); hls = null; }
+            if (hls) { 
+                hls.destroy(); 
+                hls = null; 
+            }
 
-            if (url.indexOf('.m3u8') > 0 && typeof HLS === 'function') {
+            if (url.indexOf('.m3u8') > 0 && typeof HLS !== 'undefined') {
                 hls = new HLS({ enableWorker: true, liveSyncDurationCount: 3 });
                 hls.loadSource(url);
                 hls.attachMedia(video);
@@ -388,7 +389,7 @@
                     setStatus('live', 'EN VIVO');
                     playing = true;
                 });
-hls.on(HLS.Events.ERROR, function(e, data) {
+                hls.on(HLS.Events.ERROR, function(e, data) {
                     if (data.fatal) {
                         streamIdx++;
                         doPlay();
@@ -409,14 +410,6 @@ hls.on(HLS.Events.ERROR, function(e, data) {
                     doPlay();
                 };
             }
-        }
-        }
-                    if (!playing && streamIdx < streams.length - 1) {
-                        streamIdx++;
-                        doPlay();
-                    }
-                }, 8000);
-}
         }
 
         function setStatus(type, text) {
@@ -441,7 +434,6 @@ hls.on(HLS.Events.ERROR, function(e, data) {
 
         function toggleFullscreen() {
             var player = document.getElementById('player');
-            var ui = document.getElementById('player-ui');
             if (player.classList.contains('fs')) {
                 player.classList.remove('fs');
                 if (document.exitFullscreen) document.exitFullscreen();
@@ -455,6 +447,9 @@ hls.on(HLS.Events.ERROR, function(e, data) {
             if (streams.length > 1) {
                 streamIdx = (streamIdx + 1) % streams.length;
                 doPlay();
+                showToast('Cambiando fuente...', 'success');
+            } else {
+                showToast('Solo hay una fuente', 'error');
             }
         }
 
@@ -468,39 +463,41 @@ hls.on(HLS.Events.ERROR, function(e, data) {
             }, 3000);
         }
 
+        document.getElementById('ch-grid').onclick = function(e) {
+            var card = e.target.closest('.ch-card');
+            if (card) {
+                var idx = parseInt(card.getAttribute('data-idx'));
+                selectChannel(idx);
+            }
+        };
+
         document.onkeydown = function(e) {
+            if (!started) {
+                startPlaying();
+                e.preventDefault();
+                return;
+            }
             var max = filtered.length - 1;
             if (e.keyCode === 70) {
                 toggleFullscreen();
                 e.preventDefault();
-            } else if (!playing) {
-                if (e.keyCode === 38 || e.keyCode === 40) {
-                    currentIdx = e.keyCode === 38 ? Math.max(0, currentIdx - 1) : Math.min(max, currentIdx + 1);
-                    selectChannel(currentIdx);
-                    e.preventDefault();
-                } else if (e.keyCode === 13 || e.keyCode === 32) {
-                    playCurrent();
-                    e.preventDefault();
-                }
-            } else {
-                if (e.keyCode === 38 || e.keyCode === 40) {
-                    currentIdx = e.keyCode === 38 ? Math.max(0, currentIdx - 1) : Math.min(max, currentIdx + 1);
-                    selectChannel(currentIdx);
-                    playCurrent();
-                    e.preventDefault();
-                } else if (e.keyCode === 27) {
-                    stop();
-                    e.preventDefault();
-                }
-            }
-        };
-
-        document.getElementById('ch-grid').onclick = function(e) {
-            var card = e.target.closest('.ch-card');
-            if (card) {
-                var idx = Array.prototype.indexOf.call(card.parentElement.children, card);
-                selectChannel(idx);
+            } else if (e.keyCode === 38) {
+                currentIdx = Math.max(0, currentIdx - 1);
+                selectChannel(currentIdx);
+                e.preventDefault();
+            } else if (e.keyCode === 40) {
+                currentIdx = Math.min(max, currentIdx + 1);
+                selectChannel(currentIdx);
+                e.preventDefault();
+            } else if (e.keyCode === 13 || e.keyCode === 32) {
                 playCurrent();
+                e.preventDefault();
+            } else if (e.keyCode === 27) {
+                stop();
+                e.preventDefault();
+            } else if (e.keyCode === 48) {
+                nextSource();
+                e.preventDefault();
             }
         };
 
