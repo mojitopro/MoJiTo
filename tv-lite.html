@@ -8,143 +8,186 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; background: #000; color: #fff; font-family: Arial, sans-serif; overflow: hidden; }
         
-        #player { position: relative; width: 100%; height: 55vh; background: #000; }
-        #video { width: 100%; height: 100%; object-fit: contain; background: #000; }
-        
-        #overlay {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85);
-            display: flex; align-items: center; justify-content: center;
-            z-index: 10;
-        }
-        #overlay.hidden { display: none; }
-        #overlay .txt { font-size: 24px; color: #00d4ff; }
+        #tv { height: 65vh; background: #000; position: relative; }
+        #v { width: 100%; height: 100%; background: #000; object-fit: contain; }
         
         #bar {
             position: absolute; bottom: 0; left: 0; right: 0;
-            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            background: linear-gradient(transparent, rgba(0,0,0,0.95));
             padding: 10px 15px;
             display: flex; justify-content: space-between; align-items: center;
         }
-        #ch { font-size: 16px; color: #00d4ff; font-weight: bold; }
-        #st { font-size: 12px; color: #666; }
+        #ch { font-size: 18px; color: #00d4ff; font-weight: bold; }
+        #st { font-size: 12px; color: #888; }
         
         #fullBtn {
-            background: #222; border: 1px solid #444;
-            color: #fff; padding: 8px 20px; border-radius: 4px;
-            font-size: 14px; cursor: pointer;
+            background: #333; border: 2px solid #555;
+            color: #fff; padding: 10px 30px; border-radius: 6px;
+            font-size: 16px; font-weight: bold; cursor: pointer;
         }
+        #fullBtn:hover, #fullBtn.sel { border-color: #ff0; background: #443300; }
         
-        #list { height: 45vh; background: #0a0a0a; overflow-y: auto; }
-        #srch { display: flex; gap: 8px; padding: 8px; background: #111; }
-        #srch input, #srch select {
+        #ls { height: 35vh; background: #0a0a0a; overflow-y: auto; }
+        #sr { display: flex; gap: 8px; padding: 8px; background: #111; }
+        #sr input, #sr select {
             background: #222; border: 1px solid #444; color: #fff;
-            padding: 6px 10px; border-radius: 4px; font-size: 13px;
+            padding: 8px 12px; border-radius: 4px; font-size: 14px;
         }
-        #srch input { flex: 1; }
+        #sr input { flex: 1; }
         
-        #chs { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 4px; padding: 8px; }
-        .ch {
+        #gs {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 4px; padding: 8px;
+        }
+        .c {
             background: #151515; border: 2px solid #222;
-            border-radius: 4px; padding: 8px 4px;
+            border-radius: 4px; padding: 10px 4px;
             text-align: center; cursor: pointer;
         }
-        .ch.sel { border-color: #ff0; background: #221a00; }
-        .ch .n { font-size: 10px; }
+        .c:hover { border-color: #00d4ff; }
+        .c.sel { border-color: #ff0; background: #332800; box-shadow: 0 0 10px rgba(255,255,0,0.3); }
+        .c .n { font-size: 11px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div id="player">
+    <div id="tv">
         <video id="v" controls playsinline webkit-playsinline></video>
-        <div id="overlay" class="hidden"><div class="txt">MoJiTo TV</div></div>
         <div id="bar">
-            <div><div id="ch">Sin canal</div><div id="st">Selecciona</div></div>
-            <button id="fullBtn" onclick="fs()">Full</button>
+            <div>
+                <div id="ch">MoJiTo TV</div>
+                <div id="st">Selecciona canal</div>
+            </div>
+            <button id="fullBtn">Full</button>
         </div>
     </div>
     
-    <div id="list">
-        <div id="srch">
-            <input type="text" placeholder="Buscar..." oninput="fltr()" id="q">
-            <select onchange="fltr()" id="ct"><option value="">Todos</option><option value="deportes">Deportes</option><option value="peliculas">Peliculas</option><option value="series">Series</option><option value="ninos">Ninos</option></select>
+    <div id="ls">
+        <div id="sr">
+            <input type="text" placeholder="Buscar..." oninput="fl()" id="q">
+            <select onchange="fl()" id="ct">
+                <option value="">Todos</option>
+                <option value="deportes">Deportes</option>
+                <option value="peliculas">Peliculas</option>
+                <option value="series">Series</option>
+                <option value="ninos">Ninos</option>
+                <option value="noticias">Noticias</option>
+            </select>
         </div>
-        <div id="chs"></div>
+        <div id="gs"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
     <script>
-        var all = [], flt = [], i = 0, hls = null, bkus = [], bi = 0;
+        var all = [], fl = [], i = 0, hls = null, bk = [], bi = 0;
+        var focus = 'ch';
         
         var catM = {'espn':'deportes','fox':'deportes','tnt sports':'deportes','tyc':'deportes','win':'deportes','hbo':'peliculas','cinemax':'peliculas','star':'peliculas','amc':'series','axn':'series','sony':'series','universal':'series','fx':'series','tnt':'series','disney':'ninos','nick':'ninos','cartoon':'ninos','adult':'ninos','cnn':'noticias','bbc':'noticias'};
         
-        function gc(n) { n = n.toLowerCase(); for(var k in catM) if(n.indexOf(k)>=0) return catM[k]; return 'series'; }
-        function show(t,s){ document.getElementById('st').textContent=t; document.getElementById('st').className=s; }
+        function gc(n) { n=n.toLowerCase(); for(var k in catM) if(n.indexOf(k)>=0) return catM[k]; return 'series'; }
+        function show(t){ document.getElementById('st').textContent=t; }
         
         function init() {
             fetch('/api/tv').then(r=>r.json()).then(d=>{
                 all = d.channels||[];
-                flt = all;
-                rnder();
+                rl();
             });
         }
         
-        function rnder() {
-            flt = all.filter(c=>(!q.value||c.name.toLowerCase().indexOf(q.value.toLowerCase())>=0) && (!ct.value||gc(c.name)===ct.value));
-            var h=''; flt.forEach((c,x)=>h+='<div class="ch'+(x===i?' sel':'')+'" data-i="'+x+'"><div class="n">'+c.name+'</div></div>');
-            document.getElementById('chs').innerHTML = h;
-            scrl();
+        function rl() {
+            var q=document.getElementById('q').value.toLowerCase();
+            var c=document.getElementById('ct').value;
+            fl = all.filter(x=>(!q||x.name.toLowerCase().indexOf(q)>=0)&&(!c||gc(x.name)===c));
+            var h='';
+            fl.forEach((x,idx)=>h+='<div class="c'+(idx===i?' sel':'')+'" data-i="'+idx+'"><div class="n">'+x.name+'</div></div>');
+            document.getElementById('gs').innerHTML = h;
         }
         
-        function fltr(){ rnder(); }
-        function scrl(){ var cs=document.querySelectorAll('.ch'); if(cs[i])cs[i].scrollIntoView({block:'nearest'}); }
+        function fl(){ rl(); }
+        
+        function sc() {
+            var cs=document.querySelectorAll('.c');
+            if(cs[i])cs[i].scrollIntoView({block:'nearest'});
+        }
         
         function play() {
-            if(!flt.length) return;
-            var c = flt[i];
-            bkus = c.backups||[c.url];
+            if(!fl.length) return;
+            var ch = fl[i];
+            bk = ch.backups||[ch.url];
             bi = 0;
-            document.getElementById('ch').textContent = c.name;
-            show('Conectando...','st');
+            document.getElementById('ch').textContent = ch.name;
+            show('Conectando...');
             
             var v = document.getElementById('v');
             v.pause();
             if(hls){hls.destroy(); hls=null;}
             
-            var u = bkus[bi];
+            var u = bk[bi];
             if(u.indexOf('.m3u8')>=0 && HLS.isSupported()){
                 hls = new HLS({enableWorker:true,maxBufferLength:30});
                 hls.loadSource(u);
                 hls.attachMedia(v);
-                hls.on(HLS.Events.MANIFEST_PARSED, ()=>{ show('EN VIVO','st'); v.play(); });
-                hls.on(HLS.Events.ERROR, (e,d)=>{ if(d.fatal) nxt(); });
+                hls.on(HLS.Events.MANIFEST_PARSED, ()=>{ show('EN VIVO'); v.play(); });
+                hls.on(HLS.Events.ERROR, ()=>{ nxt(); });
             } else {
                 v.src = u;
                 v.volume = 1;
-                v.onloadeddata = ()=>{ show('EN VIVO','st'); v.play(); };
+                v.onloadeddata = ()=>{ show('EN VIVO'); v.play(); };
                 v.onerror = nxt;
                 v.play().catch(nxt);
             }
-            rnder();
+            rl();
         }
         
-        function nxt(){ bi++; if(bi<bkus.length){ show('Alt...','st'); setTimeout(play,300); } else { show('Sin fuente','st'); bi=0; } }
+        function nxt(){ bi++; if(bi<bk.length){ show('Alt...'); setTimeout(play,300); } else { show('Sin fuente'); bi=0; } }
         
-        function fs(){ var p=document.getElementById('player'); if(p.requestFullscreen)p.requestFullscreen(); else if(p.webkitRequestFullScreen)p.webkitRequestFullScreen(); }
+        function fs(){ var p=document.getElementById('tv'); if(p.requestFullscreen)p.requestFullscreen(); else if(p.webkitRequestFullScreen)p.webkitRequestFullScreen(); }
+        
+        function updSel() {
+            document.querySelectorAll('.c').forEach((e,idx)=>e.classList.toggle('sel',idx===i));
+            document.getElementById('fullBtn').classList.toggle('sel',focus==='full');
+            sc();
+        }
         
         document.onkeydown = function(e) {
-            var m = flt.length - 1;
-            if(e.keyCode===38){ i=Math.max(0,i-Math.floor(window.innerWidth/90)); rnder(); }
-            else if(e.keyCode===40){ i=Math.min(m,i+Math.floor(window.innerWidth/90)); rnder(); }
-            else if(e.keyCode===37){ i=Math.max(0,i-1); rnder(); }
-            else if(e.keyCode===39){ i=Math.min(m,i+1); rnder(); }
-            else if(e.keyCode===13||e.keyCode===32) play();
-            else if(e.keyCode===27){ document.getElementById('v').pause(); document.getElementById('ch').textContent='Sin canal'; show('Parado','st'); }
+            var m = fl.length - 1;
+            var cols = Math.floor(window.innerWidth / 90);
+            
+            if(e.keyCode===38){
+                if(focus==='ch'){ i=Math.max(0,i-cols); }
+                else if(focus==='full') focus='ch';
+            }
+            else if(e.keyCode===40){
+                if(focus==='ch'){ i=Math.min(m,i+cols); }
+                else if(focus==='full') focus='ch';
+            }
+            else if(e.keyCode===37){
+                if(focus==='full') focus='ch';
+                else i=Math.max(0,i-1);
+            }
+            else if(e.keyCode===39){
+                if(focus==='ch') focus='full';
+                else i=Math.min(m,i+1);
+            }
+            else if(e.keyCode===13||e.keyCode===32){
+                if(focus==='full') fs();
+                else play();
+            }
+            else if(e.keyCode===27){
+                document.getElementById('v').pause();
+                document.getElementById('ch').textContent='MoJiTo TV';
+                show('Parado');
+            }
             else if(e.keyCode===70) fs();
+            
+            updSel();
         };
         
-        document.getElementById('chs').onclick = function(e){
-            var c = e.target.closest('.ch');
-            if(c){ i=parseInt(c.dataset.i); rnder(); play(); }
+        document.getElementById('fullBtn').onclick = fs;
+        
+        document.getElementById('gs').onclick = function(e){
+            var c = e.target.closest('.c');
+            if(c){ i=parseInt(c.dataset.i); focus='ch'; rl(); play(); updSel(); }
         };
         
         window.onload = init;
