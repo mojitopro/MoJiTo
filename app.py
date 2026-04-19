@@ -193,12 +193,12 @@ def api_tv():
     
     def better_first(url):
         u = url.lower()
-        return (u.endswith('.m3u8'), 'hd' in u or '1080' in u)
+        return (u.endswith('.m3u8') or 'hd' in u or '1080' in u)
     
     all_channels = []
     for name, urls in groups.items():
         urls = list(dict.fromkeys(urls))
-        urls.sort(key=lambda x: (not better_first(x)[0], not better_first(x)[1], not better_first(x)[2]))
+        urls.sort(key=lambda x: not better_first(x))
         all_channels.append({
             'name': name,
             'url': urls[0],
