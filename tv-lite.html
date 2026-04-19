@@ -396,58 +396,73 @@
             var url = streams[streamIdx];
             var video = document.getElementById('video');
 
-            setStatus('connecting', 'Conectando...');
+            setStatus('connecting', 'Conectando a fuente ' + (streamIdx + 1) + '...');
             document.getElementById('big-play').style.display = 'none';
 
-            if (url.indexOf('.m3u8') >= 0) {
-                if (hls) {
-                    hls.destroy();
-                    hls = null;
-                }
-                if (typeof HLS === 'function') {
-                    try {
-                        hls = new HLS({ enableWorker: true, maxBufferLength: 30 });
-                        hls.loadSource(url);
-                        hls.attachMedia(video);
-                        hls.on(HLS.Events.MANIFEST_PARSED, function() {
-                            video.play().catch(tryNext);
-                        });
-                        hls.on(HLS.Events.ERROR, function(e, data) {
-                            if (data.fatal) {
-                                streamIdx++;
-                                doPlay();
-                            }
-                        });
-                        hls.on(HLS.Events.FRAG_LOADED, function() {
-                            setStatus('live', 'EN VIVO');
-                            playing = true;
-                            showToast('Reproduciendo', 'success');
-                        });
-                    } catch (e) {
-                        streamIdx++;
-                        doPlay();
-                    }
-                } else {
-                    video.src = url;
-                    video.play().then(function() {
+            if (hls) { hls.destroy(); hls = null; }
+
+            if (url.indexOf('.m3u8') >= 0 && typeof HLS === 'function') {
+                try {
+                    hls = new HLS({ enableWorker: true, liveSyncDurationCount: 3 });
+                    hls.loadSource(url);
+                    hls.attachMedia(video);
+                    
+                    hls.on(HLS.Events.MANIFEST_PARSED, function() {
+                        video.play().catch(function() {});
+                    });
+                    
+                    hls.on(HLS.Events.ERROR, function(e, data) {
+                        if (data.fatal === HLS.ErrorTypes.NETWORK_ERROR) {
+                            streamIdx++;
+                            setTimeout(doPlay, 1000);
+                        }
+                    });
+                    
+                    hls.on(HLS.Events.FRAG_LOADED, function() {
                         setStatus('live', 'EN VIVO');
                         playing = true;
-                    }).catch(tryNext);
+                    });
+                    
+                    setTimeout(function() {
+                        if (!playing) {
+                            streamIdx++;
+                            doPlay();
+                        }
+                    }, 5000);
+                    
+                } catch (e) {
+                    streamIdx++;
+                    doPlay();
                 }
             } else {
                 video.src = url;
                 video.volume = 1;
-                video.play().then(function() {
-                    setStatus('live', 'EN VIVO');
-                    playing = true;
-                    showToast('Reproduciendo', 'success');
-                }).catch(tryNext);
+                
+                var played = false;
+                var checkPlay = setInterval(function() {
+                    if (video.readyState >= 2 && !played) {
+                        played = true;
+                        clearInterval(checkPlay);
+                        video.play().then(function() {
+                            setStatus('live', 'EN VIVO');
+                            playing = true;
+                        }).catch(function() {});
+                    }
+                }, 500);
+                
+                video.onerror = function() {
+                    clearInterval(checkPlay);
+                    streamIdx++;
+                    doPlay();
+                };
+                
+                setTimeout(function() {
+                    if (!playing && streamIdx < streams.length - 1) {
+                        streamIdx++;
+                        doPlay();
+                    }
+                }, 8000);
             }
-
-            video.onerror = function() {
-                streamIdx++;
-                doPlay();
-            };
         }
 
         function tryNext() {
