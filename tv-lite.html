@@ -11,18 +11,24 @@
         #tv { height: 65vh; background: #000; position: relative; }
         #v { width: 100%; height: 100%; background: #000; object-fit: contain; }
         
+        #tv.fs { position: fixed; top:0; left:0; width:100vw; height:100vh; z-index:9999; }
+        #tv.fs #v { object-fit: cover; }
+        
         #bar {
             position: absolute; bottom: 0; left: 0; right: 0;
             background: linear-gradient(transparent, rgba(0,0,0,0.95));
-            padding: 10px 15px;
+            padding: 12px 15px;
             display: flex; justify-content: space-between; align-items: center;
         }
-        #ch { font-size: 18px; color: #00d4ff; font-weight: bold; }
-        #st { font-size: 12px; color: #888; }
+        #bar.hid { opacity: 0; transition: opacity 0.3s; }
+        #tv.fs:hover #bar.hid, #bar:hover { opacity: 1; }
+        
+        #ch { font-size: 20px; color: #00d4ff; font-weight: bold; }
+        #st { font-size: 13px; color: #888; }
         
         #fullBtn {
             background: #333; border: 2px solid #555;
-            color: #fff; padding: 10px 30px; border-radius: 6px;
+            color: #fff; padding: 12px 35px; border-radius: 6px;
             font-size: 16px; font-weight: bold; cursor: pointer;
         }
         #fullBtn:hover, #fullBtn.sel { border-color: #ff0; background: #443300; }
@@ -53,7 +59,7 @@
 <body>
     <div id="tv">
         <video id="v" controls playsinline webkit-playsinline></video>
-        <div id="bar">
+        <div id="bar" class="hid">
             <div>
                 <div id="ch">MoJiTo TV</div>
                 <div id="st">Selecciona canal</div>
@@ -117,6 +123,11 @@
             bi = 0;
             document.getElementById('ch').textContent = ch.name;
             show('Conectando...');
+            playUrl();
+        }
+        
+        function playUrl() {
+            if(bi>=bk.length){ show('Sin fuente'); return; }
             
             var v = document.getElementById('v');
             v.pause();
@@ -127,24 +138,39 @@
                 hls = new HLS({enableWorker:true,maxBufferLength:30});
                 hls.loadSource(u);
                 hls.attachMedia(v);
-                hls.on(HLS.Events.MANIFEST_PARSED, ()=>{ show('EN VIVO'); v.play(); });
-                hls.on(HLS.Events.ERROR, ()=>{ nxt(); });
+                hls.on(HLS.Events.MANIFEST_PARSED, function(){
+                    show('EN VIVO');
+                    v.play();
+                });
+                hls.on(HLS.Events.ERROR, function(e, d){
+                    if(d.fatal){ bi++; playUrl(); }
+                });
             } else {
                 v.src = u;
                 v.volume = 1;
-                v.onloadeddata = ()=>{ show('EN VIVO'); v.play(); };
-                v.onerror = nxt;
-                v.play().catch(nxt);
+                v.onloadeddata = function(){ show('EN VIVO'); v.play(); };
+                v.onerror = function(){ bi++; playUrl(); };
+                v.onplay = function(){ show('EN VIVO'); };
+                v.play().catch(function(){ bi++; playUrl(); });
             }
             rl();
         }
         
-        function nxt(){ bi++; if(bi<bk.length){ show('Alt...'); setTimeout(play,300); } else { show('Sin fuente'); bi=0; } }
-        
-        function fs(){ var p=document.getElementById('tv'); if(p.requestFullscreen)p.requestFullscreen(); else if(p.webkitRequestFullScreen)p.webkitRequestFullScreen(); }
+        function fs() {
+            var t = document.getElementById('tv');
+            if(document.fullscreenElement){
+                document.exitFullscreen();
+            } else if(document.webkitFullscreenElement){
+                document.webkitExitFullscreen();
+            } else if(t.requestFullscreen){
+                t.requestFullscreen();
+            } else if(t.webkitRequestFullScreen){
+                t.webkitRequestFullScreen();
+            }
+        }
         
         function updSel() {
-            document.querySelectorAll('.c').forEach((e,idx)=>e.classList.toggle('sel',idx===i));
+            document.querySelectorAll('.c').forEach(function(e,idx){ e.classList.toggle('sel',idx===i); });
             document.getElementById('fullBtn').classList.toggle('sel',focus==='full');
             sc();
         }
@@ -177,6 +203,7 @@
                 document.getElementById('v').pause();
                 document.getElementById('ch').textContent='MoJiTo TV';
                 show('Parado');
+                fs();
             }
             else if(e.keyCode===70) fs();
             
@@ -184,6 +211,7 @@
         };
         
         document.getElementById('fullBtn').onclick = fs;
+        document.getElementById('v').ondblclick = fs;
         
         document.getElementById('gs').onclick = function(e){
             var c = e.target.closest('.c');
