@@ -52,28 +52,31 @@
     </div>
     
     <div id="ls">
-        <div id="sr"><input type="text" placeholder="Buscar..." oninput="rl()"></div>
+        <div id="sr"><input type="text" id="q" placeholder="Buscar..." oninput="rlist()"></div>
         <div id="chs"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
     <script>
-        var all = [], fl = [], i = 0, hls = null, bk = [], bi = 0, playing = false, isFs = false;
+        var all = [], fl = [], i = 0, hls = null, bk = [], bi = 0, playing = false, isFs = false, loading = false, curUrl = '';
         
         function init() {
             fetch('/api/tv').then(r=>r.json()).then(d=>{
                 all = d.channels || [];
                 fl = all;
                 rlist();
+            }).catch(function() {
+                document.getElementById('info').textContent = 'Error cargando canales';
             });
         }
         
         function rlist() {
-            var q = document.querySelector('#sr input').value.toLowerCase();
+            var q = document.getElementById('q').value.toLowerCase();
             fl = all.filter(x => !q || x.name.toLowerCase().indexOf(q) >= 0);
+            i = Math.min(i, Math.max(0, fl.length - 1));
             var h = '';
             fl.forEach(function(x, idx) {
-                var bc = (x.backups || []).length || 1;
+                var bc = (x.streams || 1);
                 h += '<div class="ch' + (idx === i ? ' sel' : '') + '" data-i="' + idx + '">';
                 h += '<div class="n">' + x.name + '</div>';
                 if (bc > 1) h += '<div class="b">' + bc + ' fuentes</div>';
@@ -89,10 +92,13 @@
         }
         
         function play() {
-            if (!fl.length) return;
+            if (!fl.length || loading) return;
             var ch = fl[i];
+            if (!ch) return;
+            curUrl = ch.url;
             bk = ch.backups || [ch.url];
             bi = 0;
+            loading = true;
             playing = true;
             document.getElementById('info').textContent = ch.name + ' - Conectando...';
             pnext();
@@ -101,6 +107,7 @@
         function pnext() {
             if (bi >= bk.length) {
                 document.getElementById('info').textContent = 'Sin fuente disponible';
+                loading = false;
                 playing = false;
                 return;
             }
@@ -109,6 +116,12 @@
             if (hls) { hls.destroy(); hls = null; }
             
             var u = bk[bi];
+            if (u === curUrl) {
+                bi++;
+                pnext();
+                return;
+            }
+            curUrl = u;
             document.getElementById('info').textContent = (fl[i].name) + ' - Fuente ' + (bi + 1) + '...';
             
             if (u.indexOf('.m3u8') >= 0 && HLS.isSupported()) {
@@ -116,39 +129,57 @@
                 hls.loadSource(u);
                 hls.attachMedia(v);
                 hls.on(HLS.Events.MANIFEST_PARSED, function() {
-                    v.play();
+                    v.play().catch(function() {});
                 });
                 hls.on(HLS.Events.ERROR, function(e, d) {
                     if (d.fatal) { bi++; pnext(); }
                 });
+                hls.on(HLS.Events.FRAG_LOADED, function() {
+                    loading = false;
+                    document.getElementById('info').textContent = fl[i].name + ' - EN VIVO';
+                    fs();
+                });
             } else {
                 v.src = u;
                 v.volume = 1;
-                v.onloadeddata = function() { v.play(); };
+                v.onloadeddata = function() { v.play().catch(function() {}); };
                 v.onplay = function() {
+                    loading = false;
                     document.getElementById('info').textContent = fl[i].name + ' - EN VIVO';
                     fs();
                 };
-                v.onerror = function() { bi++; pnext(); };
+                v.onerror = function() { 
+                    bi++; 
+                    if (bi < bk.length) pnext(); 
+                    else {
+                        document.getElementById('info').textContent = 'Sin fuente disponible';
+                        loading = false;
+                        playing = false;
+                    }
+                };
                 v.play().catch(function() { bi++; pnext(); });
             }
-            
-            rlist();
         }
         
         function fs() {
+            if (!playing) return;
             isFs = !isFs;
             var t = document.getElementById('tv');
             t.classList.toggle('fs', isFs);
-            if (isFs && t.requestFullscreen) t.requestFullscreen();
+            if (isFs && t.requestFullscreen) {
+                t.requestFullscreen().catch(function() {});
+            }
         }
         
         function stop() {
             playing = false;
+            loading = false;
+            curUrl = '';
             var v = document.getElementById('v');
             v.pause();
-            v.src = '';
             if (hls) { hls.destroy(); hls = null; }
+            v.src = '';
+            v.load();
             document.getElementById('info').textContent = 'Selecciona un canal';
             if (isFs) {
                 isFs = false;
@@ -161,24 +192,23 @@
         }
         
         document.onkeydown = function(e) {
+            if (!fl.length) return;
             var m = fl.length - 1;
             
             if (playing) {
-                if (e.keyCode === 38) { i = Math.max(0, i - 1); play(); }
-                else if (e.keyCode === 40) { i = Math.min(m, i + 1); play(); }
-                else if (e.keyCode === 27) stop();
-                else if (e.keyCode === 37) { i = Math.max(0, i - 1); play(); }
-                else if (e.keyCode === 39) { i = Math.min(m, i + 1); play(); }
+                if (e.keyCode === 38) { i = Math.max(0, i - 1); play(); e.preventDefault(); }
+                else if (e.keyCode === 40) { i = Math.min(m, i + 1); play(); e.preventDefault(); }
+                else if (e.keyCode === 27) { stop(); e.preventDefault(); }
+                else if (e.keyCode === 37) { i = Math.max(0, i - 1); play(); e.preventDefault(); }
+                else if (e.keyCode === 39) { i = Math.min(m, i + 1); play(); e.preventDefault(); }
             } else {
-                if (e.keyCode === 38) i = Math.max(0, i - 1);
-                else if (e.keyCode === 40) i = Math.min(m, i + 1);
-                else if (e.keyCode === 37) i = Math.max(0, i - 1);
-                else if (e.keyCode === 39) i = Math.min(m, i + 1);
-                else if (e.keyCode === 13 || e.keyCode === 32) play();
-                else if (e.keyCode === 27) stop();
+                if (e.keyCode === 38) { i = Math.max(0, i - 1); rlist(); e.preventDefault(); }
+                else if (e.keyCode === 40) { i = Math.min(m, i + 1); rlist(); e.preventDefault(); }
+                else if (e.keyCode === 37) { i = Math.max(0, i - 1); rlist(); e.preventDefault(); }
+                else if (e.keyCode === 39) { i = Math.min(m, i + 1); rlist(); e.preventDefault(); }
+                else if (e.keyCode === 13 || e.keyCode === 32) { play(); e.preventDefault(); }
+                else if (e.keyCode === 27) { stop(); e.preventDefault(); }
             }
-            
-            rlist();
         };
         
         document.getElementById('chs').onclick = function(e) {
