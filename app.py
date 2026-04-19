@@ -178,7 +178,7 @@ def api_tv():
     all_channels = []
     seen = set()
     
-    known_channels = [
+known_channels = [
         {'name': 'ESPN', 'url': 'http://38.41.8.1:8000/play/a0t3'},
         {'name': 'ESPN 2', 'url': 'http://38.41.8.1:8000/play/a0rp'},
         {'name': 'ESPN 3', 'url': 'http://38.41.8.1:8000/play/a0sw'},
@@ -192,10 +192,7 @@ def api_tv():
         {'name': 'TNT Sports', 'url': 'http://38.41.8.1:8000/play/a0sx'},
         {'name': 'TyC Sports', 'url': 'http://38.41.8.1:8000/play/a0zx'},
         {'name': 'Win Sports', 'url': 'http://38.41.8.1:8000/play/a0t3'},
-        {'name': 'HBO', 'url': 'http://38.187.3.110:8000/play/a07z/index.m3u8'},
-        {'name': 'HBO 2', 'url': 'http://45.181.120.65:9087/play/130/index.m3u8'},
-        {'name': 'HBO Family', 'url': 'http://45.181.120.65:9087/play/a0gt/index.m3u8'},
-        {'name': 'HBO Plus', 'url': 'http://38.250.125.162:9800/play/093/index.m3u8'},
+        {'name': 'HBO', 'url': 'http://45.181.120.65:9087/play/130/index.m3u8'},
         {'name': 'Star Channel', 'url': 'http://45.181.120.65:9087/play/109/index.m3u8'},
         {'name': 'Cinemax', 'url': 'http://38.41.8.1:8000/play/a0rp'},
         {'name': 'AMC', 'url': 'http://38.41.8.1:8000/play/a0t3'},
@@ -217,7 +214,7 @@ def api_tv():
         {'name': 'BBC World', 'url': 'http://38.41.8.1:8000/play/a0sw'},
         {'name': 'DW', 'url': 'http://38.41.8.1:8000/play/a0sv'},
     ]
-    
+
     for ch in known_channels:
         url = ch['url']
         key = (ch['name'], url)
@@ -228,6 +225,7 @@ def api_tv():
                 'url': url,
                 'streams': 3,
                 'fusion': True,
+                'is_hls': '.m3u8' in url,
                 'backups': [url]
             })
     

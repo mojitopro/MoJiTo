@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MoJiTo TV Lite</title>
+    <title>MoJiTo TV</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; overflow: hidden; background: #000; color: #fff; font-family: Arial, sans-serif; }
@@ -74,8 +74,9 @@
         .ch:hover { border-color: #00d4ff; background: #1a1a1a; }
         .ch.active { border-color: #4f4; background: #0a1a0a; }
         .ch .name { font-size: 12px; font-weight: bold; }
-        .ch .streams { font-size: 10px; color: #666; margin-top: 4px; }
-        .ch .streams.ok { color: #4f4; }
+        .ch .type { font-size: 10px; color: #666; margin-top: 2px; }
+        .ch .type.hls { color: #fa0; }
+        .ch .type.ts { color: #4f4; }
     </style>
 </head>
 <body>
@@ -91,7 +92,7 @@
         <div id="info">
             <div>
                 <div id="channel-name">Sin canal</div>
-                <div id="status" class="buffer">Esperando</div>
+                <div id="status" class="buffer">Selecciona un canal</div>
             </div>
             <div id="controls">
                 <button onclick="prev()">◀</button>
@@ -113,7 +114,6 @@
                 <option value="series">Series</option>
                 <option value="ninos">Niños</option>
                 <option value="noticias">Noticias</option>
-                <option value="musica">Música</option>
             </select>
         </div>
         <div id="channels"></div>
@@ -125,14 +125,13 @@
         
         var catMap = {
             'espn': 'deportes', 'fox sports': 'deportes', 'tnt sports': 'deportes',
-            'tyc': 'deportes', 'win': 'deportes', 'bein': 'deportes',
+            'tyc': 'deportes', 'win': 'deportes',
             'hbo': 'peliculas', 'cinemax': 'peliculas', 'star': 'peliculas',
-            'paramount': 'peliculas', 'golden': 'peliculas',
             'amc': 'series', 'axn': 'series', 'sony': 'series',
             'universal': 'series', 'fx': 'series', 'tnt': 'series',
             'disney': 'ninos', 'nick': 'ninos', 'cartoon': 'ninos',
             'cnn': 'noticias', 'bbc': 'noticias', 'dw': 'noticias',
-            'mtv': 'musica', 'vh1': 'musica'
+            'mtv': 'musica'
         };
         
         function getCat(name) {
@@ -141,32 +140,38 @@
             return 'series';
         }
         
-        function show(msg, type) {
-            var s = document.getElementById('status');
-            if (s) s.className = type;
-            if (s) s.textContent = msg;
+        function getType(url) {
+            if (url.indexOf('.m3u8') >= 0) return 'hls';
+            return 'ts';
         }
         
-        function showOverlay(msg) {
+        function show(msg, type) {
+            var s = document.getElementById('status');
+            if (s) { s.className = type || ''; s.textContent = msg; }
+        }
+        
+        function showOverlay(msg, show) {
             var o = document.getElementById('overlay');
-            if (msg) {
+            if (show) {
                 o.classList.remove('hidden');
-                o.querySelector('.msg').textContent = msg;
+                o.querySelector('.msg').textContent = msg || '';
             } else {
                 o.classList.add('hidden');
             }
         }
         
         function init() {
+            showOverlay('Cargando canales...', true);
             fetch('/api/tv').then(function(r) { return r.json(); })
             .then(function(d) {
                 all = d.channels || [];
                 render();
-                showOverlay('');
+                showOverlay('', false);
+                show('Selecciona un canal', '');
             })
             .catch(function(e) {
+                showOverlay('Error cargando canales', true);
                 console.log('Error:', e);
-                showOverlay('Sin conexión');
             });
         }
         
@@ -181,10 +186,11 @@
             var html = '';
             filt.forEach(function(c, i) {
                 var active = i === idx ? 'active' : '';
-                var ok = c.streams > 1 ? 'ok' : '';
+                var type = getType(c.url);
+                var typeClass = type;
                 html += '<div class="ch ' + active + '" onclick="play(' + i + ')">' +
                     '<div class="name">' + c.name + '</div>' +
-                    '<div class="streams ' + ok + '">' + c.streams + ' src</div></div>';
+                    '<div class="type ' + typeClass + '">' + type.toUpperCase() + '</div></div>';
             });
             document.getElementById('channels').innerHTML = html;
         }
@@ -194,49 +200,69 @@
         function play(i) {
             idx = i;
             var c = filt[i];
+            var url = c.url;
+            var type = getType(url);
+            
             document.getElementById('channel-name').textContent = c.name;
             show('Conectando...', 'buffer');
-            showOverlay('Conectando...');
+            showOverlay('Conectando...', true);
             
             var v = document.getElementById('video');
             v.pause();
             
-            if (hls) { hls.destroy(); hls = null; }
+            if (hls) {
+                hls.destroy();
+                hls = null;
+            }
             
-            var isM3U8 = c.url.indexOf('.m3u8') >= 0;
-            
-            if (isM3U8 && HLS.isSupported()) {
+            if (type === 'hls' && HLS.isSupported()) {
+                // HLS stream
                 hls = new HLS({ 
                     enableWorker: true,
                     lowLatencyMode: false,
                     maxLoadingDelay: 4,
                     maxBufferLength: 30
                 });
-                hls.loadSource(c.url);
+                hls.loadSource(url);
                 hls.attachMedia(v);
                 hls.on(HLS.Events.MANIFEST_PARSED, function() {
-                    showOverlay('');
+                    showOverlay('', false);
                     show('EN VIVO', 'online');
-                    v.play();
+                    v.play().catch(function(e) { console.log('Play error:', e); });
                 });
                 hls.on(HLS.Events.ERROR, function(e, data) {
                     if (data.fatal) {
-                        show('Error', 'error');
-                        showOverlay('Error');
+                        show('Error HLS', 'error');
+                        showOverlay('Error', true);
                     }
                 });
             } else {
-                v.src = c.url;
+                // Direct stream (TS)
+                v.src = url;
+                v.volume = 1;
+                
                 v.onloadeddata = function() {
-                    showOverlay('');
+                    showOverlay('', false);
                     show('EN VIVO', 'online');
                 };
-                v.onerror = function() {
-                    show('Error', 'error');
-                    showOverlay('No disponible');
+                
+                v.onplay = function() {
+                    showOverlay('', false);
+                    show('EN VIVO', 'online');
                 };
+                
                 v.onwaiting = function() { show('Buffering...', 'buffer'); };
-                v.onplaying = function() { show('EN VIVO', 'online'); showOverlay(''); };
+                v.onplaying = function() { show('EN VIVO', 'online'); showOverlay('', false); };
+                
+                v.onerror = function() {
+                    var err = v.error ? v.error.code : 'unknown';
+                    show('Error: ' + err, 'error');
+                    showOverlay('No disponible', true);
+                };
+                
+                v.play().catch(function(e) {
+                    show('Error: ' + e, 'error');
+                });
             }
             
             render();
@@ -245,8 +271,11 @@
         function togglePlay() {
             var v = document.getElementById('video');
             if (v.paused) {
-                if (v.src || (hls && hls.media)) v.play();
-                else if (idx >= 0) play(idx);
+                if (v.src || (hls && hls.media)) {
+                    v.play();
+                } else if (idx >= 0) {
+                    play(idx);
+                }
             } else {
                 v.pause();
                 show('Pausado', 'buffer');
@@ -269,10 +298,13 @@
             var v = document.getElementById('video');
             v.pause();
             v.src = '';
-            if (hls) { hls.destroy(); hls = null; }
+            if (hls) {
+                hls.destroy();
+                hls = null;
+            }
             document.getElementById('channel-name').textContent = 'Sin canal';
             show('Parado', 'buffer');
-            showOverlay('Parado');
+            showOverlay('Parado', true);
             idx = -1;
             render();
         }
@@ -282,8 +314,8 @@
         }
         
         document.onkeydown = function(e) {
-            if (e.keyCode === 37 || e.keyCode === 38) prev();
-            else if (e.keyCode === 39 || e.keyCode === 40) next();
+            if (e.keyCode === 37) prev();
+            else if (e.keyCode === 39) next();
             else if (e.keyCode === 13 || e.keyCode === 32) togglePlay();
             else if (e.keyCode === 27) stop();
         };

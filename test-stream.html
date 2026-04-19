@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Stream</title>
+    <style>
+        body { background: #000; color: #fff; font-family: Arial; text-align: center; padding: 20px; }
+        video { width: 80%; max-width: 800px; background: #111; }
+        button { padding: 15px 30px; font-size: 18px; margin: 10px; cursor: pointer; }
+        #msg { margin: 15px; font-size: 16px; }
+        .ok { color: #4f4; }
+        .error { color: #f44; }
+        .buffer { color: #fa0; }
+    </style>
+</head>
+<body>
+    <h1>Test Stream Player</h1>
+    <video id="v" controls></video>
+    <br>
+    <button onclick="play('http://38.41.8.1:8000/play/a0t3')">ESPN</button>
+    <button onclick="play('http://38.41.8.1:8000/play/a0sv')">TNT</button>
+    <button onclick="stop()">Stop</button>
+    <div id="msg">Selecciona un canal</div>
+
+    <script>
+    var v = document.getElementById('v');
+    var msg = document.getElementById('msg');
+    
+    function play(url) {
+        msg.textContent = 'Cargando... ' + url;
+        msg.className = 'buffer';
+        
+        v.src = url;
+        v.volume = 1;
+        
+        v.onloadeddata = function() {
+            msg.textContent = 'Listo! Play...';
+            msg.className = 'ok';
+            v.play().catch(e => msg.textContent = 'Play error: ' + e);
+        };
+        
+        v.onplaying = function() {
+            msg.textContent = 'REPRODUCIENDO!';
+            msg.className = 'ok';
+        };
+        
+        v.onwaiting = function() {
+            msg.textContent = 'Buffering...';
+            msg.className = 'buffer';
+        };
+        
+        v.onerror = function() {
+            msg.textContent = 'Error: ' + (v.error ? v.error.code : 'unknown');
+            msg.className = 'error';
+        };
+        
+        v.play().catch(e => {
+            msg.textContent = 'Error: ' + e;
+            msg.className = 'error';
+        });
+    }
+    
+    function stop() {
+        v.pause();
+        v.src = '';
+        msg.textContent = 'Parado';
+    }
+    </script>
+</body>
+</html>
