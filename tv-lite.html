@@ -58,7 +58,18 @@
 
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
     <script>
-        var all = [], fl = [], i = 0, hls = null, bk = [], bi = 0, playing = false, isFs = false, loading = false, curUrl = '';
+        var all = [], fl = [], i = 0, hls = null, bk = [], bi = 0, playing = false, isFs = false, loading = false;
+        
+        function isHD(url) {
+            var u = url.toLowerCase();
+            return u.indexOf('1080') >= 0 || u.indexOf('hd') >= 0 || u.indexOf('fhd') >= 0 || u.indexOf('full') >= 0;
+        }
+        
+        function sortByQuality(a, b) {
+            var ah = isHD(a) ? 1 : 0;
+            var bh = isHD(b) ? 1 : 0;
+            return bh - ah;
+        }
         
         function init() {
             fetch('/api/tv').then(r=>r.json()).then(d=>{
@@ -95,8 +106,8 @@
             if (!fl.length || loading) return;
             var ch = fl[i];
             if (!ch) return;
-            curUrl = ch.url;
             bk = ch.backups || [ch.url];
+            bk.sort(sortByQuality);
             bi = 0;
             loading = true;
             playing = true;
@@ -116,13 +127,7 @@
             if (hls) { hls.destroy(); hls = null; }
             
             var u = bk[bi];
-            if (u === curUrl) {
-                bi++;
-                pnext();
-                return;
-            }
-            curUrl = u;
-            document.getElementById('info').textContent = (fl[i].name) + ' - Fuente ' + (bi + 1) + '...';
+            document.getElementById('info').textContent = (fl[i].name) + ' - Fuente ' + (bi + 1) + ' de ' + bk.length + '...';
             
             if (u.indexOf('.m3u8') >= 0 && HLS.isSupported()) {
                 hls = new HLS({ enableWorker: true, maxBufferLength: 30 });
@@ -174,7 +179,6 @@
         function stop() {
             playing = false;
             loading = false;
-            curUrl = '';
             var v = document.getElementById('v');
             v.pause();
             if (hls) { hls.destroy(); hls = null; }
