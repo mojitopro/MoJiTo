@@ -2,9 +2,10 @@
 """
 MoJiTo Dashboard Server
 """
-from flask import Flask, jsonify, request, send_file
+from flask import Flask, jsonify, request, send_file, Response, stream_with_context
 from pathlib import Path
 import sqlite3
+import requests
 
 app = Flask(__name__)
 
@@ -311,6 +312,22 @@ def hls_js():
         return r.text, 200, {'Content-Type': 'application/javascript'}
     except:
         return '', 404
+
+
+@app.route('/stream/<path:url>')
+def proxy_stream(url):
+    try:
+        target = 'http://' + url
+        req = requests.get(target, stream=True, timeout=10, headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Referer': 'https://mojitopro.github.io/'
+        })
+        return Response(
+            stream_with_context(req.iter_content(chunk_size=8192)),
+            content_type=req.headers.get('content-type', 'video/mpeg')
+        )
+    except Exception as e:
+        return f'Stream error: {e}', 502
 
 
 @app.route('/health')
