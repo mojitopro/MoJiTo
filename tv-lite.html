@@ -15,7 +15,7 @@
             position: fixed; top:0; left:0; width:100vw; height:100vh; 
             z-index: 9999; background: #000;
         }
-        #tv.fs #v { object-fit: contain; }
+        #tv.fs #v { object-fit: cover; }
         
         #bar {
             position: absolute; bottom: 0; left: 0; right: 0;
@@ -57,6 +57,7 @@
         }
         .c.sel { border-color: #ff0; background: #332800; box-shadow: 0 0 12px rgba(255,255,0,0.4); }
         .c .n { font-size: 12px; font-weight: bold; }
+        .c .b { font-size: 10px; color: #4f4; margin-top: 2px; }
     </style>
 </head>
 <body>
@@ -88,7 +89,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
     <script>
-        var all = [], fl = [], i = 0, hls = null, bk = [], bi = 0;
+        var all = [], fl = [], i = 0, hls = null, bk = [], bi = 0, playing = false;
         var focus = 'ch';
         var isFs = false;
         
@@ -110,7 +111,11 @@
             fl = all.filter(x=>(!q||x.name.toLowerCase().indexOf(q)>=0)&&(!c||gc(x.name)===c));
             var h='';
             fl.forEach(function(x,idx){
-                h+='<div class="c'+(idx===i?' sel':'')+'" data-i="'+idx+'"><div class="n">'+x.name+'</div></div>';
+                var bc = (x.backups||[]).length;
+                h+='<div class="c'+(idx===i?' sel':'')+'" data-i="'+idx+'">'+
+                   '<div class="n">'+x.name+'</div>';
+                if(bc>0) h+='<div class="b">'+bc+' fuentes</div>';
+                h+='</div>';
             });
             document.getElementById('gs').innerHTML = h;
         }
@@ -127,20 +132,25 @@
             var ch = fl[i];
             bk = ch.backups||[ch.url];
             bi = 0;
+            playing = true;
             document.getElementById('ch').textContent = ch.name;
             show('Conectando...');
             playUrl();
         }
         
         function playUrl() {
-            if(bi>=bk.length){ show('Sin fuente'); return; }
+            if(bi>=bk.length){ 
+                show('Sin fuente'); 
+                playing = false;
+                return; 
+            }
             
             var v = document.getElementById('v');
             v.pause();
             if(hls){hls.destroy(); hls=null;}
             
             var u = bk[bi];
-            show('Intentando '+(bi+1)+'...');
+            show('Fuente '+(bi+1)+'/'+bk.length+'...');
             
             if(u.indexOf('.m3u8')>=0 && HLS.isSupported()){
                 hls = new HLS({enableWorker:true,maxBufferLength:30});
@@ -157,11 +167,23 @@
                 v.src = u;
                 v.volume = 1;
                 v.onloadeddata = function(){ show('EN VIVO'); v.play(); };
-                v.onplay = function(){ show('EN VIVO'); };
+                v.onplay = function(){ show('EN VIVO'); playing = true; };
                 v.onwaiting = function(){ show('Buffer...'); };
                 v.onerror = function(){ bi++; playUrl(); };
                 v.play().catch(function(){ bi++; playUrl(); });
             }
+            rl();
+        }
+        
+        function stop() {
+            playing = false;
+            var v = document.getElementById('v');
+            v.pause();
+            v.src = '';
+            if(hls){hls.destroy(); hls=null;}
+            document.getElementById('ch').textContent = playing ? fl[i].name : 'MoJiTo TV';
+            show(playing ? 'EN VIVO' : 'Parado - Selecciona canal');
+            i = 0;
             rl();
         }
         
@@ -207,15 +229,12 @@
             }
             else if(e.keyCode===13 || e.keyCode===32){
                 if(focus==='full') fs();
+                else if(playing) stop();
                 else play();
             }
             else if(e.keyCode===27){
-                if(isFs) fs();
-                else {
-                    document.getElementById('v').pause();
-                    document.getElementById('ch').textContent='MoJiTo TV';
-                    show('Parado');
-                }
+                if(playing) stop();
+                else if(isFs) fs();
             }
             else if(e.keyCode===70) fs();
             
@@ -223,10 +242,11 @@
         };
         
         document.getElementById('fullBtn').onclick = fs;
+        document.getElementById('v').ondblclick = fs;
         
         document.getElementById('gs').onclick = function(e){
             var c = e.target.closest('.c');
-            if(c){ i=parseInt(c.dataset.i); focus='ch'; rl(); play(); updSel(); }
+            if(c){ i=parseInt(c.dataset.i); focus='ch'; play(); updSel(); }
         };
         
         window.onload = init;
