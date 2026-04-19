@@ -150,7 +150,12 @@
             v.src = '';
             if (hls) { hls.destroy(); hls = null; }
             document.getElementById('info').textContent = 'Selecciona un canal';
-            if (isFs) fs();
+            if (isFs) {
+                isFs = false;
+                document.getElementById('tv').classList.remove('fs');
+                if (document.fullscreenElement) document.exitFullscreen();
+                else if (document.webkitFullscreenElement) document.webkitExitFullscreen();
+            }
             i = 0;
             rlist();
         }
