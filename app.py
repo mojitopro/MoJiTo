@@ -169,15 +169,17 @@ def tv():
     return send_file('tv.html')
 
 
+def is_hd(url):
+    u = url.lower()
+    return '1080' in u or '/hd/' in u or 'hd' in u or 'fhd' in u or '.m3u8' in u
+
 @app.route('/api/tv')
 def api_tv():
     import json
-    import re
     
     ROOT = Path(__file__).parent
     
-    all_channels = []
-    seen = set()
+    groups = {}
     
     for fname in ['premium_working.json', 'working_streams.json']:
         try:
@@ -185,20 +187,28 @@ def api_tv():
                 data = json.load(f)
             ch_list = data.get('channels', data) if isinstance(data, dict) else data
             for ch in ch_list:
-                name = ch.get('name', '')
-                url = ch.get('url', '')
-                fallbacks = ch.get('fallbacks', [])
-                if name and url and (name, url) not in seen:
-                    seen.add((name, url))
-                    all_channels.append({
-                        'name': name,
-                        'url': url,
-                        'streams': len(fallbacks) + 1,
-                        'fusion': len(fallbacks) > 0,
-                        'backups': [url] + fallbacks
-                    })
+                name = ch.get('name', '').strip()
+                url = ch.get('url', '').strip()
+                if name and url:
+                    if name not in groups:
+                        groups[name] = []
+                    groups[name].append(url)
         except:
             pass
+    
+    all_channels = []
+    for name, urls in groups.items():
+        urls = list(dict.fromkeys(urls))
+        urls.sort(key=lambda x: (not is_hd(x), x))
+        all_channels.append({
+            'name': name,
+            'url': urls[0],
+            'streams': len(urls),
+            'fusion': len(urls) > 1,
+            'backups': urls
+        })
+    
+    all_channels.sort(key=lambda x: x['name'])
     
     return jsonify({
         'status': 'ok',
