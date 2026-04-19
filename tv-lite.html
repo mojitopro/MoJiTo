@@ -6,299 +6,145 @@
     <title>MoJiTo TV</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; background: #000; color: #fff; font-family: Arial, sans-serif; }
+        html, body { height: 100%; background: #000; color: #fff; font-family: Arial, sans-serif; overflow: hidden; }
         
         #player { position: relative; width: 100%; height: 55vh; background: #000; }
         #video { width: 100%; height: 100%; object-fit: contain; background: #000; }
         
         #overlay {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.9);
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.85);
+            display: flex; align-items: center; justify-content: center;
             z-index: 10;
         }
         #overlay.hidden { display: none; }
-        #overlay .spinner {
-            width: 50px; height: 50px; border: 4px solid #333;
-            border-top: 4px solid #00d4ff; border-radius: 50%;
-            animation: spin 1s linear infinite; margin-bottom: 15px;
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); }
-        #overlay .title { font-size: 28px; color: #00d4ff; margin-bottom: 10px; }
-        #overlay .msg { font-size: 16px; color: #888; }
+        #overlay .txt { font-size: 24px; color: #00d4ff; }
         
-        #info {
+        #bar {
             position: absolute; bottom: 0; left: 0; right: 0;
             background: linear-gradient(transparent, rgba(0,0,0,0.9));
-            padding: 12px 15px;
+            padding: 10px 15px;
             display: flex; justify-content: space-between; align-items: center;
         }
-        #channel-name { font-size: 18px; color: #00d4ff; font-weight: bold; }
-        #status { font-size: 12px; }
-        #status.online { color: #4f4; }
-        #status.buffer { color: #fa0; }
-        #status.error { color: #f44; }
+        #ch { font-size: 16px; color: #00d4ff; font-weight: bold; }
+        #st { font-size: 12px; color: #666; }
         
-        #controls { display: flex; gap: 8px; align-items: center; }
-        #controls button {
-            background: rgba(255,255,255,0.1); border: 1px solid #444;
-            color: #fff; padding: 8px 14px; border-radius: 4px;
-            cursor: pointer; font-size: 14px;
+        #fullBtn {
+            background: #222; border: 1px solid #444;
+            color: #fff; padding: 8px 20px; border-radius: 4px;
+            font-size: 14px; cursor: pointer;
         }
-        #controls button:hover { background: rgba(255,255,255,0.2); }
-        #controls button.active { background: #00d4ff; color: #000; }
-        #vol { width: 70px; }
         
         #list { height: 45vh; background: #0a0a0a; overflow-y: auto; }
-        #search { display: flex; gap: 10px; padding: 10px; background: #111; }
-        #search input, #search select {
+        #srch { display: flex; gap: 8px; padding: 8px; background: #111; }
+        #srch input, #srch select {
             background: #222; border: 1px solid #444; color: #fff;
-            padding: 8px; border-radius: 4px; font-size: 14px;
+            padding: 6px 10px; border-radius: 4px; font-size: 13px;
         }
-        #search input { flex: 1; }
+        #srch input { flex: 1; }
         
-        #channels {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-            gap: 4px;
-            padding: 8px;
-        }
+        #chs { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 4px; padding: 8px; }
         .ch {
-            background: #151515; border: 2px solid #333;
+            background: #151515; border: 2px solid #222;
             border-radius: 4px; padding: 8px 4px;
             text-align: center; cursor: pointer;
-            transition: all 0.1s;
         }
-        .ch:hover { border-color: #00d4ff; }
-        .ch.active { border-color: #4f4; background: #0a1a0a; }
-        .ch.selected { border-color: #ff0; background: #221a00; box-shadow: 0 0 8px #ff0; }
-        .ch .name { font-size: 10px; font-weight: bold; }
+        .ch.sel { border-color: #ff0; background: #221a00; }
+        .ch .n { font-size: 10px; }
     </style>
 </head>
 <body>
     <div id="player">
-        <video id="video" controls playsinline webkit-playsinline></video>
-        
-        <div id="overlay" class="hidden">
-            <div class="spinner"></div>
-            <div class="title">MoJiTo TV</div>
-            <div class="msg">Cargando...</div>
-        </div>
-        
-        <div id="info">
-            <div>
-                <div id="channel-name">Sin canal</div>
-                <div id="status" class="buffer">Selecciona un canal</div>
-            </div>
-            <div id="controls">
-                <button onclick="playCurrent()">Play</button>
-                <button onclick="stop()">Stop</button>
-                <button onclick="fullScreen()">Full</button>
-                <input type="range" id="vol" min="0" max="100" value="100" onchange="setVol(this.value)">
-            </div>
+        <video id="v" controls playsinline webkit-playsinline></video>
+        <div id="overlay" class="hidden"><div class="txt">MoJiTo TV</div></div>
+        <div id="bar">
+            <div><div id="ch">Sin canal</div><div id="st">Selecciona</div></div>
+            <button id="fullBtn" onclick="fs()">Full</button>
         </div>
     </div>
     
     <div id="list">
-        <div id="search">
-            <input type="text" placeholder="Buscar..." oninput="filter()" id="q">
-            <select onchange="filter()" id="cat">
-                <option value="">Todos</option>
-                <option value="deportes">Deportes</option>
-                <option value="peliculas">Peliculas</option>
-                <option value="series">Series</option>
-                <option value="ninos">Ninos</option>
-                <option value="noticias">Noticias</option>
-            </select>
+        <div id="srch">
+            <input type="text" placeholder="Buscar..." oninput="fltr()" id="q">
+            <select onchange="fltr()" id="ct"><option value="">Todos</option><option value="deportes">Deportes</option><option value="peliculas">Peliculas</option><option value="series">Series</option><option value="ninos">Ninos</option></select>
         </div>
-        <div id="channels"></div>
+        <div id="chs"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
     <script>
-        var all = [], filt = [], idx = 0, hls = null;
-        var currentBackups = [], backupIdx = 0;
-        var cols = 3;
+        var all = [], flt = [], i = 0, hls = null, bkus = [], bi = 0;
         
-        var catMap = {
-            'espn': 'deportes', 'fox sports': 'deportes', 'tnt sports': 'deportes',
-            'tyc': 'deportes', 'win': 'deportes', 'bein': 'deportes',
-            'hbo': 'peliculas', 'cinemax': 'peliculas', 'star': 'peliculas',
-            'amc': 'series', 'axn': 'series', 'sony': 'series',
-            'universal': 'series', 'fx': 'series', 'tnt': 'series',
-            'disney': 'ninos', 'nick': 'ninos', 'cartoon': 'ninos', 'adult': 'ninos',
-            'cnn': 'noticias', 'bbc': 'noticias', 'dw': 'noticias',
-            'mtv': 'musica'
-        };
+        var catM = {'espn':'deportes','fox':'deportes','tnt sports':'deportes','tyc':'deportes','win':'deportes','hbo':'peliculas','cinemax':'peliculas','star':'peliculas','amc':'series','axn':'series','sony':'series','universal':'series','fx':'series','tnt':'series','disney':'ninos','nick':'ninos','cartoon':'ninos','adult':'ninos','cnn':'noticias','bbc':'noticias'};
         
-        function getCat(name) {
-            name = name.toLowerCase();
-            for (var k in catMap) if (name.indexOf(k) >= 0) return catMap[k];
-            return 'series';
-        }
-        
-        function show(msg, type) {
-            var s = document.getElementById('status');
-            if (s && msg !== undefined) { s.className = type || ''; s.textContent = msg; }
-        }
-        
-        function showOverlay(msg, show) {
-            var o = document.getElementById('overlay');
-            if (show) {
-                o.classList.remove('hidden');
-                o.querySelector('.msg').textContent = msg || '';
-            } else {
-                o.classList.add('hidden');
-            }
-        }
+        function gc(n) { n = n.toLowerCase(); for(var k in catM) if(n.indexOf(k)>=0) return catM[k]; return 'series'; }
+        function show(t,s){ document.getElementById('st').textContent=t; document.getElementById('st').className=s; }
         
         function init() {
-            cols = Math.floor(window.innerWidth / 100);
-            showOverlay('Cargando canales...', true);
-            fetch('/api/tv').then(function(r) { return r.json(); })
-            .then(function(d) {
-                all = d.channels || [];
-                filt = all;
-                render();
-                showOverlay('', false);
-                show('Selecciona un canal', '');
+            fetch('/api/tv').then(r=>r.json()).then(d=>{
+                all = d.channels||[];
+                flt = all;
+                rnder();
             });
         }
         
-        function render() {
-            filt = all.filter(function(c) {
-                var q = document.getElementById('q').value.toLowerCase();
-                var cat = document.getElementById('cat').value;
-                return (!q || c.name.toLowerCase().indexOf(q) >= 0) && 
-                       (!cat || getCat(c.name) === cat);
-            });
-            
-            var html = '';
-            filt.forEach(function(c, i) {
-                var active = i === idx ? 'active' : '';
-                var sel = i === idx ? 'selected' : '';
-                html += '<div class="ch ' + active + ' ' + sel + '" data-i="' + i + '">' +
-                    '<div class="name">' + c.name + '</div></div>';
-            });
-            document.getElementById('channels').innerHTML = html;
-            scrollToSelected();
+        function rnder() {
+            flt = all.filter(c=>(!q.value||c.name.toLowerCase().indexOf(q.value.toLowerCase())>=0) && (!ct.value||gc(c.name)===ct.value));
+            var h=''; flt.forEach((c,x)=>h+='<div class="ch'+(x===i?' sel':'')+'" data-i="'+x+'"><div class="n">'+c.name+'</div></div>');
+            document.getElementById('chs').innerHTML = h;
+            scrl();
         }
         
-        function filter() { render(); }
+        function fltr(){ rnder(); }
+        function scrl(){ var cs=document.querySelectorAll('.ch'); if(cs[i])cs[i].scrollIntoView({block:'nearest'}); }
         
-        function scrollToSelected() {
-            var chs = document.querySelectorAll('.ch');
-            if (chs[idx]) {
-                chs[idx].scrollIntoView({block: 'nearest'});
-            }
-        }
-        
-        function playCurrent() {
-            if (filt.length === 0) return;
-            var c = filt[idx];
-            currentBackups = c.backups || [c.url];
-            backupIdx = 0;
+        function play() {
+            if(!flt.length) return;
+            var c = flt[i];
+            bkus = c.backups||[c.url];
+            bi = 0;
+            document.getElementById('ch').textContent = c.name;
+            show('Conectando...','st');
             
-            document.getElementById('channel-name').textContent = c.name;
-            show('Conectando...', 'buffer');
-            showOverlay('Conectando...', true);
-            
-            var v = document.getElementById('video');
+            var v = document.getElementById('v');
             v.pause();
+            if(hls){hls.destroy(); hls=null;}
             
-            if (hls) { hls.destroy(); hls = null; }
-            
-            var url = currentBackups[backupIdx];
-            var type = url.indexOf('.m3u8') >= 0 ? 'hls' : 'ts';
-            
-            if (type === 'hls' && HLS.isSupported()) {
-                hls = new HLS({enableWorker: true, lowLatencyMode: false, maxLoadingDelay: 4, maxBufferLength: 30});
-                hls.loadSource(url);
+            var u = bkus[bi];
+            if(u.indexOf('.m3u8')>=0 && HLS.isSupported()){
+                hls = new HLS({enableWorker:true,maxBufferLength:30});
+                hls.loadSource(u);
                 hls.attachMedia(v);
-                hls.on(HLS.Events.MANIFEST_PARSED, function() {
-                    showOverlay('', false);
-                    show('EN VIVO', 'online');
-                    v.play();
-                });
-                hls.on(HLS.Events.ERROR, function(e, data) {
-                    if (data.fatal) playBackup();
-                });
+                hls.on(HLS.Events.MANIFEST_PARSED, ()=>{ show('EN VIVO','st'); v.play(); });
+                hls.on(HLS.Events.ERROR, (e,d)=>{ if(d.fatal) nxt(); });
             } else {
-                v.src = url;
+                v.src = u;
                 v.volume = 1;
-                v.onloadeddata = function() { showOverlay('', false); show('EN VIVO', 'online'); v.play(); };
-                v.onplay = function() { showOverlay('', false); show('EN VIVO', 'online'); };
-                v.onwaiting = function() { show('Buffering...', 'buffer'); };
-                v.onerror = function() { playBackup(); };
-                v.play().catch(function() { playBackup(); });
+                v.onloadeddata = ()=>{ show('EN VIVO','st'); v.play(); };
+                v.onerror = nxt;
+                v.play().catch(nxt);
             }
-            
-            render();
+            rnder();
         }
         
-        function playBackup() {
-            backupIdx++;
-            if (backupIdx < currentBackups.length) {
-                show('Alt ' + (backupIdx + 1) + '...', 'buffer');
-                setTimeout(playCurrent, 300);
-            } else {
-                show('Sin fuente', 'error');
-                showOverlay('Error', true);
-                backupIdx = 0;
-            }
-        }
+        function nxt(){ bi++; if(bi<bkus.length){ show('Alt...','st'); setTimeout(play,300); } else { show('Sin fuente','st'); bi=0; } }
         
-        function stop() {
-            var v = document.getElementById('video');
-            v.pause();
-            v.src = '';
-            if (hls) { hls.destroy(); hls = null; }
-            document.getElementById('channel-name').textContent = 'Sin canal';
-            show('Parado', 'buffer');
-            showOverlay('Parado', true);
-        }
-        
-        function fullScreen() {
-            var p = document.getElementById('player');
-            if (p.requestFullscreen) p.requestFullscreen();
-            else if (p.webkitRequestFullScreen) p.webkitRequestFullScreen();
-        }
-        
-        function setVol(val) {
-            document.getElementById('video').volume = val / 100;
-        }
+        function fs(){ var p=document.getElementById('player'); if(p.requestFullscreen)p.requestFullscreen(); else if(p.webkitRequestFullScreen)p.webkitRequestFullScreen(); }
         
         document.onkeydown = function(e) {
-            var max = filt.length - 1;
-            if (e.keyCode === 38) { // Up
-                idx = Math.max(0, idx - cols);
-                render();
-            } else if (e.keyCode === 40) { // Down
-                idx = Math.min(max, idx + cols);
-                render();
-            } else if (e.keyCode === 37) { // Left
-                idx = Math.max(0, idx - 1);
-                render();
-            } else if (e.keyCode === 39) { // Right
-                idx = Math.min(max, idx + 1);
-                render();
-            } else if (e.keyCode === 13) { // Enter
-                playCurrent();
-            } else if (e.keyCode === 27) { // Escape
-                stop();
-            } else if (e.keyCode === 70) { // F
-                fullScreen();
-            }
+            var m = flt.length - 1;
+            if(e.keyCode===38){ i=Math.max(0,i-Math.floor(window.innerWidth/90)); rnder(); }
+            else if(e.keyCode===40){ i=Math.min(m,i+Math.floor(window.innerWidth/90)); rnder(); }
+            else if(e.keyCode===37){ i=Math.max(0,i-1); rnder(); }
+            else if(e.keyCode===39){ i=Math.min(m,i+1); rnder(); }
+            else if(e.keyCode===13||e.keyCode===32) play();
+            else if(e.keyCode===27){ document.getElementById('v').pause(); document.getElementById('ch').textContent='Sin canal'; show('Parado','st'); }
+            else if(e.keyCode===70) fs();
         };
         
-        document.getElementById('channels').onclick = function(e) {
-            var ch = e.target.closest('.ch');
-            if (ch) {
-                idx = parseInt(ch.dataset.i);
-                render();
-                playCurrent();
-            }
+        document.getElementById('chs').onclick = function(e){
+            var c = e.target.closest('.ch');
+            if(c){ i=parseInt(c.dataset.i); rnder(); play(); }
         };
         
         window.onload = init;
