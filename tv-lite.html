@@ -8,29 +8,8 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100%; overflow: hidden; background: #000; color: #fff; font-family: Arial, sans-serif; }
         
-        #player { 
-            position: relative; 
-            width: 100%; 
-            height: 55vh; 
-            background: #000; 
-        }
-        
-        #video { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: contain; 
-            background: #000; 
-        }
-        
-        #player:-webkit-full-screen {
-            width: 100vw !important;
-            height: 100vh !important;
-        }
-        
-        #player:fullscreen {
-            width: 100vw !important;
-            height: 100vh !important;
-        }
+        #player { position: relative; width: 100%; height: 55vh; background: #000; }
+        #video { width: 100%; height: 100%; object-fit: contain; background: #000; }
         
         #overlay {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
@@ -45,14 +24,14 @@
             border-top: 4px solid #00d4ff; border-radius: 50%;
             animation: spin 1s linear infinite; margin-bottom: 15px;
         }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spin { 100% { transform: rotate(360deg); }
         #overlay .title { font-size: 28px; color: #00d4ff; margin-bottom: 10px; }
         #overlay .msg { font-size: 16px; color: #888; }
         
         #info {
             position: absolute; bottom: 0; left: 0; right: 0;
             background: linear-gradient(transparent, rgba(0,0,0,0.9));
-            padding: 15px;
+            padding: 12px 15px;
             display: flex; justify-content: space-between; align-items: center;
         }
         #channel-name { font-size: 18px; color: #00d4ff; font-weight: bold; }
@@ -61,7 +40,7 @@
         #status.buffer { color: #fa0; }
         #status.error { color: #f44; }
         
-        #controls { display: flex; gap: 8px; }
+        #controls { display: flex; gap: 8px; align-items: center; }
         #controls button {
             background: rgba(255,255,255,0.1); border: 1px solid #444;
             color: #fff; padding: 8px 14px; border-radius: 4px;
@@ -69,12 +48,10 @@
         }
         #controls button:hover { background: rgba(255,255,255,0.2); }
         #controls button.active { background: #00d4ff; color: #000; }
-        #vol { width: 80px; vertical-align: middle; }
+        #vol { width: 70px; }
         
         #list { height: 45vh; background: #0a0a0a; overflow-y: auto; }
-        #search { 
-            display: flex; gap: 10px; padding: 10px; background: #111; 
-        }
+        #search { display: flex; gap: 10px; padding: 10px; background: #111; }
         #search input, #search select {
             background: #222; border: 1px solid #444; color: #fff;
             padding: 8px; border-radius: 4px; font-size: 14px;
@@ -83,20 +60,20 @@
         
         #channels {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 6px;
-            padding: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 4px;
+            padding: 8px;
         }
         .ch {
             background: #151515; border: 2px solid #333;
-            border-radius: 6px; padding: 10px 6px;
+            border-radius: 4px; padding: 8px 4px;
             text-align: center; cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.1s;
         }
         .ch:hover { border-color: #00d4ff; }
         .ch.active { border-color: #4f4; background: #0a1a0a; }
-        .ch .name { font-size: 11px; font-weight: bold; }
-        .ch .status { font-size: 9px; color: #666; margin-top: 2px; }
+        .ch.selected { border-color: #ff0; background: #221a00; box-shadow: 0 0 8px #ff0; }
+        .ch .name { font-size: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -115,11 +92,9 @@
                 <div id="status" class="buffer">Selecciona un canal</div>
             </div>
             <div id="controls">
-                <button onclick="prev()">◀</button>
-                <button onclick="togglePlay()">▶</button>
-                <button onclick="next()">▶</button>
-                <button onclick="stop()">■</button>
-                <button onclick="fullScreen()">⛶</button>
+                <button onclick="playCurrent()">Play</button>
+                <button onclick="stop()">Stop</button>
+                <button onclick="fullScreen()">Full</button>
                 <input type="range" id="vol" min="0" max="100" value="100" onchange="setVol(this.value)">
             </div>
         </div>
@@ -131,9 +106,9 @@
             <select onchange="filter()" id="cat">
                 <option value="">Todos</option>
                 <option value="deportes">Deportes</option>
-                <option value="peliculas">Películas</option>
+                <option value="peliculas">Peliculas</option>
                 <option value="series">Series</option>
-                <option value="ninos">Niños</option>
+                <option value="ninos">Ninos</option>
                 <option value="noticias">Noticias</option>
             </select>
         </div>
@@ -142,9 +117,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.10/dist/hls.min.js"></script>
     <script>
-        var all = [], filt = [], idx = -1, hls = null;
-        var currentBackups = [], backupIdx = 0, retryTimeout = null;
-        var isRetrying = false;
+        var all = [], filt = [], idx = 0, hls = null;
+        var currentBackups = [], backupIdx = 0;
+        var cols = 3;
         
         var catMap = {
             'espn': 'deportes', 'fox sports': 'deportes', 'tnt sports': 'deportes',
@@ -179,17 +154,15 @@
         }
         
         function init() {
+            cols = Math.floor(window.innerWidth / 100);
             showOverlay('Cargando canales...', true);
             fetch('/api/tv').then(function(r) { return r.json(); })
             .then(function(d) {
                 all = d.channels || [];
+                filt = all;
                 render();
                 showOverlay('', false);
                 show('Selecciona un canal', '');
-            })
-            .catch(function(e) {
-                showOverlay('Error cargando canales', true);
-                console.log('Error:', e);
             });
         }
         
@@ -204,36 +177,30 @@
             var html = '';
             filt.forEach(function(c, i) {
                 var active = i === idx ? 'active' : '';
-                var st = c.streams || 1;
-                html += '<div class="ch ' + active + '" onclick="play(' + i + ')">' +
-                    '<div class="name">' + c.name + '</div>' +
-                    '<div class="status">' + st + ' fuentes</div></div>';
+                var sel = i === idx ? 'selected' : '';
+                html += '<div class="ch ' + active + ' ' + sel + '" data-i="' + i + '">' +
+                    '<div class="name">' + c.name + '</div></div>';
             });
             document.getElementById('channels').innerHTML = html;
+            scrollToSelected();
         }
         
         function filter() { render(); }
         
-        function play(i, useBackup) {
-            if (i !== undefined) {
-                idx = i;
-                var c = filt[i];
-                currentBackups = c.backups || [c.url];
-                backupIdx = useBackup || 0;
+        function scrollToSelected() {
+            var chs = document.querySelectorAll('.ch');
+            if (chs[idx]) {
+                chs[idx].scrollIntoView({block: 'nearest'});
             }
-            
-            if (backupIdx >= currentBackups.length) {
-                backupIdx = 0;
-                show('Sin fuente disponible', 'error');
-                showOverlay('Sin fuente', true);
-                return;
-            }
-            
+        }
+        
+        function playCurrent() {
+            if (filt.length === 0) return;
             var c = filt[idx];
-            var url = currentBackups[backupIdx];
-            var type = url.indexOf('.m3u8') >= 0 ? 'hls' : 'ts';
+            currentBackups = c.backups || [c.url];
+            backupIdx = 0;
             
-            document.getElementById('channel-name').textContent = c.name + (backupIdx > 0 ? ' (alt' + backupIdx + ')' : '');
+            document.getElementById('channel-name').textContent = c.name;
             show('Conectando...', 'buffer');
             showOverlay('Conectando...', true);
             
@@ -241,15 +208,12 @@
             v.pause();
             
             if (hls) { hls.destroy(); hls = null; }
-            clearTimeout(retryTimeout);
+            
+            var url = currentBackups[backupIdx];
+            var type = url.indexOf('.m3u8') >= 0 ? 'hls' : 'ts';
             
             if (type === 'hls' && HLS.isSupported()) {
-                hls = new HLS({ 
-                    enableWorker: true,
-                    lowLatencyMode: false,
-                    maxLoadingDelay: 4,
-                    maxBufferLength: 30
-                });
+                hls = new HLS({enableWorker: true, lowLatencyMode: false, maxLoadingDelay: 4, maxBufferLength: 30});
                 hls.loadSource(url);
                 hls.attachMedia(v);
                 hls.on(HLS.Events.MANIFEST_PARSED, function() {
@@ -258,79 +222,31 @@
                     v.play();
                 });
                 hls.on(HLS.Events.ERROR, function(e, data) {
-                    if (data.fatal) {
-                        tryNextBackup();
-                    }
+                    if (data.fatal) playBackup();
                 });
             } else {
                 v.src = url;
                 v.volume = 1;
-                
-                v.onloadeddata = function() {
-                    showOverlay('', false);
-                    show('EN VIVO', 'online');
-                    v.play();
-                };
-                
-                v.onplay = function() {
-                    show('EN VIVO', 'online');
-                    showOverlay('', false);
-                    isRetrying = false;
-                };
-                
+                v.onloadeddata = function() { showOverlay('', false); show('EN VIVO', 'online'); v.play(); };
+                v.onplay = function() { showOverlay('', false); show('EN VIVO', 'online'); };
                 v.onwaiting = function() { show('Buffering...', 'buffer'); };
-                v.onplaying = function() { 
-                    show('EN VIVO', 'online'); 
-                    showOverlay('', false);
-                    isRetrying = false;
-                };
-                
-                v.onerror = function() {
-                    tryNextBackup();
-                };
-                
-                v.play().catch(function(e) { tryNextBackup(); });
+                v.onerror = function() { playBackup(); };
+                v.play().catch(function() { playBackup(); });
             }
             
             render();
         }
         
-        function tryNextBackup() {
+        function playBackup() {
             backupIdx++;
             if (backupIdx < currentBackups.length) {
-                show('Intentando fuente alternativa...', 'buffer');
-                setTimeout(function() { play(undefined, backupIdx); }, 500);
+                show('Alt ' + (backupIdx + 1) + '...', 'buffer');
+                setTimeout(playCurrent, 300);
             } else {
-                show('Todas las fuentes fallan', 'error');
+                show('Sin fuente', 'error');
                 showOverlay('Error', true);
                 backupIdx = 0;
             }
-        }
-        
-        function togglePlay() {
-            var v = document.getElementById('video');
-            if (v.paused) {
-                if (v.src || (hls && hls.media)) {
-                    v.play();
-                } else if (idx >= 0) {
-                    play(idx);
-                }
-            } else {
-                v.pause();
-                show('Pausado', 'buffer');
-            }
-        }
-        
-        function prev() {
-            if (filt.length === 0) return;
-            idx = (idx - 1 + filt.length) % filt.length;
-            play(idx);
-        }
-        
-        function next() {
-            if (filt.length === 0) return;
-            idx = (idx + 1) % filt.length;
-            play(idx);
         }
         
         function stop() {
@@ -338,37 +254,52 @@
             v.pause();
             v.src = '';
             if (hls) { hls.destroy(); hls = null; }
-            clearTimeout(retryTimeout);
             document.getElementById('channel-name').textContent = 'Sin canal';
             show('Parado', 'buffer');
             showOverlay('Parado', true);
-            idx = -1;
-            backupIdx = 0;
-            render();
+        }
+        
+        function fullScreen() {
+            var p = document.getElementById('player');
+            if (p.requestFullscreen) p.requestFullscreen();
+            else if (p.webkitRequestFullScreen) p.webkitRequestFullScreen();
         }
         
         function setVol(val) {
             document.getElementById('video').volume = val / 100;
         }
         
-        function fullScreen() {
-            var p = document.getElementById('player');
-            if (p.requestFullscreen) {
-                p.requestFullscreen();
-            } else if (p.webkitRequestFullScreen) {
-                p.webkitRequestFullScreen();
-            }
-        }
-        
         document.onkeydown = function(e) {
-            if (e.keyCode === 37) prev();
-            else if (e.keyCode === 39) next();
-            else if (e.keyCode === 13 || e.keyCode === 32) togglePlay();
-            else if (e.keyCode === 27) stop();
-            else if (e.keyCode === 70) fullScreen(); // F for fullscreen
+            var max = filt.length - 1;
+            if (e.keyCode === 38) { // Up
+                idx = Math.max(0, idx - cols);
+                render();
+            } else if (e.keyCode === 40) { // Down
+                idx = Math.min(max, idx + cols);
+                render();
+            } else if (e.keyCode === 37) { // Left
+                idx = Math.max(0, idx - 1);
+                render();
+            } else if (e.keyCode === 39) { // Right
+                idx = Math.min(max, idx + 1);
+                render();
+            } else if (e.keyCode === 13) { // Enter
+                playCurrent();
+            } else if (e.keyCode === 27) { // Escape
+                stop();
+            } else if (e.keyCode === 70) { // F
+                fullScreen();
+            }
         };
         
-        document.getElementById('video').ondblclick = fullScreen;
+        document.getElementById('channels').onclick = function(e) {
+            var ch = e.target.closest('.ch');
+            if (ch) {
+                idx = parseInt(ch.dataset.i);
+                render();
+                playCurrent();
+            }
+        };
         
         window.onload = init;
     </script>
