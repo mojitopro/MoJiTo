@@ -179,58 +179,7 @@ def api_tv():
     all_channels = []
     seen = set()
     
-known_channels = [
-        {'name': 'ESPN', 'url': 'http://38.41.8.1:8000/play/a0t3'},
-        {'name': 'ESPN 2', 'url': 'http://38.41.8.1:8000/play/a0rp'},
-        {'name': 'ESPN 3', 'url': 'http://38.41.8.1:8000/play/a0sw'},
-        {'name': 'ESPN 4', 'url': 'http://38.41.8.1:8000/play/a0sv'},
-        {'name': 'ESPN 5', 'url': 'http://38.41.8.1:8000/play/a0rm'},
-        {'name': 'ESPN 6', 'url': 'http://38.41.8.1:8000/play/a0sx'},
-        {'name': 'ESPN 7', 'url': 'http://38.41.8.1:8000/play/a0zx'},
-        {'name': 'Fox Sports 1', 'url': 'http://38.41.8.1:8000/play/a0sw'},
-        {'name': 'Fox Sports 2', 'url': 'http://38.41.8.1:8000/play/a0sv'},
-        {'name': 'Fox Sports 3', 'url': 'http://38.41.8.1:8000/play/a0rm'},
-        {'name': 'TNT Sports', 'url': 'http://38.41.8.1:8000/play/a0sx'},
-        {'name': 'TyC Sports', 'url': 'http://38.41.8.1:8000/play/a0zx'},
-        {'name': 'Win Sports', 'url': 'http://38.41.8.1:8000/play/a0t3'},
-        {'name': 'HBO', 'url': 'http://45.181.120.65:9087/play/130/index.m3u8'},
-        {'name': 'Star Channel', 'url': 'http://45.181.120.65:9087/play/109/index.m3u8'},
-        {'name': 'Cinemax', 'url': 'http://38.41.8.1:8000/play/a0rp'},
-        {'name': 'AMC', 'url': 'http://38.41.8.1:8000/play/a0t3'},
-        {'name': 'TNT', 'url': 'http://38.41.8.1:8000/play/a0sv'},
-        {'name': 'FX', 'url': 'http://38.41.8.1:8000/play/a0sw'},
-        {'name': 'AXN', 'url': 'http://38.41.8.1:8000/play/a0rp'},
-        {'name': 'Sony', 'url': 'http://38.41.8.1:8000/play/a0t7'},
-        {'name': 'Universal', 'url': 'http://38.41.8.1:8000/play/a0t3'},
-        {'name': 'Paramount', 'url': 'http://38.41.8.1:8000/play/a0sx'},
-        {'name': 'Discovery Channel', 'url': 'http://38.41.8.1:8000/play/a0rm'},
-        {'name': 'Nat Geo', 'url': 'http://38.41.8.1:8000/play/a0t3'},
-        {'name': 'History', 'url': 'http://38.41.8.1:8000/play/a0t7'},
-        {'name': 'Animal Planet', 'url': 'http://38.41.8.1:8000/play/a0rp'},
-        {'name': 'Disney Channel', 'url': 'http://38.41.8.1:8000/play/a0sv'},
-        {'name': 'Nickelodeon', 'url': 'http://38.41.8.1:8000/play/a0rm'},
-        {'name': 'Cartoon Network', 'url': 'http://181.119.86.1:8000/play/a01g'},
-        {'name': 'MTV', 'url': 'http://38.41.8.1:8000/play/a0sx'},
-        {'name': 'CNN', 'url': 'http://38.41.8.1:8000/play/a0t3'},
-        {'name': 'BBC World', 'url': 'http://38.41.8.1:8000/play/a0sw'},
-        {'name': 'DW', 'url': 'http://38.41.8.1:8000/play/a0sv'},
-    ]
-
-    for ch in known_channels:
-        url = ch['url']
-        key = (ch['name'], url)
-        if key not in seen:
-            seen.add(key)
-            all_channels.append({
-                'name': ch['name'],
-                'url': url,
-                'streams': 3,
-                'fusion': True,
-                'is_hls': '.m3u8' in url,
-                'backups': [url]
-            })
-    
-    for fname in ['working_streams.json', 'premium_working.json']:
+    for fname in ['premium_working.json', 'working_streams.json']:
         try:
             with open(ROOT / fname) as f:
                 data = json.load(f)
