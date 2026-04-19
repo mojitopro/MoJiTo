@@ -176,7 +176,7 @@ def api_tv():
     ROOT = Path(__file__).parent
     groups = {}
     
-    for fname in ['premium_working.json', 'working_streams.json']:
+    for fname in ['custom_channels.json', 'premium_working.json', 'working_streams.json']:
         try:
             with open(ROOT / fname) as f:
                 data = json.load(f)
