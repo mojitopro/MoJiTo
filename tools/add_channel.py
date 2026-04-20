@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 """
-Add channel to custom_channels.json
-Usage:
-  python tools/add_channel.py "Channel Name"    - Add/search channel
-  python tools/add_channel.py --remove "Name"    - Remove channel and all backups
-  python tools/add_channel.py --clear          - Clear all channels
-  python tools/add_channel.py --list           - List all channels
+Add channel to custom_channels.json - fast, no testing
+Usage: python tools/add_channel.py "Channel Name"
 """
 import json
 import sys
@@ -45,7 +41,7 @@ def list_channels():
     print(f"Saved channels ({len(channels)}):")
     for ch in channels:
         backups = ch.get('backups', [])
-        print(f"  - {ch['name']}: {len(backups)} backups")
+        print(f"  - {ch['name']}: {len(backups)} urls")
 
 
 def remove_channel(name):
@@ -56,21 +52,17 @@ def remove_channel(name):
         return False
     del channels[idx]
     save_channels(channels)
-    print(f"Removed channel: {existing['name']} ({len(existing.get('backups', []))} backups)")
+    print(f"Removed: {existing['name']}")
     return True
 
 
 def clear_all():
-    channels = load_channels()
-    if not channels:
-        print("No channels to clear")
-        return
     save_channels([])
-    print(f"Cleared {len(channels)} channels")
+    print("Cleared all channels")
 
 
 def add_channel(channel_name):
-    print(f"Searching for: {channel_name}...")
+    print(f"Searching: {channel_name}...")
 
     result = searchtv.search(channel_name, limit=100)
 
@@ -79,59 +71,35 @@ def add_channel(channel_name):
         sys.exit(1)
 
     streams = result.get('streams', [])
-    print(f"Found {len(streams)} streams")
-
     if not streams:
         print("No streams found")
         sys.exit(1)
+
+    urls = [s['url'] for s in streams]
+    print(f"Found {len(urls)} streams")
 
     channels = load_channels()
     idx, existing = find_existing(channels, channel_name)
 
     if existing:
         print(f"Channel '{existing['name']}' already exists")
-        primary = existing['url']
-        existing_backups = set(existing.get('backups', []))
-
-        added_backups = []
-        for stream in streams:
-            url = stream['url']
-            if url != primary and url not in existing_backups:
-                existing_backups.add(url)
-                added_backups.append(url)
-                print(f"  Added backup: {url}")
-
-        existing['backups'] = list(existing_backups)
-
-        if added_backups:
-            print(f"Added {len(added_backups)} new backups")
-            save_channels(channels)
-            print("Updated custom_channels.json")
-        else:
-            print("No new backups to add")
+        existing['url'] = urls[0]
+        existing['backups'] = urls
     else:
-        primary = streams[0]['url']
-        backups = [s['url'] for s in streams]
-
-        new_channel = {
+        channels.append({
             "name": channel_name,
-            "url": primary,
-            "backups": backups
-        }
-        channels.append(new_channel)
+            "url": urls[0],
+            "backups": urls
+        })
 
-        print(f"Added new channel: {channel_name}")
-        print(f"  Primary: {primary}")
-        print(f"  Backups: {len(backups) - 1}")
-
-        save_channels(channels)
-        print("Saved to custom_channels.json")
+    save_channels(channels)
+    print(f"Saved {len(urls)} streams to custom_channels.json")
 
 
 def main():
     if len(sys.argv) < 2:
         print(f"Usage: python {sys.argv[0]} \"Channel Name\"")
-        print("       python {sys.argv[0]} --remove \"Channel Name\"")
+        print("       python {sys.argv[0]} --remove \"Name\"")
         print("       python {sys.argv[0]} --clear")
         print("       python {sys.argv[0]} --list")
         sys.exit(1)

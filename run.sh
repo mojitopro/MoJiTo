@@ -80,18 +80,30 @@ asyncio.run(run())
             echo "Run './run.sh pipeline' to process new streams"
         fi
         ;;
-    *)
+    channel)
+        shift
+        if [ -z "$1" ]; then
+            echo "Usage: $0 channel \"Channel Name\"   - Add channel from searchtv"
+            echo "       $0 channel --remove \"Name\" - Remove channel"
+            echo "       $0 channel --list         - List channels"
+            echo "       $0 channel --clear        - Clear all"
+        else
+            python3 tools/add_channel.py "$@"
+        fi
+        ;;
+*)
         echo "MoJiTo Control"
         echo ""
-        echo "Usage: $0 {start|stop|restart|status|pipeline|ingest}"
+        echo "Usage: $0 {start|stop|restart|status|pipeline|ingest|add|channel}"
         echo ""
         echo "Commands:"
         echo "  start    - Start daemon (auto-runs every 5 min)"
-        echo "  stop    - Stop daemon"
-        echo "  restart - Restart daemon"
-        echo "  status  - Show system status"
+        echo "  stop     - Stop daemon"
+        echo "  restart  - Restart daemon"
+        echo "  status   - Show system status"
         echo "  pipeline - Run one-time pipeline"
-        echo "  ingest  - Ingest all JSON/M3U files"
-        echo "  add     - Add streams from specific file"
-        ;;
-esac
+        echo "  ingest   - Ingest all JSON/M3U files"
+        echo "  add      - Add streams from specific file"
+        echo "  channel  - Add/manage custom channels"
+        echo ""
+        esac
