@@ -319,6 +319,12 @@
                 document.getElementById('ch-name').textContent = ch.name;
                 document.getElementById('playOverlay').style.display = 'none';
                 playCurrent();
+                setTimeout(function() {
+                    var card = document.querySelector('.ch-card.active');
+                    if (card) {
+                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 100);
             }
         }
 
@@ -469,11 +475,19 @@
                 e.preventDefault();
             } else if (e.keyCode === 38) {
                 currentIdx = Math.max(0, currentIdx - 1);
-                selectChannel(currentIdx);
+                renderChannels();
+                setTimeout(function() {
+                    var card = document.querySelector('.ch-card.active');
+                    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 10);
                 e.preventDefault();
             } else if (e.keyCode === 40) {
                 currentIdx = Math.min(max, currentIdx + 1);
-                selectChannel(currentIdx);
+                renderChannels();
+                setTimeout(function() {
+                    var card = document.querySelector('.ch-card.active');
+                    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 10);
                 e.preventDefault();
             } else if (e.keyCode === 13 || e.keyCode === 32) {
                 playCurrent();

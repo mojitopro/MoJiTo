@@ -1,10 +1,1 @@
-[
-  {
-    "name": "Adult Swim",
-    "url": "http://181.119.86.1:8000/play/a019",
-    "backups": [
-      "http://181.119.86.1:8000/play/a019",
-      "https://otrok8.aradkit.com:8443/live/AdultSwim.m3u8"
-    ]
-  }
-]
+[]
