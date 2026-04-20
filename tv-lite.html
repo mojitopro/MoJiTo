@@ -351,6 +351,10 @@
                 return bh - ah;
             });
 
+            if (streams.length > 15) {
+                streams = streams.slice(0, 15);
+            }
+
             streamIdx = 0;
             doPlay();
         }
@@ -381,11 +385,14 @@
                     showToast('EN VIVO', 'success');
                 });
                 hls.on(HLS.Events.ERROR, function(e, data) {
-                    showToast('HLS error, probando siguiente...', 'error');
+                    showToast('Error, probando sig...', 'error');
                     if (data.fatal) {
                         streamIdx++;
-                        doPlay();
+                        setTimeout(doPlay, 500);
                     }
+                });
+                hls.on(HLS.Events.FRAG_LOADED, function() {
+                    showToast('Cargando stream...', 'info');
                 });
             } else {
                 video.src = url;

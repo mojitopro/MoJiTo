@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Add channel to custom_channels.json - fast, no testing
-Usage: python tools/add_channel.py "Channel Name"
+Add ANY channel - searches searchtv.net
+Usage: python tools/add_channel.py "Any Channel Name"
 """
 import json
 import sys
@@ -72,7 +72,7 @@ def add_channel(channel_name):
 
     streams = result.get('streams', [])
     if not streams:
-        print("No streams found")
+        print("No streams found. Try another name.")
         sys.exit(1)
 
     urls = [s['url'] for s in streams]
@@ -82,7 +82,7 @@ def add_channel(channel_name):
     idx, existing = find_existing(channels, channel_name)
 
     if existing:
-        print(f"Channel '{existing['name']}' already exists")
+        print(f"Channel '{existing['name']}' already exists, updating...")
         existing['url'] = urls[0]
         existing['backups'] = urls
     else:
@@ -91,17 +91,19 @@ def add_channel(channel_name):
             "url": urls[0],
             "backups": urls
         })
+        print(f"Added: {channel_name}")
 
     save_channels(channels)
-    print(f"Saved {len(urls)} streams to custom_channels.json")
+    print(f"Saved to custom_channels.json")
 
 
 def main():
     if len(sys.argv) < 2:
-        print(f"Usage: python {sys.argv[0]} \"Channel Name\"")
-        print("       python {sys.argv[0]} --remove \"Name\"")
-        print("       python {sys.argv[0]} --clear")
-        print("       python {sys.argv[0]} --list")
+        print("Usage:")
+        print("  python tools/add_channel.py \"Channel Name\"   - Add any channel")
+        print("  python tools/add_channel.py --remove \"Name\"  - Remove channel")
+        print("  python tools/add_channel.py --list        - List channels")
+        print("  python tools/add_channel.py --clear       - Clear all")
         sys.exit(1)
 
     cmd = sys.argv[1]
