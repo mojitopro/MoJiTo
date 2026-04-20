@@ -112,7 +112,15 @@
             display: flex; flex-direction: column;
             background: #0d0d12;
             border-top: 1px solid #1a1a2e;
-            overflow: hidden;
+            overflow-y: auto;
+            min-height: 200px;
+            min-height: 45vh;
+        }
+
+        #channels {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
         }
 
         #guide-header {
@@ -209,21 +217,12 @@
         <div id="player">
             <div class="bg-pattern"></div>
             <video id="video" playsinline webkit-playsinline></video>
-            
-<div class="play-overlay" id="playOverlay" onclick="startPlaying()">
+            <div class="play-overlay" id="playOverlay" onclick="startPlaying()">
                 <div class="play-btn">
                     <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                 </div>
                 <div class="play-text">Toca para ver TV</div>
             </div>
-
-            <div id="player-ui"></div>
-
-        </div>
-                <div class="play-text">Toca para ver TV</div>
-            </div>
-
-            
         </div>
 
         <div id="guide">
