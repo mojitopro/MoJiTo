@@ -2,18 +2,18 @@
   "channels": [
     {
       "name": "Adult Swim",
-      "url": "http://181.119.86.1:8000/play/a019",
+      "url": "http://181.78.78.66:8000/play/a0fn"
       "fallbacks": [
-        "http://181.78.78.66:8000/play/a0fn",
         "http://200.59.188.3:8000/play/a0qp",
         "http://190.60.59.67:8000/play/a0io",
+        "http://181.119.86.1:8000/play/a019",
         "http://190.61.42.218:9000/play/a06r",
         "http://181.78.79.131:8000/play/a0pk"
       ],
       "category": "Infantil"
     },
     {
-      "name": "Cartoon Network",
+      "name": "Nickelodeon",
       "url": "http://45.169.163.237:4000/play/a01c",
       "fallbacks": [
         "http://181.78.78.66:8000/play/a0fb",
@@ -350,7 +350,7 @@
       "category": "Infantil"
     },
     {
-      "name": "Nickelodeon",
+      "name": "otro",
       "url": "http://38.41.8.1:8000/play/a0sx",
       "fallbacks": [],
       "category": "Infantil"
