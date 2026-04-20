@@ -351,14 +351,13 @@
 
         function doPlay() {
             if (streamIdx >= streams.length) {
-                setStatus('error', 'Sin fuente disponible');
+                showToast('Todas las fuentes fallaron', 'error');
                 return;
             }
 
             var url = streams[streamIdx];
             var video = document.getElementById('video');
-
-            setStatus('connecting', 'Conectando...');
+            showToast('Reproduciendo: ' + url.substring(0, 50), 'success');
 
             if (hls) { 
                 hls.destroy(); 
@@ -366,16 +365,17 @@
             }
 
             if (url.indexOf('.m3u8') > 0 && typeof HLS !== 'undefined') {
-                hls = new HLS({ enableWorker: true, liveSyncDurationCount: 3 });
+                hls = new HLS({ enableWorker: true, liveSyncDurationCount: 3, lowLatencyMode: true });
                 hls.loadSource(url);
                 hls.attachMedia(video);
                 hls.on(HLS.Events.MANIFEST_PARSED, function() {
-                    video.play().catch(function() {});
-                    setStatus('live', 'EN VIVO');
+                    video.play().catch(function(e) { showToast('Play error: ' + e, 'error'); });
                     playing = true;
                     document.getElementById('player').classList.add('playing');
+                    showToast('EN VIVO', 'success');
                 });
                 hls.on(HLS.Events.ERROR, function(e, data) {
+                    showToast('HLS error, probando siguiente...', 'error');
                     if (data.fatal) {
                         streamIdx++;
                         doPlay();
@@ -385,7 +385,6 @@
                 video.src = url;
                 video.volume = 1;
                 video.play().then(function() {
-                    setStatus('live', 'EN VIVO');
                     playing = true;
                     document.getElementById('player').classList.add('playing');
                 }).catch(function() {

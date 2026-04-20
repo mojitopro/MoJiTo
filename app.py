@@ -174,9 +174,29 @@ def api_tv():
     import json
     
     ROOT = Path(__file__).parent
-    groups = {}
+    custom_channels = {}
+    fusion_channels = {}
     
-    for fname in ['custom_channels.json', 'premium_working.json', 'working_streams.json']:
+    try:
+        with open(ROOT / 'custom_channels.json') as f:
+            data = json.load(f)
+        ch_list = data.get('channels', data) if isinstance(data, dict) else data
+        for ch in ch_list:
+            name = ch.get('name', '').strip()
+            url = ch.get('url', '').strip()
+            backups = ch.get('backups', [])
+            if name and url:
+                all_urls = [url] + backups
+                all_urls = list(dict.fromkeys(all_urls))
+                custom_channels[name] = {
+                    'url': all_urls[0],
+                    'backups': all_urls,
+                    'custom': True
+                }
+    except:
+        pass
+    
+    for fname in ['premium_working.json', 'working_streams.json']:
         try:
             with open(ROOT / fname) as f:
                 data = json.load(f)
@@ -185,9 +205,9 @@ def api_tv():
                 name = ch.get('name', '').strip()
                 url = ch.get('url', '').strip()
                 if name and url:
-                    if name not in groups:
-                        groups[name] = []
-                    groups[name].append(url)
+                    if name not in fusion_channels:
+                        fusion_channels[name] = []
+                    fusion_channels[name].append(url)
         except:
             pass
     
@@ -196,7 +216,22 @@ def api_tv():
         return (u.endswith('.m3u8') or 'hd' in u or '1080' in u)
     
     all_channels = []
-    for name, urls in groups.items():
+    
+    for name, ch_data in custom_channels.items():
+        urls = ch_data['backups']
+        urls.sort(key=lambda x: not better_first(x))
+        all_channels.append({
+            'name': name,
+            'url': urls[0],
+            'streams': len(urls),
+            'fusion': len(urls) > 1,
+            'backups': urls,
+            'custom': True
+        })
+    
+    for name, urls in fusion_channels.items():
+        if name in custom_channels:
+            continue
         urls = list(dict.fromkeys(urls))
         urls.sort(key=lambda x: not better_first(x))
         all_channels.append({
@@ -204,7 +239,8 @@ def api_tv():
             'url': urls[0],
             'streams': len(urls),
             'fusion': len(urls) > 1,
-            'backups': urls
+            'backups': urls,
+            'custom': False
         })
     
     all_channels.sort(key=lambda x: x['name'])
