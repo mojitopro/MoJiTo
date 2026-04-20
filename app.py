@@ -180,7 +180,10 @@ def api_tv():
     try:
         with open(ROOT / 'custom_channels.json') as f:
             data = json.load(f)
-        ch_list = data.get('channels', data) if isinstance(data, dict) else data
+        if isinstance(data, list):
+            ch_list = data
+        else:
+            ch_list = data.get('channels', data) if isinstance(data, dict) else []
         for ch in ch_list:
             name = ch.get('name', '').strip()
             url = ch.get('url', '').strip()

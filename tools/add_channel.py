@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.13
 """
 Add channel to custom_channels.json
 Usage: python tools/add_channel.py "Channel Name"
