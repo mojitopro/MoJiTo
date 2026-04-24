@@ -1,273 +1,88 @@
 [
   {
-    "name": "CARTOON NT HD",
-    "url": "http://45.5.119.43:4000/play/a0l0/index.m3u8",
+    "name": "GOLDEN",
+    "url": "https://goldenboy.duckhunting.playout.vju.tv/DuckhuntingTV_GoldenBoy/main.m3u8",
     "backups": [
-      "http://45.5.119.43:4000/play/a0l0/index.m3u8"
+      "https://goldenboy.duckhunting.playout.vju.tv/DuckhuntingTV_GoldenBoy/main.m3u8",
+      "https://rpn.bozztv.com/gusa/gusa-goldentv/index.m3u8"
     ],
     "category": "Peliculas"
   },
   {
-    "name": "Cartoon Network",
-    "url": "http://138.117.86.162:18000/play/a0a3",
+    "name": "HISTORY",
+    "url": "https://rpn.bozztv.com/gusa/gusa-tvshollywoohistory/index.m3u8",
     "backups": [
-      "http://138.117.86.162:18000/play/a0a3"
+      "https://amg00426-lds-amg00426c2-samsung-ph-4623.playouts.now.amagi.tv/playlist.m3u8",
+      "https://rpn.bozztv.com/gusa/gusa-tvshollywoohistory/index.m3u8",
+      "https://liveh34.vtvprime.vn/hls/HISTORY/index.m3u8",
+      "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-41_480.m3u8",
+      "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-40_480.m3u8"
     ],
     "category": "Peliculas"
   },
   {
-    "name": "HBO",
-    "url": "http://181.78.78.66:8000/play/a0e3",
+    "name": "SONY",
+    "url": "https://wurlsonypicturestv.global.transmit.live/hls/68deeb1c0238cda82df543dd/v1/spt_sonykal_1/lg_us/latest/main/hls/playlist.m3u8",
     "backups": [
-      "http://181.78.78.66:8000/play/a0e3"
+      "https://wurlsonypicturestv.global.transmit.live/hls/68deeb1c0238cda82df543dd/v1/spt_sonykal_1/lg_us/latest/main/hls/playlist.m3u8"
     ],
     "category": "Peliculas"
   },
   {
-    "name": "010 Cartoon Network HD",
-    "url": "http://45.181.120.65:9087/play/010/index.m3u8",
+    "name": "STAR",
+    "url": "http://23.237.104.106:8080/USA_STARZ/index.m3u8",
     "backups": [
-      "http://45.181.120.65:9087/play/010/index.m3u8"
+      "http://23.237.104.106:8080/USA_STARZ/index.m3u8",
+      "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-68.playlist.m3u8",
+      "http://live.azstartv.com/azstar/smil:azstar.smil/playlist.m3u8",
+      "http://live.canadastartv.com:1935/canadastartv/canadastartv/playlist.m3u",
+      "https://prima-ott-live.ssl.cdn.cra.cz/channels/prima_star/playlist/cze/live_hd.m3u8?offsetSeconds=0&url=0"
     ],
     "category": "Peliculas"
   },
   {
-    "name": "Cartoon Network",
-    "url": "http://190.66.24.164:45000/play/a00i",
+    "name": "UNIVERSAL",
+    "url": "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-75_480.m3u8",
     "backups": [
-      "http://190.66.24.164:45000/play/a00i"
+      "http://190.2.212.209:8050/play/a0q3",
+      "http://190.2.212.209:8050/play/a0q4",
+      "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-75_480.m3u8",
+      "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-67_720.m3u8"
     ],
     "category": "Peliculas"
   },
   {
-    "name": "Cartoonito",
-    "url": "http://148.222.230.144:8000/play/a0az/index.m3u8",
+    "name": "FX",
+    "url": "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-78_720.m3u8",
     "backups": [
-      "http://148.222.230.144:8000/play/a0az/index.m3u8"
+      "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg01438-ewscrippscompan-ionmystery-tablo/playlist.m3u8",
+      "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-78_720.m3u8"
     ],
     "category": "Peliculas"
   },
   {
-    "name": "Cartoonito",
-    "url": "http://38.183.213.254:8000/play/a01i/index.m3u8",
+    "name": "AXN",
+    "url": "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-77.playlist.m3u8",
     "backups": [
-      "http://38.183.213.254:8000/play/a01i/index.m3u8"
+      "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-77.playlist.m3u8"
     ],
     "category": "Peliculas"
   },
   {
-    "name": "Cartoonito",
-    "url": "http://190.105.128.198:5800/play/a02z/index.m3u8",
+    "name": "AMC",
+    "url": "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-76.playlist.m3u8",
     "backups": [
-      "http://190.105.128.198:5800/play/a02z/index.m3u8"
+      "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-76.playlist.m3u8"
     ],
     "category": "Peliculas"
   },
   {
-    "name": "117) Cartoon Network HD",
-    "url": "http://181.119.111.25:4000/play/a0hd/index.m3u8",
+    "name": "NATIONAL GEOGRAPHIC",
+    "url": "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-46_720.m3u8",
     "backups": [
-      "http://181.119.111.25:4000/play/a0hd/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "Cartoon Network",
-    "url": "http://45.5.119.97:12500/play/a02l/index.m3u8",
-    "backups": [
-      "http://45.5.119.97:12500/play/a02l/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "CARTOON NT HD",
-    "url": "http://190.61.90.17:9999/play/a0l0/index.m3u8",
-    "backups": [
-      "http://190.61.90.17:9999/play/a0l0/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "CARTOON NT HD",
-    "url": "http://45.186.106.207:8000/play/a07l/index.m3u8",
-    "backups": [
-      "http://45.186.106.207:8000/play/a07l/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "Cartoonito HD",
-    "url": "http://176.65.146.203:5003/play/a081/index.m3u8",
-    "backups": [
-      "http://176.65.146.203:5003/play/a081/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "Cartoon Network",
-    "url": "http://191.97.6.30:8000/play/a0fg/index.m3u8",
-    "backups": [
-      "http://191.97.6.30:8000/play/a0fg/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "Cartoon Network HD",
-    "url": "http://181.224.255.210:8001/play/a0py/index.m3u8",
-    "backups": [
-      "http://181.224.255.210:8001/play/a0py/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "CARTOON NETWORK SPS",
-    "url": "http://200.115.96.66:4000/play/a0dd/index.m3u8",
-    "backups": [
-      "http://200.115.96.66:4000/play/a0dd/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "CARTOON NETWORK SJ",
-    "url": "http://190.60.39.195:8000/play/a0w9/index.m3u8",
-    "backups": [
-      "http://190.60.39.195:8000/play/a0w9/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "Cartoonito",
-    "url": "http://200.35.176.154:8000/play/a011/index.m3u8",
-    "backups": [
-      "http://200.35.176.154:8000/play/a011/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "CARTOONITO HD SJ",
-    "url": "http://190.60.39.195:8000/play/a0x0/index.m3u8",
-    "backups": [
-      "http://190.60.39.195:8000/play/a0x0/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "CARTOONITO",
-    "url": "http://201.182.251.150:9000/play/a02g/index.m3u8",
-    "backups": [
-      "http://201.182.251.150:9000/play/a02g/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "CARTOON NETWORK HD",
-    "url": "http://186.151.95.60:8000/play/c042/index.m3u8",
-    "backups": [
-      "http://186.151.95.60:8000/play/c042/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "Cartoon Network",
-    "url": "http://181.78.4.250:8097/play/a08u/index.m3u8",
-    "backups": [
-      "http://181.78.4.250:8097/play/a08u/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "Cartoon Network",
-    "url": "http://38.191.202.162:45000/play/a00i",
-    "backups": [
-      "http://38.191.202.162:45000/play/a00i"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "Cartoonito",
-    "url": "http://190.2.213.220:8000/play/a0e7/index.m3u8",
-    "backups": [
-      "http://190.2.213.220:8000/play/a0e7/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "Cartoonito",
-    "url": "http://181.78.109.48:9998/play/a01o/index.m3u8",
-    "backups": [
-      "http://181.78.109.48:9998/play/a01o/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "CARTOONITO",
-    "url": "http://181.78.12.119:16123/play/a09m/index.m3u8",
-    "backups": [
-      "http://181.78.12.119:16123/play/a09m/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "Cartoonito",
-    "url": "http://38.156.13.106:8888/play/a035/index.m3u8",
-    "backups": [
-      "http://38.156.13.106:8888/play/a035/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "Cartoonito",
-    "url": "http://181.78.17.52:8000/play/a0qb/index.m3u8",
-    "backups": [
-      "http://181.78.17.52:8000/play/a0qb/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "Cartoon Network",
-    "url": "http://190.119.112.30:8000/play/a00p/index.m3u8",
-    "backups": [
-      "http://190.119.112.30:8000/play/a00p/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "CARTOON NETWORK",
-    "url": "http://201.182.251.146:9000/play/a02h/index.m3u8",
-    "backups": [
-      "http://201.182.251.146:9000/play/a02h/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "Cartoon Network",
-    "url": "http://38.211.145.109:8000/play/a00i/index.m3u8",
-    "backups": [
-      "http://38.211.145.109:8000/play/a00i/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "Cartoon Network",
-    "url": "http://45.228.234.30:16000/play/a00f/index.m3u8",
-    "backups": [
-      "http://45.228.234.30:16000/play/a00f/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "Cartoon Network",
-    "url": "http://181.78.109.48:9998/play/a01m/index.m3u8",
-    "backups": [
-      "http://181.78.109.48:9998/play/a01m/index.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "Cartoon Network",
-    "url": "http://200.60.124.20:29000/play/a01t/index.m3u8",
-    "backups": [
-      "http://200.60.124.20:29000/play/a01t/index.m3u8"
+      "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-46_720.m3u8",
+      "https://live-fi.tvkaista.net/national-geographic/live.m3u8?src=freetv",
+      "https://admdn2.cdn.mangomolo.com/nagtv/smil:nagtv.stream.smil/playlist.m3u8"
     ],
     "category": "Peliculas"
   }
