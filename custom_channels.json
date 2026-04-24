@@ -1,80 +1,89 @@
 [
   {
-    "name": "GOLDEN",
-    "url": "https://goldenboy.duckhunting.playout.vju.tv/DuckhuntingTV_GoldenBoy/main.m3u8",
+    "name": "Stream 1",
+    "url": "https://tv-trt1.medya.trt.com.tr/master.m3u8",
     "backups": [
-      "https://goldenboy.duckhunting.playout.vju.tv/DuckhuntingTV_GoldenBoy/main.m3u8"
+      "https://tv-trt1.medya.trt.com.tr/master.m3u8"
     ],
     "category": "Peliculas"
   },
   {
-    "name": "HISTORY",
-    "url": "https://rpn.bozztv.com/gusa/gusa-tvshollywoohistory/index.m3u8",
+    "name": "Stream 2",
+    "url": "https://amg00217-newsmax-newsmax-zeasn-022k9.amagi.tv/playlist.m3u8",
     "backups": [
-      "https://amg00426-lds-amg00426c2-samsung-ph-4623.playouts.now.amagi.tv/playlist.m3u8",
-      "https://rpn.bozztv.com/gusa/gusa-tvshollywoohistory/index.m3u8",
-      "https://liveh34.vtvprime.vn/hls/HISTORY/index.m3u8"
+      "https://amg00217-newsmax-newsmax-zeasn-022k9.amagi.tv/playlist.m3u8"
     ],
     "category": "Peliculas"
   },
   {
-    "name": "SONY",
-    "url": "https://wurlsonypicturestv.global.transmit.live/hls/68deeb1c0238cda82df543dd/v1/spt_sonykal_1/lg_us/latest/main/hls/playlist.m3u8",
+    "name": "Stream 3",
+    "url": "https://blacknewschannel-xumo-us.amagi.tv/playlist.m3u8",
     "backups": [
-      "https://wurlsonypicturestv.global.transmit.live/hls/68deeb1c0238cda82df543dd/v1/spt_sonykal_1/lg_us/latest/main/hls/playlist.m3u8"
+      "https://blacknewschannel-xumo-us.amagi.tv/playlist.m3u8"
     ],
     "category": "Peliculas"
   },
   {
-    "name": "STAR",
-    "url": "http://23.237.104.106:8080/USA_STARZ/index.m3u8",
+    "name": "Stream 4",
+    "url": "https://jukin-peopleareawesome-2-it.samsung.wurl.tv/playlist.m3u8",
     "backups": [
-      "http://23.237.104.106:8080/USA_STARZ/index.m3u8",
-      "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-68.playlist.m3u8",
-      "http://live.azstartv.com/azstar/smil:azstar.smil/playlist.m3u8"
+      "https://jukin-peopleareawesome-2-it.samsung.wurl.tv/playlist.m3u8"
     ],
     "category": "Peliculas"
   },
   {
-    "name": "UNIVERSAL",
-    "url": "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-75_480.m3u8",
+    "name": "Stream 5",
+    "url": "https://live-hls-web-ajd.getaj.net/AJD/index.m3u8",
     "backups": [
-      "http://190.2.212.209:8050/play/a0q3",
-      "http://190.2.212.209:8050/play/a0q4"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "FX",
-    "url": "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-78_720.m3u8",
-    "backups": [
-      "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg01438-ewscrippscompan-ionmystery-tablo/playlist.m3u8",
-      "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-78_720.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "AXN",
-    "url": "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-77.playlist.m3u8",
-    "backups": [
-      "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-77.playlist.m3u8"
-    ],
-    "category": "Peliculas"
-  },
-  {
-    "name": "AMC",
-    "url": "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-76.playlist.m3u8",
-    "backups": [
-      "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-76.playlist.m3u8"
+      "https://live-hls-web-ajd.getaj.net/AJD/index.m3u8"
     ],
     "category": "Peliculas"
   },
   {
     "name": "NATIONAL GEOGRAPHIC",
-    "url": "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-46_720.m3u8",
+    "url": "https://live-fi.tvkaista.net/national-geographic/live.m3u8?src=freetv",
     "backups": [
-      "https://live-fi.tvkaista.net/national-geographic/live.m3u8?src=freetv",
-      "https://admdn2.cdn.mangomolo.com/nagtv/smil:nagtv.stream.smil/playlist.m3u8"
+      "https://live-fi.tvkaista.net/national-geographic/live.m3u8?src=freetv"
+    ],
+    "category": "Peliculas"
+  },
+  {
+    "name": "MOVIES",
+    "url": "https://30a-tv.com/feeds/pzaz/30atvmovies.m3u8",
+    "backups": [
+      "https://30a-tv.com/feeds/pzaz/30atvmovies.m3u8"
+    ],
+    "category": "Peliculas"
+  },
+  {
+    "name": "Stream 8",
+    "url": "https://cdn3.wowza.com/5/V2Y2VmhqMEFDTUkx/olelo/G0",
+    "backups": [
+      "https://cdn3.wowza.com/5/V2Y2VmhqMEFDTUkx/olelo/G0"
+    ],
+    "category": "Peliculas"
+  },
+  {
+    "name": "Stream 9",
+    "url": "https://tdameritrade-vizio.amagi.tv/playlist.m3u8",
+    "backups": [
+      "https://tdameritrade-vizio.amagi.tv/playlist.m3u8"
+    ],
+    "category": "Peliculas"
+  },
+  {
+    "name": "Stream 10",
+    "url": "https://jamieoliver-xumo.amagi.tv/playlist.m3u8",
+    "backups": [
+      "https://jamieoliver-xumo.amagi.tv/playlist.m3u8"
+    ],
+    "category": "Peliculas"
+  },
+  {
+    "name": "Stream 11",
+    "url": "https://carolburnett-vizio.amagi.tv/playlist.m3u8",
+    "backups": [
+      "https://carolburnett-vizio.amagi.tv/playlist.m3u8"
     ],
     "category": "Peliculas"
   }
