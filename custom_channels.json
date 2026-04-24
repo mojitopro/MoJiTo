@@ -3,8 +3,7 @@
     "name": "GOLDEN",
     "url": "https://goldenboy.duckhunting.playout.vju.tv/DuckhuntingTV_GoldenBoy/main.m3u8",
     "backups": [
-      "https://goldenboy.duckhunting.playout.vju.tv/DuckhuntingTV_GoldenBoy/main.m3u8",
-      "https://rpn.bozztv.com/gusa/gusa-goldentv/index.m3u8"
+      "https://goldenboy.duckhunting.playout.vju.tv/DuckhuntingTV_GoldenBoy/main.m3u8"
     ],
     "category": "Peliculas"
   },
@@ -14,9 +13,7 @@
     "backups": [
       "https://amg00426-lds-amg00426c2-samsung-ph-4623.playouts.now.amagi.tv/playlist.m3u8",
       "https://rpn.bozztv.com/gusa/gusa-tvshollywoohistory/index.m3u8",
-      "https://liveh34.vtvprime.vn/hls/HISTORY/index.m3u8",
-      "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-41_480.m3u8",
-      "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-40_480.m3u8"
+      "https://liveh34.vtvprime.vn/hls/HISTORY/index.m3u8"
     ],
     "category": "Peliculas"
   },
@@ -34,9 +31,7 @@
     "backups": [
       "http://23.237.104.106:8080/USA_STARZ/index.m3u8",
       "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-68.playlist.m3u8",
-      "http://live.azstartv.com/azstar/smil:azstar.smil/playlist.m3u8",
-      "http://live.canadastartv.com:1935/canadastartv/canadastartv/playlist.m3u",
-      "https://prima-ott-live.ssl.cdn.cra.cz/channels/prima_star/playlist/cze/live_hd.m3u8?offsetSeconds=0&url=0"
+      "http://live.azstartv.com/azstar/smil:azstar.smil/playlist.m3u8"
     ],
     "category": "Peliculas"
   },
@@ -45,9 +40,7 @@
     "url": "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-75_480.m3u8",
     "backups": [
       "http://190.2.212.209:8050/play/a0q3",
-      "http://190.2.212.209:8050/play/a0q4",
-      "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-75_480.m3u8",
-      "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-67_720.m3u8"
+      "http://190.2.212.209:8050/play/a0q4"
     ],
     "category": "Peliculas"
   },
@@ -80,7 +73,6 @@
     "name": "NATIONAL GEOGRAPHIC",
     "url": "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-46_720.m3u8",
     "backups": [
-      "http://201.217.246.42:44310/Live/3fcb6e26785fd8d415571b26dc3cf5d3/local-46_720.m3u8",
       "https://live-fi.tvkaista.net/national-geographic/live.m3u8?src=freetv",
       "https://admdn2.cdn.mangomolo.com/nagtv/smil:nagtv.stream.smil/playlist.m3u8"
     ],
