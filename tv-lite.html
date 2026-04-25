@@ -343,18 +343,22 @@
         function loadChannels() {
             request('/api/unified', function(err, resp) {
                 if (err) {
-                    showToast('Error cargando canales', 'error');
+                    showToast('Error cargando canales: ' + err, 'error');
                     return;
                 }
-                var data = JSON.parse(resp);
-                channels = data.channels || [];
-                organizeChannels();
-                filtered = channels;
-                renderCategories();
-                document.getElementById('chCount').textContent = channels.length;
-                renderChannels();
-                if (channels.length > 0) {
-                    selectChannel(0);
+                try {
+                    var data = JSON.parse(resp);
+                    channels = data.channels || [];
+                    organizeChannels();
+                    filtered = channels;
+                    renderCategories();
+                    document.getElementById('chCount').textContent = channels.length;
+                    renderChannels();
+                    if (channels.length > 0) {
+                        selectChannel(0);
+                    }
+                } catch(e) {
+                    showToast('Error parse: ' + e, 'error');
                 }
             });
         }
