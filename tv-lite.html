@@ -217,10 +217,13 @@
         }
         .ch-badge {
             position: absolute; top: 6px; right: 6px;
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: #ffc832;
+            padding: 2px 6px; border-radius: 3px;
+            font-size: 8px; font-weight: 700;
+            text-transform: uppercase;
         }
+        .custom-badge { background: #9c27b0; color: #fff; }
+        .premium-badge { background: #ffc832; color: #000; }
+        .verified-badge { background: #4f4; color: #000; }
 
         .empty-state {
             display: flex; flex-direction: column;
@@ -309,16 +312,20 @@
 
         var CATEGORY_ORDER = {
             'all': 0,
-            'Peliculas': 1,
-            'Premium': 2,
-            'Series': 3,
-            'Entretenimiento': 4,
-            'Deportes': 5,
-            'Documentales': 6,
-            'Infantil': 7,
-            'Noticias': 8,
-            'Musica': 9,
-            'Comedia': 10
+            'custom': 1,
+            'premium': 2,
+            'normal': 3,
+            'verified': 4,
+            'Peliculas': 10,
+            'Premium': 11,
+            'Series': 12,
+            'Entretenimiento': 13,
+            'Deportes': 14,
+            'Documentales': 15,
+            'Infantil': 16,
+            'Noticias': 17,
+            'Musica': 18,
+            'Comedia': 19
         };
 
         function request(url, callback) {
@@ -334,7 +341,7 @@
         }
 
         function loadChannels() {
-            request('/api/tv', function(err, resp) {
+            request('/api/unified', function(err, resp) {
                 if (err) {
                     showToast('Error cargando canales', 'error');
                     return;
@@ -354,6 +361,10 @@
 
         function organizeChannels() {
             channels.sort(function(a, b) {
+                var typeOrder = {'custom': 0, 'premium': 1, 'normal': 2, 'verified': 3};
+                var typeA = typeOrder[a.type] || 99;
+                var typeB = typeOrder[b.type] || 99;
+                if (typeA !== typeB) return typeA - typeB;
                 var catA = CATEGORY_ORDER[a.category] || 99;
                 var catB = CATEGORY_ORDER[b.category] || 99;
                 if (catA !== catB) return catA - catB;
@@ -362,15 +373,17 @@
         }
 
         function renderCategories() {
-            var cats = {'all': 'Todo'};
+            var cats = {'all': 'Todo', 'custom': 'Custom', 'premium': 'Premium', 'normal': 'Normal'};
+            var typeCounts = {custom: 0, premium: 0, normal: 0, verified: 0};
             for (var i = 0; i < channels.length; i++) {
-                var cat = channels[i].category || 'Otro';
-                if (!cats[cat]) cats[cat] = cat;
+                var t = channels[i].type || 'normal';
+                typeCounts[t] = (typeCounts[t] || 0) + 1;
             }
             var html = '';
             for (var key in cats) {
                 var cls = key === currentCategory ? ' active' : '';
-                html += '<div class="cat-tab' + cls + '" onclick="setCategory(\'' + key + '\')">' + cats[key] + '</div>';
+                var count = key === 'all' ? channels.length : (typeCounts[key] || 0);
+                html += '<div class="cat-tab' + cls + '" onclick="setCategory(\'' + key + '\')">' + cats[key] + ' (' + count + ')</div>';
             }
             document.getElementById('categoryTabs').innerHTML = html;
         }
@@ -409,16 +422,48 @@
             container.innerHTML = html;
         }
 
-        function filterChannels() {
+function filterChannels() {
             var q = document.getElementById('search').value.toLowerCase();
             var cat = currentCategory;
             filtered = [];
             for (var i = 0; i < channels.length; i++) {
+                var ch = channels[i];
                 var match = true;
-                if (q && channels[i].name.toLowerCase().indexOf(q) < 0) match = false;
-                if (cat !== 'all' && (channels[i].category || 'Otro') !== cat) match = false;
-                if (match) filtered.push(channels[i]);
+                if (q && ch.name.toLowerCase().indexOf(q) < 0) match = false;
+                if (cat !== 'all' && (ch.type || 'normal') !== cat) match = false;
+                if (match) filtered.push(ch);
             }
+            currentIdx = 0;
+            document.getElementById('chCount').textContent = filtered.length;
+            renderChannels();
+        }
+
+        function renderChannels() {
+            var html = '';
+            var container = document.getElementById('ch-grid');
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg><div>Sin canales</div></div>';
+                return;
+            }
+            for (var i = 0; i < filtered.length; i++) {
+                var ch = filtered[i];
+                var hd = ch.streams > 1 || isHD(ch.url);
+                var active = i === currentIdx ? ' active' : '';
+                var badge = '';
+                var typeLabel = ch.type || 'normal';
+                if (typeLabel === 'custom') badge = '<div class="ch-badge custom-badge">CUSTOM</div>';
+                else if (typeLabel === 'premium') badge = '<div class="ch-badge premium-badge">PREMIUM</div>';
+                else if (typeLabel === 'verified') badge = '<div class="ch-badge verified-badge">VERIFIED</div>';
+                html += '<div class="ch-card' + active + '" data-idx="' + i + '">' + badge +
+                    '<div class="name">' + ch.name + '</div>' +
+                    '<div class="meta">' +
+                        (hd ? '<span class="quality">HD</span>' : '<span></span>') +
+                        '<span class="sources">' + ch.streams + ' streams</span>' +
+                    '</div>' +
+                '</div>';
+            }
+            container.innerHTML = html;
+        }
             currentIdx = 0;
             document.getElementById('chCount').textContent = filtered.length;
             renderChannels();
