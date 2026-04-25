@@ -68,7 +68,7 @@ def get_top_clusters(limit=20):
 
 @app.route('/')
 def index():
-    return send_file('tv-simple.html')
+    return send_file('tv.html')
 
 
 @app.route('/tv-old')
@@ -397,6 +397,63 @@ def add_cors(response):
 @app.route('/health')
 def health():
     return jsonify({'status': 'ok', 'service': 'mojito-dashboard'})
+
+
+@app.route('/api/search')
+def api_search():
+    import requests
+    q = request.args.get('q', '').strip().lower()
+    page = int(request.args.get('page', 1))
+    
+    if not q:
+        return jsonify({'streams': []})
+    
+    limit = 20
+    start_idx = (page - 1) * limit
+    
+    try:
+        resp = requests.get(f'https://searchtv.net/search/?query={q}', timeout=10, headers={'User-Agent': 'Mozilla/5.0'})
+        
+        if resp.status_code != 200:
+            return jsonify({'streams': []})
+        
+        items = list(resp.json().keys())
+        
+        streams = []
+        downloaded = 0
+        i = start_idx
+        
+        while downloaded < limit and i < len(items):
+            try:
+                stream_resp = requests.get(f'https://searchtv.net/stream/uuid/{items[i]}/', timeout=2, headers={'User-Agent': 'Mozilla/5.0'})
+                if 'EXTM3U' in stream_resp.text:
+                    title = str(items[i])
+                    url = ''
+                    for line in stream_resp.text.split('\n'):
+                        if line.startswith('#EXTINF:'):
+                            parts = line.split(',')
+                            if len(parts) > 1:
+                                import re
+                                raw = parts[1].strip().split('==>')[0].strip()
+                                title = re.sub(r'\s*\(\d+\)\s*$', '', raw).strip()
+                        elif line.startswith('http'):
+                            url = line.strip()
+                            break
+                    if url:
+                        streams.append({'title': title, 'url': url})
+                        downloaded += 1
+            except:
+                pass
+            i += 1
+        
+        streams.sort(key=lambda x: 1 if '1080' in x['title'].lower() or 'hd' in x['title'].lower() else 2)
+        
+        has_more = i < len(items)
+        
+        return jsonify({'streams': streams, 'hasMore': has_more})
+        
+    except Exception as e:
+        return jsonify({'streams': [], 'error': str(e)[:50]})
 
 
 if __name__ == '__main__':
