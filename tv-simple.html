@@ -20,8 +20,8 @@
         .status.live .dot { background: #4f4; }
         #guide { flex: 1; display: flex; flex-direction: column; background: #08080c; overflow: hidden; }
         #guide-header { padding: 10px; background: #0c0c12; display: flex; gap: 10px; align-items: center; }
-        #search { flex: 1; background: #12121a; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 5px; }
-        .ch-count { color: #ffc832; font-size: 14px; }
+        #search { flex: 1; background: #12121a; border: 2px solid #ffc832; color: #fff; padding: 15px; border-radius: 5px; font-size: 18px; }
+        .ch-count { color: #ffc832; font-size: 16px; font-weight: bold; }
         .type-tabs { display: flex; gap: 5px; padding: 8px; background: #0a0a10; overflow-x: auto; }
         .type-tab { background: #1a1a25; border: 1px solid #333; color: #888; padding: 8px 15px; border-radius: 5px; font-size: 13px; white-space: nowrap; }
         .type-tab.active { background: #ffc832; color: #000; border-color: #ffc832; }
@@ -229,6 +229,27 @@
         document.querySelector('.play-overlay').style.display = 'none';
         play();
     }
+    
+    document.onkeydown = function(e) {
+        var searchFocused = document.activeElement === document.getElementById('search');
+        
+        if (!searchFocused) {
+            if (e.key === 'ArrowUp') { select((currentIdx - 4 + filtered.length) % filtered.length); e.preventDefault(); }
+            else if (e.key === 'ArrowDown') { select((currentIdx + 4) % filtered.length); e.preventDefault(); }
+            else if (e.key === 'ArrowLeft') { prev(); e.preventDefault(); }
+            else if (e.key === 'ArrowRight') { next(); e.preventDefault(); }
+            else if (e.key === 'Enter' || e.key === ' ') { play(); e.preventDefault(); }
+            else if (e.key === 'Backspace') { document.getElementById('search').value = ''; filter(); }
+            else if (e.key === 'Escape') { document.getElementById('video').focus(); }
+        } else {
+            if (e.key === 'Enter') { filter(); document.getElementById('video').focus(); }
+            if (e.key === 'Escape') { document.getElementById('search').value = ''; document.getElementById('video').focus(); }
+        }
+    };
+    
+    document.getElementById('search').onkeydown = function(e) {
+        if (e.key === 'Enter') { filter(); document.getElementById('video').focus(); }
+    };
     
     renderTabs();
     render();
