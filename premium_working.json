@@ -2,7 +2,7 @@
   "channels": [
     {
       "name": "Adult Swim",
-      "url": "http://181.78.78.66:8000/play/a0fn"
+      "url": "http://181.78.78.66:8000/play/a0fn",
       "fallbacks": [
         "http://200.59.188.3:8000/play/a0qp",
         "http://190.60.59.67:8000/play/a0io",

@@ -1,0 +1,468 @@
+{
+  "catalog": {
+    "version": "1.0.0",
+    "updated": "2026-04-25",
+    "streams_verified": true
+  },
+  "channels": [
+    {
+      "id": "adult_swim",
+      "name": "Adult Swim",
+      "category": "Infantil",
+      "streams": [
+        {"url": "http://190.60.59.67:8000/play/a0io", "verified": true, "video": true},
+        {"url": "http://181.119.86.1:8000/play/a019", "verified": true, "video": true},
+        {"url": "http://190.61.42.218:9000/play/a06r", "verified": true, "video": true},
+        {"url": "http://181.78.79.131:8000/play/a0pk", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "nickelodeon",
+      "name": "Nickelodeon",
+      "category": "Infantil",
+      "streams": [
+        {"url": "http://45.169.163.237:4000/play/a01c", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "disney_channel",
+      "name": "Disney Channel",
+      "category": "Infantil",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0sv", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "disney_xd",
+      "name": "Disney XD",
+      "category": "Infantil",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0rm", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "nick_jr",
+      "name": "Nick Jr",
+      "category": "Infantil",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0zx", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "discovery_kids",
+      "name": "Discovery Kids",
+      "category": "Infantil",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0t7", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "cartoon_network",
+      "name": "Cartoon Network",
+      "category": "Infantil",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0sx", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "tnt",
+      "name": "TNT",
+      "category": "Peliculas",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0sv", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "space",
+      "name": "Space",
+      "category": "Peliculas",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0rm", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "cinecanal",
+      "name": "Cinecanal",
+      "category": "Peliculas",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0sx", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "golden",
+      "name": "Golden",
+      "category": "Peliculas",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0zx", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "golden_edge",
+      "name": "Golden Edge",
+      "category": "Peliculas",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0t7", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "studio_universal",
+      "name": "Studio Universal",
+      "category": "Peliculas",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0rp", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "tbs",
+      "name": "TBS",
+      "category": "Peliculas",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0sw", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "hbo",
+      "name": "HBO",
+      "category": "Premium",
+      "streams": [
+        {"url": "http://45.181.120.65:9087/play/128/index.m3u8", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "hbo_2",
+      "name": "HBO 2",
+      "category": "Premium",
+      "streams": [
+        {"url": "http://45.181.120.65:9087/play/130/index.m3u8", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "cinemax",
+      "name": "Cinemax",
+      "category": "Premium",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0rp", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "star_channel",
+      "name": "Star Channel",
+      "category": "Premium",
+      "streams": [
+        {"url": "http://45.181.120.65:9087/play/109/index.m3u8", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "espn",
+      "name": "ESPN",
+      "category": "Deportes",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0t3", "verified": true, "video": true},
+        {"url": "http://190.60.59.67:8000/play/a0jh", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "espn_2",
+      "name": "ESPN 2",
+      "category": "Deportes",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0rp", "verified": true, "video": true},
+        {"url": "http://190.60.37.118:4000/play/a0bv", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "espn_3",
+      "name": "ESPN 3",
+      "category": "Deportes",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0sw", "verified": true, "video": true},
+        {"url": "http://181.78.79.131:8000/play/a0s6", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "espn_4",
+      "name": "ESPN 4",
+      "category": "Deportes",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0sv", "verified": true, "video": true},
+        {"url": "http://190.60.37.118:4000/play/a09j", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "espn_5",
+      "name": "ESPN 5",
+      "category": "Deportes",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0rm", "verified": true, "video": true},
+        {"url": "http://190.60.37.118:4000/play/a0bj", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "espn_6",
+      "name": "ESPN 6",
+      "category": "Deportes",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0sx", "verified": true, "video": true},
+        {"url": "http://190.60.37.118:4000/play/a0bp", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "espn_7",
+      "name": "ESPN 7",
+      "category": "Deportes",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0zx", "verified": true, "video": true},
+        {"url": "http://38.41.8.1:8000/play/a0zx", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "fox_sports_1",
+      "name": "Fox Sports 1",
+      "category": "Deportes",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0sw", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "fox_sports_2",
+      "name": "Fox Sports 2",
+      "category": "Deportes",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0sv", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "fox_sports_3",
+      "name": "Fox Sports 3",
+      "category": "Deportes",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0rm", "verified": true, "video": true},
+        {"url": "http://181.78.78.66:8000/play/a03h", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "tnt_sports",
+      "name": "TNT Sports",
+      "category": "Deportes",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0sx", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "tyc_sports",
+      "name": "TyC Sports",
+      "category": "Deportes",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0zx", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "tyc_sports_2",
+      "name": "TyC Sports 2",
+      "category": "Deportes",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0t7", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "win_sports",
+      "name": "Win Sports",
+      "category": "Deportes",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0t3", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "gol_tv",
+      "name": "Gol TV",
+      "category": "Deportes",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0rp", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "directv_sports",
+      "name": "Directv Sports",
+      "category": "Deportes",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0sv", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "bein_sports",
+      "name": "BeIN Sports",
+      "category": "Deportes",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0rm", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "warner_channel",
+      "name": "Warner Channel",
+      "category": "Entretenimiento",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0zx", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "sony_channel",
+      "name": "Sony Channel",
+      "category": "Entretenimiento",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0t7", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "universal_channel",
+      "name": "Universal Channel",
+      "category": "Entretenimiento",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0t3", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "axn",
+      "name": "AXN",
+      "category": "Entretenimiento",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0rp", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "fx",
+      "name": "FX",
+      "category": "Entretenimiento",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0sw", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "amc",
+      "name": "AMC",
+      "category": "Entretenimiento",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0t3", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "paramount",
+      "name": "Paramount",
+      "category": "Entretenimiento",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0sx", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "discovery_channel",
+      "name": "Discovery Channel",
+      "category": "Documentales",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0rm", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "discovery_home",
+      "name": "Discovery Home",
+      "category": "Documentales",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0sx", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "discovery_id",
+      "name": "Discovery ID",
+      "category": "Documentales",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0zx", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "history",
+      "name": "History",
+      "category": "Documentales",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0t7", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "nat_geo",
+      "name": "Nat Geo",
+      "category": "Documentales",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0t3", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "animal_planet",
+      "name": "Animal Planet",
+      "category": "Documentales",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0rp", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "cnn",
+      "name": "CNN",
+      "category": "Noticias",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0t3", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "cnn_espanol",
+      "name": "CNN Español",
+      "category": "Noticias",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0rp", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "bbc_world",
+      "name": "BBC World",
+      "category": "Noticias",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0sw", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "dw",
+      "name": "DW",
+      "category": "Noticias",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0sv", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "telesur",
+      "name": "TeleSur",
+      "category": "Noticias",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0rm", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "mtv",
+      "name": "MTV",
+      "category": "Musica",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0sx", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "vh1",
+      "name": "VH1",
+      "category": "Musica",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0zx", "verified": true, "video": true}
+      ]
+    },
+    {
+      "id": "telehit",
+      "name": "Telehit",
+      "category": "Musica",
+      "streams": [
+        {"url": "http://38.41.8.1:8000/play/a0t7", "verified": true, "video": true}
+      ]
+    }
+  ]
+}

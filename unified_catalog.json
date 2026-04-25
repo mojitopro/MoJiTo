@@ -1,0 +1,868 @@
+{
+  "catalog_version": "1.0.0",
+  "updated": "2026-04-25",
+  "description": "Cat\u00e1logo unificado: premium + custom + normal + verified",
+  "total_channels": 75,
+  "channel_types": {
+    "premium": 63,
+    "custom": 11,
+    "normal": 63,
+    "verified": 1
+  },
+  "channels": [
+    {
+      "name": "Adult Swim",
+      "category": "Infantil",
+      "types": [
+        "premium",
+        "normal",
+        "verified"
+      ],
+      "urls": [
+        "http://181.78.78.66:8000/play/a0fn",
+        "http://200.59.188.3:8000/play/a0qp",
+        "http://190.60.59.67:8000/play/a0io",
+        "http://181.119.86.1:8000/play/a019",
+        "http://190.61.42.218:9000/play/a06r",
+        "http://181.78.79.131:8000/play/a0pk"
+      ]
+    },
+    {
+      "name": "Nickelodeon",
+      "category": "Infantil",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://45.169.163.237:4000/play/a01c",
+        "http://181.78.78.66:8000/play/a0fb",
+        "http://181.78.79.131:8000/play/a0p1",
+        "http://38.41.8.1:8000/play/a0sx"
+      ]
+    },
+    {
+      "name": "ESPN",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0t3",
+        "http://181.119.86.1:8000/play/a0c1",
+        "http://190.60.59.67:8000/play/a0jh"
+      ]
+    },
+    {
+      "name": "ESPN 2",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0rp",
+        "http://181.119.86.1:8000/play/a03x",
+        "http://190.60.37.118:4000/play/a0bv"
+      ]
+    },
+    {
+      "name": "ESPN 3",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sw",
+        "http://181.119.86.1:8000/play/a033",
+        "http://181.78.79.131:8000/play/a0s6"
+      ]
+    },
+    {
+      "name": "ESPN 4",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sv",
+        "http://181.119.86.1:8000/play/a01f",
+        "http://190.60.37.118:4000/play/a09j"
+      ]
+    },
+    {
+      "name": "ESPN 5",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0rm",
+        "http://190.60.37.118:4000/play/a0bj"
+      ]
+    },
+    {
+      "name": "ESPN 6",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sx",
+        "http://181.78.78.66:8000/play/a03h",
+        "http://190.60.37.118:4000/play/a0bp"
+      ]
+    },
+    {
+      "name": "ESPN 7",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0zx",
+        "http://181.78.78.66:8000/play/a0fc",
+        "http://190.60.37.118:4000/play/a09j"
+      ]
+    },
+    {
+      "name": "ESPN Premium",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0t7",
+        "http://181.119.86.1:8000/play/a0dc",
+        "http://190.60.37.118:4000/play/a0c8"
+      ]
+    },
+    {
+      "name": "Fox Sports 1",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sw",
+        "http://181.119.86.1:8000/play/a033"
+      ]
+    },
+    {
+      "name": "Fox Sports 2",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sv",
+        "http://181.119.86.1:8000/play/a03x"
+      ]
+    },
+    {
+      "name": "Fox Sports 3",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0rm",
+        "http://181.78.78.66:8000/play/a03h"
+      ]
+    },
+    {
+      "name": "TNT Sports",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sx"
+      ]
+    },
+    {
+      "name": "TyC Sports",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0zx"
+      ]
+    },
+    {
+      "name": "TyC Sports 2",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0t7"
+      ]
+    },
+    {
+      "name": "Win Sports",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0t3"
+      ]
+    },
+    {
+      "name": "Gol TV",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0rp"
+      ]
+    },
+    {
+      "name": "Directv Sports",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sv"
+      ]
+    },
+    {
+      "name": "BeIN Sports",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0rm"
+      ]
+    },
+    {
+      "name": "HBO",
+      "category": "Premium",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.187.3.110:8000/play/a07z/index.m3u8",
+        "http://45.181.120.65:9087/play/128/index.m3u8"
+      ]
+    },
+    {
+      "name": "HBO 2",
+      "category": "Premium",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://45.181.120.65:9087/play/130/index.m3u8"
+      ]
+    },
+    {
+      "name": "HBO Family",
+      "category": "Premium",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://45.181.120.65:9087/play/a0gt/index.m3u8"
+      ]
+    },
+    {
+      "name": "HBO Plus",
+      "category": "Premium",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.250.125.162:9800/play/093/index.m3u8"
+      ]
+    },
+    {
+      "name": "HBO Xtreme",
+      "category": "Premium",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://45.181.120.65:9087/play/128/index.m3u8"
+      ]
+    },
+    {
+      "name": "Cinemax",
+      "category": "Premium",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0rp"
+      ]
+    },
+    {
+      "name": "Star Channel",
+      "category": "Premium",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://45.181.120.65:9087/play/109/index.m3u8",
+        "http://181.209.169.226:1900/play/a06m/index.m3u8",
+        "http://38.250.125.162:9800/play/062/index.m3u8"
+      ]
+    },
+    {
+      "name": "Star TVE",
+      "category": "Premium",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.7.223.20:8000/play/a0ir"
+      ]
+    },
+    {
+      "name": "Paramount",
+      "category": "Premium",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sx"
+      ]
+    },
+    {
+      "name": "AMC",
+      "category": "Premium",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0t3"
+      ]
+    },
+    {
+      "name": "Warner Channel",
+      "category": "Entretenimiento",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0zx"
+      ]
+    },
+    {
+      "name": "Sony Channel",
+      "category": "Entretenimiento",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0t7"
+      ]
+    },
+    {
+      "name": "Universal Channel",
+      "category": "Entretenimiento",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0t3"
+      ]
+    },
+    {
+      "name": "AXN",
+      "category": "Entretenimiento",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0rp"
+      ]
+    },
+    {
+      "name": "FX",
+      "category": "Entretenimiento",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sw"
+      ]
+    },
+    {
+      "name": "TNT",
+      "category": "Peliculas",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sv"
+      ]
+    },
+    {
+      "name": "Space",
+      "category": "Peliculas",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0rm"
+      ]
+    },
+    {
+      "name": "Cinecanal",
+      "category": "Peliculas",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sx"
+      ]
+    },
+    {
+      "name": "Golden",
+      "category": "Peliculas",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0zx"
+      ]
+    },
+    {
+      "name": "Golden Edge",
+      "category": "Peliculas",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0t7"
+      ]
+    },
+    {
+      "name": "Studio Universal",
+      "category": "Peliculas",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0rp"
+      ]
+    },
+    {
+      "name": "TBS",
+      "category": "Comedia",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sw"
+      ]
+    },
+    {
+      "name": "Comedy Central",
+      "category": "Comedia",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sv"
+      ]
+    },
+    {
+      "name": "Discovery Channel",
+      "category": "Documentales",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0rm"
+      ]
+    },
+    {
+      "name": "Discovery Home",
+      "category": "Documentales",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sx"
+      ]
+    },
+    {
+      "name": "Discovery ID",
+      "category": "Documentales",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0zx"
+      ]
+    },
+    {
+      "name": "History",
+      "category": "Documentales",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0t7"
+      ]
+    },
+    {
+      "name": "Nat Geo",
+      "category": "Documentales",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0t3"
+      ]
+    },
+    {
+      "name": "Animal Planet",
+      "category": "Documentales",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0rp"
+      ]
+    },
+    {
+      "name": "Disney Channel",
+      "category": "Infantil",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sv"
+      ]
+    },
+    {
+      "name": "Disney XD",
+      "category": "Infantil",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0rm"
+      ]
+    },
+    {
+      "name": "otro",
+      "category": "Infantil",
+      "types": [
+        "premium"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sx"
+      ]
+    },
+    {
+      "name": "Nick Jr",
+      "category": "Infantil",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0zx"
+      ]
+    },
+    {
+      "name": "Discovery Kids",
+      "category": "Infantil",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0t7"
+      ]
+    },
+    {
+      "name": "CNN",
+      "category": "Noticias",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0t3"
+      ]
+    },
+    {
+      "name": "CNN Espanol",
+      "category": "Noticias",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0rp"
+      ]
+    },
+    {
+      "name": "BBC World",
+      "category": "Noticias",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sw"
+      ]
+    },
+    {
+      "name": "DW",
+      "category": "Noticias",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sv"
+      ]
+    },
+    {
+      "name": "TeleSur",
+      "category": "Noticias",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0rm"
+      ]
+    },
+    {
+      "name": "MTV",
+      "category": "Musica",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0sx"
+      ]
+    },
+    {
+      "name": "VH1",
+      "category": "Musica",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0zx"
+      ]
+    },
+    {
+      "name": "Telehit",
+      "category": "Musica",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://38.41.8.1:8000/play/a0t7"
+      ]
+    },
+    {
+      "name": "Movistar Deportes",
+      "category": "Deportes",
+      "types": [
+        "premium",
+        "normal"
+      ],
+      "urls": [
+        "http://45.177.21.6:9000/play/a01c",
+        "http://38.137.192.250:8000/play/a06z"
+      ]
+    },
+    {
+      "name": "Stream 1",
+      "category": "Peliculas",
+      "types": [
+        "custom"
+      ],
+      "urls": [
+        "https://tv-trt1.medya.trt.com.tr/master.m3u8",
+        "https://tv-trt1.medya.trt.com.tr/master.m3u8"
+      ]
+    },
+    {
+      "name": "Stream 2",
+      "category": "Peliculas",
+      "types": [
+        "custom"
+      ],
+      "urls": [
+        "https://amg00217-newsmax-newsmax-zeasn-022k9.amagi.tv/playlist.m3u8",
+        "https://amg00217-newsmax-newsmax-zeasn-022k9.amagi.tv/playlist.m3u8"
+      ]
+    },
+    {
+      "name": "Stream 3",
+      "category": "Peliculas",
+      "types": [
+        "custom"
+      ],
+      "urls": [
+        "https://blacknewschannel-xumo-us.amagi.tv/playlist.m3u8",
+        "https://blacknewschannel-xumo-us.amagi.tv/playlist.m3u8"
+      ]
+    },
+    {
+      "name": "Stream 4",
+      "category": "Peliculas",
+      "types": [
+        "custom"
+      ],
+      "urls": [
+        "https://jukin-peopleareawesome-2-it.samsung.wurl.tv/playlist.m3u8",
+        "https://jukin-peopleareawesome-2-it.samsung.wurl.tv/playlist.m3u8"
+      ]
+    },
+    {
+      "name": "Stream 5",
+      "category": "Peliculas",
+      "types": [
+        "custom"
+      ],
+      "urls": [
+        "https://live-hls-web-ajd.getaj.net/AJD/index.m3u8",
+        "https://live-hls-web-ajd.getaj.net/AJD/index.m3u8"
+      ]
+    },
+    {
+      "name": "NATIONAL GEOGRAPHIC",
+      "category": "Peliculas",
+      "types": [
+        "custom"
+      ],
+      "urls": [
+        "https://live-fi.tvkaista.net/national-geographic/live.m3u8?src=freetv",
+        "https://live-fi.tvkaista.net/national-geographic/live.m3u8?src=freetv"
+      ]
+    },
+    {
+      "name": "MOVIES",
+      "category": "Peliculas",
+      "types": [
+        "custom"
+      ],
+      "urls": [
+        "https://30a-tv.com/feeds/pzaz/30atvmovies.m3u8",
+        "https://30a-tv.com/feeds/pzaz/30atvmovies.m3u8"
+      ]
+    },
+    {
+      "name": "Stream 8",
+      "category": "Peliculas",
+      "types": [
+        "custom"
+      ],
+      "urls": [
+        "https://cdn3.wowza.com/5/V2Y2VmhqMEFDTUkx/olelo/G0",
+        "https://cdn3.wowza.com/5/V2Y2VmhqMEFDTUkx/olelo/G0"
+      ]
+    },
+    {
+      "name": "Stream 9",
+      "category": "Peliculas",
+      "types": [
+        "custom"
+      ],
+      "urls": [
+        "https://tdameritrade-vizio.amagi.tv/playlist.m3u8",
+        "https://tdameritrade-vizio.amagi.tv/playlist.m3u8"
+      ]
+    },
+    {
+      "name": "Stream 10",
+      "category": "Peliculas",
+      "types": [
+        "custom"
+      ],
+      "urls": [
+        "https://jamieoliver-xumo.amagi.tv/playlist.m3u8",
+        "https://jamieoliver-xumo.amagi.tv/playlist.m3u8"
+      ]
+    },
+    {
+      "name": "Stream 11",
+      "category": "Peliculas",
+      "types": [
+        "custom"
+      ],
+      "urls": [
+        "https://carolburnett-vizio.amagi.tv/playlist.m3u8",
+        "https://carolburnett-vizio.amagi.tv/playlist.m3u8"
+      ]
+    },
+    {
+      "name": "Cartoon Network",
+      "category": "General",
+      "types": [
+        "normal"
+      ],
+      "urls": [
+        "http://181.119.86.1:8000/play/a01g"
+      ]
+    }
+  ]
+}

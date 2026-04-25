@@ -1,0 +1,65 @@
+{
+  "working": [
+    {
+      "name": "Adult Swim",
+      "url": "http://190.60.59.67:8000/play/a0io",
+      "bytes": 3834
+    },
+    {
+      "name": "Adult Swim",
+      "url": "http://181.119.86.1:8000/play/a019",
+      "bytes": 3739
+    },
+    {
+      "name": "Adult Swim",
+      "url": "http://190.61.42.218:9000/play/a06r",
+      "bytes": 3410
+    },
+    {
+      "name": "Adult Swim",
+      "url": "http://181.78.79.131:8000/play/a0pk",
+      "bytes": 780
+    },
+    {
+      "name": "TNT",
+      "url": "http://38.41.8.1:8000/play/a0sv",
+      "bytes": 4284
+    },
+    {
+      "name": "Space",
+      "url": "http://38.41.8.1:8000/play/a0rm",
+      "bytes": 4660
+    },
+    {
+      "name": "Cinecanal",
+      "url": "http://38.41.8.1:8000/play/a0sx",
+      "bytes": 4534
+    },
+    {
+      "name": "Golden",
+      "url": "http://38.41.8.1:8000/play/a0zx",
+      "bytes": 3452
+    },
+    {
+      "name": "Golden Edge",
+      "url": "http://38.41.8.1:8000/play/a0t7",
+      "bytes": 4762
+    },
+    {
+      "name": "Studio Universal",
+      "url": "http://38.41.8.1:8000/play/a0rp",
+      "bytes": 3562
+    },
+    {
+      "name": "TBS",
+      "url": "http://38.41.8.1:8000/play/a0sw",
+      "bytes": 3960
+    },
+    {
+      "name": "HBO",
+      "url": "http://45.181.120.65:9087/play/128/index.m3u8",
+      "bytes": 2240
+    }
+  ],
+  "failed": []
+}

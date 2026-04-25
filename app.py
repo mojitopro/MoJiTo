@@ -169,6 +169,68 @@ def tv():
     return send_file('tv.html')
 
 
+@app.route('/api/unified')
+def api_unified():
+    import json
+    
+    ROOT = Path(__file__).parent
+    
+    try:
+        with open(ROOT / 'unified_catalog.json') as f:
+            catalog = json.load(f)
+        
+        channels = []
+        for ch in catalog.get('channels', []):
+            urls = ch.get('urls', [])
+            types = ch.get('types', [])
+            
+            type_label = 'normal'
+            if 'custom' in types:
+                type_label = 'custom'
+            elif 'premium' in types:
+                type_label = 'premium'
+            elif 'verified' in types:
+                type_label = 'verified'
+            
+            if 'premium' in types and 'normal' in types:
+                type_label = 'premium'
+            elif 'custom' in types:
+                type_label = 'custom'
+            
+            channels.append({
+                'name': ch.get('name', ''),
+                'url': urls[0] if urls else '',
+                'urls': urls,
+                'category': ch.get('category', 'General'),
+                'type': type_label,
+                'types': types,
+                'streams': len(urls),
+                'fusion': len(urls) > 1,
+                'backups': urls[1:] if len(urls) > 1 else []
+            })
+        
+        channels.sort(key=lambda x: (
+            0 if x['type'] == 'custom' else 1 if x['type'] == 'premium' else 2,
+            -len(x.get('urls', [])),
+            x.get('name', '')
+        ))
+        
+        return jsonify({
+            'status': 'ok',
+            'channels': channels,
+            'total': len(channels),
+            'by_type': {
+                'custom': len([c for c in channels if c['type'] == 'custom']),
+                'premium': len([c for c in channels if c['type'] == 'premium']),
+                'normal': len([c for c in channels if c['type'] == 'normal']),
+                'verified': len([c for c in channels if c['type'] == 'verified'])
+            }
+        })
+    
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e)})
+
+
 @app.route('/api/tv')
 def api_tv():
     import json
