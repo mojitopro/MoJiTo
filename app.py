@@ -68,7 +68,7 @@ def get_top_clusters(limit=20):
 
 @app.route('/')
 def index():
-    return send_file('tv-lite.html')
+    return send_file('tv-simple.html')
 
 
 @app.route('/tv-old')

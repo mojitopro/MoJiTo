@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoJiTo TV</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; background: #050508; color: #fff; font-family: Arial, sans-serif; overflow: hidden; }
+        #app { display: flex; flex-direction: column; height: 100vh; }
+        #player { flex: 0 0 45vh; background: #000; position: relative; display: flex; align-items: center; justify-content: center; }
+        #player video { width: 100%; height: 100%; object-fit: contain; background: #000; }
+        .play-overlay { position: absolute; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
+        .play-btn { width: 80px; height: 80px; background: #ffc832; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; color: #000; }
+        .play-text { color: #888; margin-top: 10px; }
+        .top-bar { position: absolute; top: 0; left: 0; right: 0; padding: 10px; background: rgba(0,0,0,0.7); display: flex; justify-content: space-between; }
+        .ch-name { color: #ffc832; font-size: 18px; font-weight: bold; }
+        .status { background: #222; padding: 5px 10px; border-radius: 15px; font-size: 12px; }
+        .status .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #666; margin-right: 5px; }
+        .status.live .dot { background: #4f4; }
+        #guide { flex: 1; display: flex; flex-direction: column; background: #08080c; overflow: hidden; }
+        #guide-header { padding: 10px; background: #0c0c12; display: flex; gap: 10px; align-items: center; }
+        #search { flex: 1; background: #12121a; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 5px; }
+        .ch-count { color: #ffc832; font-size: 14px; }
+        .type-tabs { display: flex; gap: 5px; padding: 8px; background: #0a0a10; overflow-x: auto; }
+        .type-tab { background: #1a1a25; border: 1px solid #333; color: #888; padding: 8px 15px; border-radius: 5px; font-size: 13px; white-space: nowrap; }
+        .type-tab.active { background: #ffc832; color: #000; border-color: #ffc832; }
+        .ch-grid { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; padding: 10px; overflow-y: auto; }
+        .ch-card { background: #12121a; border: 1px solid #2a2a3e; border-radius: 8px; padding: 12px; position: relative; cursor: pointer; }
+        .ch-card:hover { border-color: #4a4a5e; }
+        .ch-card.active { border-color: #ffc832; background: #1a1a25; }
+        .ch-card .name { font-size: 14px; font-weight: bold; }
+        .ch-card .meta { font-size: 11px; color: #666; margin-top: 5px; }
+        .ch-badge { position: absolute; top: 5px; right: 5px; padding: 2px 5px; border-radius: 3px; font-size: 8px; font-weight: bold; text-transform: uppercase; }
+        .custom-badge { background: #9c27b0; color: #fff; }
+        .premium-badge { background: #ffc832; color: #000; }
+        .bottom-bar { padding: 10px; background: #0a0a10; display: flex; gap: 10px; justify-content: center; }
+        .ctrl-btn { background: #1a1a25; border: 1px solid #444; color: #ccc; padding: 10px 20px; border-radius: 5px; font-size: 14px; cursor: pointer; }
+        .ctrl-btn.green { background: #ffc832; color: #000; border-color: #ffc832; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="player">
+            <div class="play-overlay" onclick="startPlay()">
+                <div class="play-btn">▶</div>
+                <div class="play-text">Toca para ver</div>
+            </div>
+            <video id="video" playsinline></video>
+            <div class="top-bar">
+                <div class="ch-name" id="chName">MoJiTo TV</div>
+                <div class="status" id="status"><span class="dot"></span><span>En espera</span></div>
+            </div>
+        </div>
+        <div id="guide">
+            <div id="guide-header">
+                <input type="text" id="search" placeholder="Buscar..." oninput="filter()">
+                <span class="ch-count" id="chCount">0</span>
+            </div>
+            <div class="type-tabs" id="typeTabs"></div>
+            <div class="ch-grid" id="chGrid"></div>
+        </div>
+        <div class="bottom-bar">
+            <button class="ctrl-btn" onclick="prev()">◀</button>
+            <button class="ctrl-btn green" onclick="play()">▶</button>
+            <button class="ctrl-btn" onclick="next()">▶</button>
+        </div>
+    </div>
+
+    <script>
+    var channels = [
+        {name: "MOVIES", url: "https://30a-tv.com/feeds/pzaz/30atvmovies.m3u8", type: "custom"},
+        {name: "NATIONAL GEOGRAPHIC", url: "https://live-fi.tvkaista.net/national-geographic/live.m3u8", type: "custom"},
+        {name: "Adult Swim", url: "http://190.60.59.67:8000/play/a0io", type: "premium"},
+        {name: "Adult Swim", url: "http://181.119.86.1:8000/play/a019", type: "premium"},
+        {name: "Nickelodeon", url: "http://45.169.163.237:4000/play/a01c", type: "premium"},
+        {name: "ESPN", url: "http://38.41.8.1:8000/play/a0t3", type: "premium"},
+        {name: "ESPN 2", url: "http://38.41.8.1:8000/play/a0rp", type: "premium"},
+        {name: "ESPN 3", url: "http://38.41.8.1:8000/play/a0sw", type: "premium"},
+        {name: "ESPN 4", url: "http://38.41.8.1:8000/play/a0sv", type: "premium"},
+        {name: "ESPN 5", url: "http://38.41.8.1:8000/play/a0rm", type: "premium"},
+        {name: "ESPN 6", url: "http://38.41.8.1:8000/play/a0sx", type: "premium"},
+        {name: "ESPN 7", url: "http://38.41.8.1:8000/play/a0zx", type: "premium"},
+        {name: "Fox Sports 1", url: "http://38.41.8.1:8000/play/a0sw", type: "premium"},
+        {name: "Fox Sports 2", url: "http://38.41.8.1:8000/play/a0sv", type: "premium"},
+        {name: "Fox Sports 3", url: "http://38.41.8.1:8000/play/a0rm", type: "premium"},
+        {name: "TNT Sports", url: "http://38.41.8.1:8000/play/a0sx", type: "premium"},
+        {name: "TyC Sports", url: "http://38.41.8.1:8000/play/a0zx", type: "premium"},
+        {name: "Win Sports", url: "http://38.41.8.1:8000/play/a0t3", type: "premium"},
+        {name: "Gol TV", url: "http://38.41.8.1:8000/play/a0rp", type: "premium"},
+        {name: "HBO", url: "http://45.181.120.65:9087/play/128/index.m3u8", type: "premium"},
+        {name: "HBO 2", url: "http://45.181.120.65:9087/play/130/index.m3u8", type: "premium"},
+        {name: "Cinemax", url: "http://38.41.8.1:8000/play/a0rp", type: "premium"},
+        {name: "Star Channel", url: "http://45.181.120.65:9087/play/109/index.m3u8", type: "premium"},
+        {name: "TNT", url: "http://38.41.8.1:8000/play/a0sv", type: "premium"},
+        {name: "Space", url: "http://38.41.8.1:8000/play/a0rm", type: "premium"},
+        {name: "Cinecanal", url: "http://38.41.8.1:8000/play/a0sx", type: "premium"},
+        {name: "Golden", url: "http://38.41.8.1:8000/play/a0zx", type: "premium"},
+        {name: "Golden Edge", url: "http://38.41.8.1:8000/play/a0t7", type: "premium"},
+        {name: "Studio Universal", url: "http://38.41.8.1:8000/play/a0rp", type: "premium"},
+        {name: "TBS", url: "http://38.41.8.1:8000/play/a0sw", type: "premium"},
+        {name: "Warner Channel", url: "http://38.41.8.1:8000/play/a0zx", type: "premium"},
+        {name: "Sony Channel", url: "http://38.41.8.1:8000/play/a0t7", type: "premium"},
+        {name: "Universal Channel", url: "http://38.41.8.1:8000/play/a0t3", type: "premium"},
+        {name: "AXN", url: "http://38.41.8.1:8000/play/a0rp", type: "premium"},
+        {name: "FX", url: "http://38.41.8.1:8000/play/a0sw", type: "premium"},
+        {name: "AMC", url: "http://38.41.8.1:8000/play/a0t3", type: "premium"},
+        {name: "Paramount", url: "http://38.41.8.1:8000/play/a0sx", type: "premium"},
+        {name: "Discovery Channel", url: "http://38.41.8.1:8000/play/a0rm", type: "premium"},
+        {name: "Discovery Home", url: "http://38.41.8.1:8000/play/a0sx", type: "premium"},
+        {name: "Discovery ID", url: "http://38.41.8.1:8000/play/a0zx", type: "premium"},
+        {name: "History", url: "http://38.41.8.1:8000/play/a0t7", type: "premium"},
+        {name: "Nat Geo", url: "http://38.41.8.1:8000/play/a0t3", type: "premium"},
+        {name: "Animal Planet", url: "http://38.41.8.1:8000/play/a0rp", type: "premium"},
+        {name: "Disney Channel", url: "http://38.41.8.1:8000/play/a0sv", type: "premium"},
+        {name: "Disney XD", url: "http://38.41.8.1:8000/play/a0rm", type: "premium"},
+        {name: "Nick Jr", url: "http://38.41.8.1:8000/play/a0zx", type: "premium"},
+        {name: "Discovery Kids", url: "http://38.41.8.1:8000/play/a0t7", type: "premium"},
+        {name: "Cartoon Network", url: "http://38.41.8.1:8000/play/a0sx", type: "premium"},
+        {name: "CNN", url: "http://38.41.8.1:8000/play/a0t3", type: "premium"},
+        {name: "CNN Espanol", url: "http://38.41.8.1:8000/play/a0rp", type: "premium"},
+        {name: "BBC World", url: "http://38.41.8.1:8000/play/a0sw", type: "premium"},
+        {name: "DW", url: "http://38.41.8.1:8000/play/a0sv", type: "premium"},
+        {name: "TeleSur", url: "http://38.41.8.1:8000/play/a0rm", type: "premium"},
+        {name: "MTV", url: "http://38.41.8.1:8000/play/a0sx", type: "premium"},
+        {name: "VH1", url: "http://38.41.8.1:8000/play/a0zx", type: "premium"},
+        {name: "Telehit", url: "http://38.41.8.1:8000/play/a0t7", type: "premium"},
+        {name: "Directv Sports", url: "http://38.41.8.1:8000/play/a0sv", type: "premium"},
+        {name: "BeIN Sports", url: "http://38.41.8.1:8000/play/a0rm", type: "premium"},
+        {name: "TyC Sports 2", url: "http://38.41.8.1:8000/play/a0t7", type: "premium"}
+    ];
+    
+    var filtered = channels;
+    var currentIdx = 0;
+    var hls = null;
+    var playing = false;
+    
+    function render() {
+        var html = '';
+        for (var i = 0; i < filtered.length; i++) {
+            var ch = filtered[i];
+            var active = i === currentIdx ? ' active' : '';
+            var badge = ch.type === 'custom' ? '<div class="ch-badge custom-badge">CUSTOM</div>' : '<div class="ch-badge premium-badge">PREMIUM</div>';
+            html += '<div class="ch-card' + active + '" onclick="select(' + i + ')">' + badge +
+                '<div class="name">' + ch.name + '</div>' +
+                '<div class="meta">1 stream</div>' +
+            '</div>';
+        }
+        document.getElementById('chGrid').innerHTML = html;
+        document.getElementById('chCount').textContent = filtered.length;
+    }
+    
+    function renderTabs() {
+        var types = {'all': 'Todo', 'custom': 'Custom', 'premium': 'Premium'};
+        var counts = {all: channels.length, custom: 0, premium: 0};
+        for (var i = 0; i < channels.length; i++) {
+            counts[channels[i].type]++;
+        }
+        var html = '';
+        for (var t in types) {
+            var active = (window.currentType || 'all') === t ? ' active' : '';
+            html += '<div class="type-tab' + active + '" onclick="setType(\'' + t + '\')">' + types[t] + ' (' + counts[t] + ')</div>';
+        }
+        document.getElementById('typeTabs').innerHTML = html;
+    }
+    
+    function setType(t) {
+        window.currentType = t;
+        if (t === 'all') {
+            filtered = channels;
+        } else {
+            filtered = [];
+            for (var i = 0; i < channels.length; i++) {
+                if (channels[i].type === t) filtered.push(channels[i]);
+            }
+        }
+        currentIdx = 0;
+        renderTabs();
+        render();
+    }
+    
+    function filter() {
+        var q = document.getElementById('search').value.toLowerCase();
+        var t = window.currentType || 'all';
+        filtered = [];
+        for (var i = 0; i < channels.length; i++) {
+            if (channels[i].name.toLowerCase().indexOf(q) >= 0 && (t === 'all' || channels[i].type === t)) {
+                filtered.push(channels[i]);
+            }
+        }
+        render();
+    }
+    
+    function select(i) {
+        currentIdx = i;
+        var ch = filtered[i];
+        if (ch) {
+            document.getElementById('chName').textContent = ch.name;
+            if (playing) loadUrl(ch.url);
+        }
+        render();
+    }
+    
+    function prev() { select((currentIdx - 1 + filtered.length) % filtered.length); }
+    function next() { select((currentIdx + 1) % filtered.length); }
+    
+    function loadUrl(url) {
+        var video = document.getElementById('video');
+        if (url.indexOf('.m3u8') > 0 && typeof Hls !== 'undefined') {
+            if (hls) hls.destroy();
+            hls = new Hls();
+            hls.loadSource(url);
+            hls.attachMedia(video);
+        } else {
+            video.src = url;
+        }
+        video.play();
+    }
+    
+    function play() {
+        playing = true;
+        var ch = filtered[currentIdx];
+        if (ch) loadUrl(ch.url);
+        document.getElementById('status').className = 'status live';
+        document.getElementById('status').innerHTML = '<span class="dot"></span><span>LIVE</span>';
+    }
+    
+    function startPlay() {
+        document.querySelector('.play-overlay').style.display = 'none';
+        play();
+    }
+    
+    renderTabs();
+    render();
+    </script>
+</body>
+</html>
