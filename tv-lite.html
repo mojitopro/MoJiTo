@@ -310,6 +310,71 @@
         var channels = [], filtered = [], currentIdx = 0, hls = null, playing = false, streams = [], streamIdx = 0;
         var started = false, currentCategory = 'all';
 
+        // Fallback static channels for old browsers
+        var STATIC_CHANNELS = [
+            {name: "MOVIES", url: "https://30a-tv.com/feeds/pzaz/30atvmovies.m3u8", type: "custom"},
+            {name: "NATIONAL GEOGRAPHIC", url: "https://live-fi.tvkaista.net/national-geographic/live.m3u8?src=freetv", type: "custom"},
+            {name: "Adult Swim", url: "http://190.60.59.67:8000/play/a0io", type: "premium"},
+            {name: "Adult Swim", url: "http://181.119.86.1:8000/play/a019", type: "premium"},
+            {name: "Nickelodeon", url: "http://45.169.163.237:4000/play/a01c", type: "premium"},
+            {name: "ESPN", url: "http://38.41.8.1:8000/play/a0t3", type: "premium"},
+            {name: "ESPN 2", url: "http://38.41.8.1:8000/play/a0rp", type: "premium"},
+            {name: "ESPN 3", url: "http://38.41.8.1:8000/play/a0sw", type: "premium"},
+            {name: "Fox Sports 1", url: "http://38.41.8.1:8000/play/a0sw", type: "premium"},
+            {name: "Fox Sports 2", url: "http://38.41.8.1:8000/play/a0sv", type: "premium"},
+            {name: "Fox Sports 3", url: "http://38.41.8.1:8000/play/a0rm", type: "premium"},
+            {name: "TNT Sports", url: "http://38.41.8.1:8000/play/a0sx", type: "premium"},
+            {name: "TyC Sports", url: "http://38.41.8.1:8000/play/a0zx", type: "premium"},
+            {name: "Win Sports", url: "http://38.41.8.1:8000/play/a0t3", type: "premium"},
+            {name: "Gol TV", url: "http://38.41.8.1:8000/play/a0rp", type: "premium"},
+            {name: "HBO", url: "http://45.181.120.65:9087/play/128/index.m3u8", type: "premium"},
+            {name: "HBO 2", url: "http://45.181.120.65:9087/play/130/index.m3u8", type: "premium"},
+            {name: "Cinemax", url: "http://38.41.8.1:8000/play/a0rp", type: "premium"},
+            {name: "Star Channel", url: "http://45.181.120.65:9087/play/109/index.m3u8", type: "premium"},
+            {name: "TNT", url: "http://38.41.8.1:8000/play/a0sv", type: "premium"},
+            {name: "Space", url: "http://38.41.8.1:8000/play/a0rm", type: "premium"},
+            {name: "Cinecanal", url: "http://38.41.8.1:8000/play/a0sx", type: "premium"},
+            {name: "Golden", url: "http://38.41.8.1:8000/play/a0zx", type: "premium"},
+            {name: "Golden Edge", url: "http://38.41.8.1:8000/play/a0t7", type: "premium"},
+            {name: "Studio Universal", url: "http://38.41.8.1:8000/play/a0rp", type: "premium"},
+            {name: "TBS", url: "http://38.41.8.1:8000/play/a0sw", type: "premium"},
+            {name: "Warner Channel", url: "http://38.41.8.1:8000/play/a0zx", type: "premium"},
+            {name: "Sony Channel", url: "http://38.41.8.1:8000/play/a0t7", type: "premium"},
+            {name: "Universal Channel", url: "http://38.41.8.1:8000/play/a0t3", type: "premium"},
+            {name: "AXN", url: "http://38.41.8.1:8000/play/a0rp", type: "premium"},
+            {name: "FX", url: "http://38.41.8.1:8000/play/a0sw", type: "premium"},
+            {name: "AMC", url: "http://38.41.8.1:8000/play/a0t3", type: "premium"},
+            {name: "Paramount", url: "http://38.41.8.1:8000/play/a0sx", type: "premium"},
+            {name: "Discovery Channel", url: "http://38.41.8.1:8000/play/a0rm", type: "premium"},
+            {name: "Discovery Home", url: "http://38.41.8.1:8000/play/a0sx", type: "premium"},
+            {name: "Discovery ID", url: "http://38.41.8.1:8000/play/a0zx", type: "premium"},
+            {name: "History", url: "http://38.41.8.1:8000/play/a0t7", type: "premium"},
+            {name: "Nat Geo", url: "http://38.41.8.1:8000/play/a0t3", type: "premium"},
+            {name: "Animal Planet", url: "http://38.41.8.1:8000/play/a0rp", type: "premium"},
+            {name: "Disney Channel", url: "http://38.41.8.1:8000/play/a0sv", type: "premium"},
+            {name: "Disney XD", url: "http://38.41.8.1:8000/play/a0rm", type: "premium"},
+            {name: "Nick Jr", url: "http://38.41.8.1:8000/play/a0zx", type: "premium"},
+            {name: "Discovery Kids", url: "http://38.41.8.1:8000/play/a0t7", type: "premium"},
+            {name: "Cartoon Network", url: "http://38.41.8.1:8000/play/a0sx", type: "premium"},
+            {name: "CNN", url: "http://38.41.8.1:8000/play/a0t3", type: "premium"},
+            {name: "CNN Espanol", url: "http://38.41.8.1:8000/play/a0rp", type: "premium"},
+            {name: "BBC World", url: "http://38.41.8.1:8000/play/a0sw", type: "premium"},
+            {name: "DW", url: "http://38.41.8.1:8000/play/a0sv", type: "premium"},
+            {name: "TeleSur", url: "http://38.41.8.1:8000/play/a0rm", type: "premium"},
+            {name: "MTV", url: "http://38.41.8.1:8000/play/a0sx", type: "premium"},
+            {name: "VH1", url: "http://38.41.8.1:8000/play/a0zx", type: "premium"},
+            {name: "Telehit", url: "http://38.41.8.1:8000/play/a0t7", type: "premium"},
+            {name: "Movistar Deportes", url: "http://45.177.21.6:9000/play/a01c", type: "premium"},
+            {name: "Directv Sports", url: "http://38.41.8.1:8000/play/a0sv", type: "premium"},
+            {name: "BeIN Sports", url: "http://38.41.8.1:8000/play/a0rm", type: "premium"},
+            {name: "ESPN 4", url: "http://38.41.8.1:8000/play/a0sv", type: "premium"},
+            {name: "ESPN 5", url: "http://38.41.8.1:8000/play/a0rm", type: "premium"},
+            {name: "ESPN 6", url: "http://38.41.8.1:8000/play/a0sx", type: "premium"},
+            {name: "ESPN 7", url: "http://38.41.8.1:8000/play/a0zx", type: "premium"},
+            {name: "ESPN Premium", url: "http://38.41.8.1:8000/play/a0t7", type: "premium"},
+            {name: "TyC Sports 2", url: "http://38.41.8.1:8000/play/a0t7", type: "premium"}
+        ];
+
         var CATEGORY_ORDER = {
             'all': 0,
             'custom': 1,
@@ -343,12 +408,22 @@
         function loadChannels() {
             request('/api/unified', function(err, resp) {
                 if (err) {
-                    showToast('Error cargando canales: ' + err, 'error');
+                    console.log('API failed, using static channels');
+                    channels = STATIC_CHANNELS.map(function(ch) {
+                        return {name: ch.name, url: ch.url, type: ch.type, category: 'General', streams: 1, backups: [ch.url]};
+                    });
+                    useStaticChannels();
                     return;
                 }
                 try {
                     var data = JSON.parse(resp);
-                    channels = data.channels || [];
+                    if (data.channels && data.channels.length > 0) {
+                        channels = data.channels;
+                    } else {
+                        channels = STATIC_CHANNELS.map(function(ch) {
+                            return {name: ch.name, url: ch.url, type: ch.type, category: 'General', streams: 1, backups: [ch.url]};
+                        });
+                    }
                     organizeChannels();
                     filtered = channels;
                     renderCategories();
@@ -358,9 +433,23 @@
                         selectChannel(0);
                     }
                 } catch(e) {
-                    showToast('Error parse: ' + e, 'error');
+                    channels = STATIC_CHANNELS.map(function(ch) {
+                        return {name: ch.name, url: ch.url, type: ch.type, category: 'General', streams: 1, backups: [ch.url]};
+                    });
+                    useStaticChannels();
                 }
             });
+        }
+
+        function useStaticChannels() {
+            organizeChannels();
+            filtered = channels;
+            renderCategories();
+            document.getElementById('chCount').textContent = channels.length;
+            renderChannels();
+            if (channels.length > 0) {
+                selectChannel(0);
+            }
         }
 
         function organizeChannels() {
@@ -372,7 +461,7 @@
                 var catA = CATEGORY_ORDER[a.category] || 99;
                 var catB = CATEGORY_ORDER[b.category] || 99;
                 if (catA !== catB) return catA - catB;
-                return b.streams - a.streams;
+                return (b.streams || 1) - (a.streams || 1);
             });
         }
 
@@ -412,21 +501,26 @@
             }
             for (var i = 0; i < filtered.length; i++) {
                 var ch = filtered[i];
-                var hd = ch.streams > 1 || isHD(ch.url);
+                var streams = ch.streams || ch.backups ? (ch.backups ? ch.backups.length : 1) : 1;
+                var hd = streams > 1 || isHD(ch.url);
                 var active = i === currentIdx ? ' active' : '';
-                var badge = ch.streams > 3 ? '<div class="ch-badge"></div>' : '';
+                var badge = '';
+                var typeLabel = ch.type || 'normal';
+                if (typeLabel === 'custom') badge = '<div class="ch-badge custom-badge">CUSTOM</div>';
+                else if (typeLabel === 'premium') badge = '<div class="ch-badge premium-badge">PREMIUM</div>';
+                else if (typeLabel === 'verified') badge = '<div class="ch-badge verified-badge">VERIFIED</div>';
                 html += '<div class="ch-card' + active + '" data-idx="' + i + '">' + badge +
                     '<div class="name">' + ch.name + '</div>' +
                     '<div class="meta">' +
                         (hd ? '<span class="quality">HD</span>' : '<span></span>') +
-                        '<span class="sources">' + ch.streams + '</span>' +
+                        '<span class="sources">' + streams + '</span>' +
                     '</div>' +
                 '</div>';
             }
             container.innerHTML = html;
         }
 
-function filterChannels() {
+        function filterChannels() {
             var q = document.getElementById('search').value.toLowerCase();
             var cat = currentCategory;
             filtered = [];
